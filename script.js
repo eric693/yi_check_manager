@@ -1909,43 +1909,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         initLeaveTab();
     });
 
-    tabAdminBtn.addEventListener('click', () => {
-        // 簡化版：直接切換分頁
-        // 按鈕只有管理員能看到，無需再次驗證
-        switchTab('admin-view');
-    });
-    // tabAdminBtn.addEventListener('click', async () => {
-    
-    //     // 獲取按鈕元素和處理中文字
-    //     const button = tabAdminBtn; // tabAdminBtn 變數本身就是按鈕元素
-    //     const loadingText = t('CHECKING') || '檢查中...'; // 可以使用更貼切的翻譯
-
-    //     // A. 進入處理中狀態
-    //     generalButtonState(button, 'processing', loadingText);
-        
-    //     try {
-    //         // 呼叫 API 檢查 Session 和權限
-    //         const res = await callApifetch("checkSession");
-            
-    //         // 檢查回傳的結果和權限
-    //         if (res.ok && res.user && res.user.dept === "管理員") {
-    //             // 如果 Session 有效且是管理員，執行頁籤切換
-    //             switchTab('admin-view');
-    //         } else {
-    //             // 如果權限不足或 Session 無效，給予錯誤提示
-    //             showNotification(t("ERR_NO_PERMISSION"), "error");
-    //         }
-            
-    //     } catch (err) {
-    //         // 處理網路錯誤或 API 呼叫失敗
-    //         console.error(err);
-    //         showNotification(t("NETWORK_ERROR") || '網絡錯誤', "error");
-            
-    //     } finally {
-    //         // B. 無論 API 成功、失敗或網路錯誤，都要恢復按鈕狀態
-    //         generalButtonState(button, 'idle');
-    //     }
+    // tabAdminBtn.addEventListener('click', () => {
+    //     // 簡化版：直接切換分頁
+    //     // 按鈕只有管理員能看到，無需再次驗證
+    //     switchTab('admin-view');
     // });
+    tabAdminBtn.addEventListener('click', async () => {
+    
+        // 獲取按鈕元素和處理中文字
+        const button = tabAdminBtn;
+        const loadingText = t('CHECKING') || '檢查中...';
+        
+        // A. 進入處理中狀態
+        generalButtonState(button, 'processing', loadingText);
+        
+        try {
+            // ✅ 修正：改用 initApp（與 ensureLogin 一致）
+            const res = await callApifetch("initApp");
+            
+            console.log('🔍 管理員權限檢查:', res);
+            console.log('   - ok:', res.ok);
+            console.log('   - user:', res.user);
+            console.log('   - dept:', res.user?.dept);
+            
+            // 檢查回傳的結果和權限
+            if (res.ok && res.user && res.user.dept === "管理員") {
+                console.log('✅ 管理員權限驗證通過');
+                // 如果 Session 有效且是管理員，執行頁籤切換
+                switchTab('admin-view');
+            } else {
+                console.log('❌ 權限驗證失敗');
+                console.log('   實際部門:', res.user?.dept);
+                // 如果權限不足或 Session 無效，給予錯誤提示
+                showNotification(t("ERR_NO_PERMISSION") || "您沒有權限執行此操作", "error");
+            }
+            
+        } catch (err) {
+            // 處理網路錯誤或 API 呼叫失敗
+            console.error('❌ API 呼叫錯誤:', err);
+            showNotification(t("NETWORK_ERROR") || '網絡錯誤', "error");
+            
+        } finally {
+            // B. 無論 API 成功、失敗或網路錯誤，都要恢復按鈕狀態
+            generalButtonState(button, 'idle');
+        }
+    });
     // 月曆按鈕事件
     document.getElementById('prev-month').addEventListener('click', () => {
         currentMonthDate.setMonth(currentMonthDate.getMonth() - 1);
