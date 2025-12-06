@@ -2014,6 +2014,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderDailyRecords(date);
         }
     });
+    displayAnnouncements();
 });
 
 /**
@@ -2303,43 +2304,3 @@ function deleteAnnouncement(id) {
     displayAnnouncements();
     showNotification('公告已刪除', 'success');
 }
-
-// 初始化
-document.addEventListener('DOMContentLoaded', () => {
-    // 顯示公告
-    displayAnnouncements();
-    
-    // 管理員發布公告
-    const submitBtn = document.getElementById('submit-announcement-btn');
-    if (submitBtn) {
-        submitBtn.addEventListener('click', () => {
-            const title = document.getElementById('announcement-title').value.trim();
-            const content = document.getElementById('announcement-content').value.trim();
-            const priority = document.getElementById('announcement-priority').value;
-            
-            if (!title || !content) {
-                showNotification('標題和內容不可為空', 'error');
-                return;
-            }
-            
-            const announcements = loadAnnouncements();
-            announcements.unshift({
-                id: Date.now().toString(),
-                title,
-                content,
-                priority,
-                createdAt: new Date().toISOString()
-            });
-            
-            saveAnnouncements(announcements);
-            
-            document.getElementById('announcement-title').value = '';
-            document.getElementById('announcement-content').value = '';
-            document.getElementById('announcement-priority').value = 'normal';
-            
-            displayAdminAnnouncements();
-            displayAnnouncements();
-            showNotification('公告已發布！', 'success');
-        });
-    }
-});
