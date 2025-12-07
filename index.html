@@ -69,6 +69,9 @@
                 });
             });
         </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -914,6 +917,81 @@
                                     新增地點
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                    <!-- 員工打卡分析區塊 -->
+                    <div class="card p-6 mt-6">
+                        <h2 data-i18n="ADMIN_PUNCH_ANALYSIS_TITLE" class="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                            員工打卡分析
+                        </h2>
+                        <p data-i18n="ADMIN_PUNCH_ANALYSIS_DESC" class="text-gray-500 dark:text-gray-400 mb-4">
+                            查看員工每月打卡時間分布與工時統計
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <!-- 選擇員工 -->
+                            <div>
+                                <label data-i18n="ANALYSIS_EMPLOYEE_LABEL" for="analysis-employee" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    選擇員工
+                                </label>
+                                <select id="analysis-employee" 
+                                        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">
+                                    <option value="" data-i18n="ANALYSIS_SELECT_EMPLOYEE">請選擇員工</option>
+                                </select>
+                            </div>
+                            
+                            <!-- 選擇月份 -->
+                            <div>
+                                <label data-i18n="ANALYSIS_MONTH_LABEL" for="analysis-month" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    選擇月份
+                                </label>
+                                <input type="month" 
+                                    id="analysis-month" 
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">
+                            </div>
+                            
+                            <!-- 查詢按鈕 -->
+                            <button id="load-punch-analysis-btn" 
+                                    data-i18n="BTN_LOAD_ANALYSIS"
+                                    class="w-full py-3 px-4 rounded-lg font-bold btn-primary">
+                                載入分析圖表
+                            </button>
+                        </div>
+                        
+                        <!-- 圖表容器 -->
+                        <div id="punch-analysis-container" class="mt-6" style="display: none;">
+                            <!-- 工時統計圖 -->
+                            <div class="mb-6">
+                                <h3 data-i18n="CHART_WORK_HOURS_TITLE" class="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                                    每日工作時數
+                                </h3>
+                                <canvas id="work-hours-chart"></canvas>
+                            </div>
+                            
+                            <!-- 打卡時間分布圖 -->
+                            <div>
+                                <h3 data-i18n="CHART_PUNCH_TIME_TITLE" class="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                                    打卡時間分布
+                                </h3>
+                                <canvas id="punch-time-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- 載入中 -->
+                        <div id="punch-analysis-loading" 
+                            data-i18n="ANALYSIS_LOADING" 
+                            class="text-center text-gray-500 dark:text-gray-400 py-4" 
+                            style="display: none;">
+                            正在載入分析資料...
+                        </div>
+                        
+                        <!-- 無資料提示 -->
+                        <div id="punch-analysis-empty" 
+                            class="text-center text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4" 
+                            style="display: none;">
+                            <p data-i18n="ANALYSIS_NO_DATA" class="font-semibold">
+                                該月份無打卡記錄
+                            </p>
                         </div>
                     </div>
                     <div class="card p-6 mt-6">
