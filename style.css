@@ -509,3 +509,68 @@ html.dark .info-value {
 .info-card.salary-card .info-value {
     color: white;
 }
+
+/* ======================================= */
+/* 地點管理功能樣式 (Location Management) */
+/* ======================================= */
+
+/* 自訂拉桿樣式 */
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #4F46E5;
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #4F46E5;
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    border: none;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    background: #4338CA;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    background: #4338CA;
+}
+
+html.dark input[type="range"]::-webkit-slider-thumb {
+    background: #818CF8;
+}
+
+html.dark input[type="range"]::-moz-range-thumb {
+    background: #818CF8;
+}
+
+/* 搜尋結果樣式 */
+#search-results-list li {
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s;
+}
+
+#search-results-list li:hover {
+    background-color: #f3f4f6;
+}
+
+html.dark #search-results-list li {
+    border-bottom: 1px solid #4b5563;
+}
+
+html.dark #search-results-list li:hover {
+    background-color: #374151;
+}
+
+#search-results-list li:last-child {
+    border-bottom: none;
+}

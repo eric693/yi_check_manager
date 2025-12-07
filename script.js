@@ -1064,6 +1064,134 @@ async function renderDailyRecords(dateKey) {
     }
 }
 
+// ==================== 地點搜尋功能 ====================
+
+/**
+ * 使用 Nominatim API 搜尋地點
+ */
+async function searchLocation(query) {
+    if (!query || query.trim() === '') {
+        return [];
+    }
+    
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=zh-TW`
+        );
+        
+        if (!response.ok) {
+            throw new Error('搜尋失敗');
+        }
+        
+        const results = await response.json();
+        return results;
+        
+    } catch (error) {
+        console.error('地點搜尋錯誤:', error);
+        showNotification('搜尋失敗，請檢查網路連線', 'error');
+        return [];
+    }
+}
+
+/**
+ * 顯示搜尋結果
+ */
+function displaySearchResults(results) {
+    const resultsList = document.getElementById('search-results-list');
+    const resultsContainer = document.getElementById('search-results');
+    
+    if (!resultsList || !resultsContainer) return;
+    
+    resultsList.innerHTML = '';
+    
+    if (results.length === 0) {
+        resultsContainer.classList.add('hidden');
+        showNotification('找不到相關地點', 'warning');
+        return;
+    }
+    
+    resultsContainer.classList.remove('hidden');
+    
+    results.forEach(result => {
+        const li = document.createElement('li');
+        li.className = 'text-sm text-gray-800 dark:text-gray-200';
+        li.innerHTML = `
+            <div class="font-semibold">${result.display_name}</div>
+            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                ${parseFloat(result.lat).toFixed(6)}, ${parseFloat(result.lon).toFixed(6)}
+            </div>
+        `;
+        
+        li.addEventListener('click', () => {
+            selectSearchResult(result);
+        });
+        
+        resultsList.appendChild(li);
+    });
+}
+
+/**
+ * 選擇搜尋結果
+ */
+function selectSearchResult(result) {
+    const nameInput = document.getElementById('location-name');
+    const latInput = document.getElementById('location-lat');
+    const lngInput = document.getElementById('location-lng');
+    const addBtn = document.getElementById('add-location-btn');
+    const resultsContainer = document.getElementById('search-results');
+    
+    if (nameInput) nameInput.value = result.display_name.split(',')[0].trim();
+    if (latInput) latInput.value = parseFloat(result.lat).toFixed(6);
+    if (lngInput) lngInput.value = parseFloat(result.lon).toFixed(6);
+    if (addBtn) addBtn.disabled = false;
+    if (resultsContainer) resultsContainer.classList.add('hidden');
+    
+    // 更新地圖標記
+    if (mapInstance && marker) {
+        const coords = [parseFloat(result.lat), parseFloat(result.lon)];
+        currentCoords = coords;
+        mapInstance.setView(coords, 18);
+        marker.setLatLng(coords);
+        
+        // 更新圓形範圍
+        const radius = parseInt(document.getElementById('location-radius').value);
+        if (circle) {
+            circle.setLatLng(coords);
+            circle.setRadius(radius);
+        } else {
+            circle = L.circle(coords, {
+                color: 'blue',
+                fillColor: '#30f',
+                fillOpacity: 0.2,
+                radius: radius
+            }).addTo(mapInstance);
+        }
+    }
+    
+    showNotification('已選擇地點', 'success');
+}
+
+// ==================== 範圍調整拉桿 ====================
+
+/**
+ * 初始化範圍拉桿
+ */
+function initRadiusSlider() {
+    const slider = document.getElementById('location-radius');
+    const valueDisplay = document.getElementById('radius-value');
+    
+    if (!slider || !valueDisplay) return;
+    
+    slider.addEventListener('input', (e) => {
+        const value = e.target.value;
+        valueDisplay.textContent = value;
+        
+        // 即時更新地圖上的圓形範圍
+        if (circle && currentCoords) {
+            circle.setRadius(parseInt(value));
+        }
+    });
+}
 document.addEventListener('DOMContentLoaded', async () => {
     
     const loginBtn = document.getElementById('login-btn');
@@ -1410,11 +1538,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         getLocationBtn.disabled = true;
         
         navigator.geolocation.getCurrentPosition((pos) => {
-            locationLatInput.value = pos.coords.latitude;
-            locationLngInput.value = pos.coords.longitude;
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            const radius = parseInt(document.getElementById('location-radius').value); // 新增
+            
+            locationLatInput.value = lat.toFixed(6);
+            locationLngInput.value = lng.toFixed(6);
             getLocationBtn.textContent = '已取得';
             addLocationBtn.disabled = false;
-            showNotification("位置已成功取得！", "success");
+            
+            // 新增：更新地圖和圓形範圍
+            if (mapInstance) {
+                const coords = [lat, lng];
+                currentCoords = coords;
+                mapInstance.setView(coords, 18);
+                
+                if (marker) {
+                    marker.setLatLng(coords);
+                } else {
+                    marker = L.marker(coords).addTo(mapInstance);
+                }
+                
+                // 顯示圓形範圍
+                if (circle) {
+                    circle.setLatLng(coords);
+                    circle.setRadius(radius);
+                } else {
+                    circle = L.circle(coords, {
+                        color: 'blue',
+                        fillColor: '#30f',
+                        fillOpacity: 0.2,
+                        radius: radius
+                    }).addTo(mapInstance);
+                }
+            }
+            
+            showNotification('位置已成功取得！', 'success');
         }, (err) => {
             showNotification(t("ERROR_GEOLOCATION", { msg: err.message }), "error");
             getLocationBtn.textContent = '取得當前位置';
@@ -1426,6 +1585,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = document.getElementById('location-name').value;
         const lat = document.getElementById('location-lat').value;
         const lng = document.getElementById('location-lng').value;
+        const radius = document.getElementById('location-radius').value; // 新增
         
         if (!name || !lat || !lng) {
             showNotification("請填寫所有欄位並取得位置", "error");
@@ -1433,17 +1593,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         try {
-            const res = await callApifetch(`addLocation&name=${encodeURIComponent(name)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`);
+            // 加入 radius 參數
+            const res = await callApifetch(`addLocation&name=${encodeURIComponent(name)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&radius=${radius}`);
             if (res.ok) {
                 showNotification("地點新增成功！", "success");
+                
                 // 清空輸入欄位
                 document.getElementById('location-name').value = '';
                 document.getElementById('location-lat').value = '';
                 document.getElementById('location-lng').value = '';
+                document.getElementById('location-search').value = ''; // 新增
+                document.getElementById('location-radius').value = 200; // 新增
+                document.getElementById('radius-value').textContent = '200'; // 新增
+                
                 // 重設按鈕狀態
                 getLocationBtn.textContent = '取得當前位置';
                 getLocationBtn.disabled = false;
                 addLocationBtn.disabled = true;
+                
+                // 新增：清除地圖上的圓形
+                if (circle) {
+                    mapInstance.removeLayer(circle);
+                    circle = null;
+                }
             } else {
                 showNotification("新增地點失敗：" + res.msg, "error");
             }
@@ -1512,6 +1684,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         
     };
     
+    // 初始化拉桿
+    initRadiusSlider();
+    
+    // 🔍 搜尋功能事件綁定
+    const searchBtn = document.getElementById('search-location-btn');
+    const searchInput = document.getElementById('location-search');
+    
+    if (searchBtn && searchInput) {
+        // 點擊搜尋按鈕
+        searchBtn.addEventListener('click', async () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                const results = await searchLocation(query);
+                displaySearchResults(results);
+            }
+        });
+        
+        // Enter 鍵搜尋
+        searchInput.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    const results = await searchLocation(query);
+                    displaySearchResults(results);
+                }
+            }
+        });
+    }
+    
+    // 點擊外部關閉搜尋結果
+    document.addEventListener('click', (e) => {
+        const resultsContainer = document.getElementById('search-results');
+        const searchInput = document.getElementById('location-search');
+        const searchBtn = document.getElementById('search-location-btn');
+        
+        if (resultsContainer && 
+            !resultsContainer.contains(e.target) && 
+            e.target !== searchInput && 
+            e.target !== searchBtn) {
+            resultsContainer.classList.add('hidden');
+        }
+    });
     // 語系初始化
     let currentLang = localStorage.getItem("lang"); // 先從 localStorage 讀取上次的設定
     

@@ -803,21 +803,102 @@
                     
                     <div class="card p-6 mt-6">
                         <h2 data-i18n="ADD_LOCATION_TITLE" class="text-xl font-bold text-gray-800 dark:text-white mb-2">新增打卡地點</h2>
-                        <p data-i18n="ADD_LOCATION_DESCRIPTION" class="text-gray-500 dark:text-gray-400 mb-4">輸入地點名稱,並使用您的當前位置作為經緯度。</p>
+                        <p data-i18n="ADD_LOCATION_DESCRIPTION" class="text-gray-500 dark:text-gray-400 mb-4">輸入地點名稱，並使用您的當前位置作為經緯度。</p>
+                        
                         <div class="space-y-4">
+                            <!-- 🔍 地點搜尋功能 -->
                             <div>
-                                <label data-i18n="LOCATION_NAME_LABEL" for="location-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">地點名稱</label>
-                                <input type="text" id="location-name" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            </div>
-                            <div>
-                                <label data-i18n="COORDINATES_LAT_LNG_LABEL" class="block text-sm font-medium text-gray-700 dark:text-gray-300">經緯度 (Latitude / Longitude)</label>
-                                <div class="mt-1 flex space-x-2">
-                                    <input type="text" id="location-lat" placeholder="緯度" readonly class="block w-1/2 rounded-md border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 dark:text-white shadow-sm sm:text-sm cursor-not-allowed">
-                                    <input type="text" id="location-lng" placeholder="經度" readonly class="block w-1/2 rounded-md border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 dark:text-white shadow-sm sm:text-sm cursor-not-allowed">
+                                <label for="location-search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    🔍 搜尋地點
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        id="location-search" 
+                                        placeholder="輸入地址或地點名稱搜尋..." 
+                                        class="w-full p-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                                    <button 
+                                        id="search-location-btn" 
+                                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div id="search-results" class="mt-2 max-h-48 overflow-y-auto hidden">
+                                    <ul id="search-results-list" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg"></ul>
                                 </div>
                             </div>
-                            <button data-i18n="GET_LOCATION_BTN" id="get-location-btn" class="w-full py-2 px-4 rounded-lg font-bold btn-secondary">取得當前位置</button>
-                            <button data-i18n="ADD_LOCATION_BTN" id="add-location-btn" class="w-full py-2 px-4 rounded-lg font-bold btn-primary" disabled>新增地點</button>
+                    
+                            <!-- 地點名稱 -->
+                            <div>
+                                <label data-i18n="LOCATION_NAME_LABEL" for="location-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">地點名稱</label>
+                                <input 
+                                    type="text" 
+                                    id="location-name" 
+                                    placeholder="例如：台北101" 
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                    
+                            <!-- 經緯度 -->
+                            <div>
+                                <label data-i18n="COORDINATES_LAT_LNG_LABEL" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">經緯度</label>
+                                <div class="flex space-x-2">
+                                    <input 
+                                        type="text" 
+                                        id="location-lat" 
+                                        placeholder="緯度" 
+                                        readonly 
+                                        class="w-1/2 p-2 rounded-md border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 dark:text-white shadow-sm cursor-not-allowed">
+                                    <input 
+                                        type="text" 
+                                        id="location-lng" 
+                                        placeholder="經度" 
+                                        readonly 
+                                        class="w-1/2 p-2 rounded-md border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 dark:text-white shadow-sm cursor-not-allowed">
+                                </div>
+                            </div>
+                    
+                            <!-- 📍 打卡範圍調整 -->
+                            <div>
+                                <label for="location-radius" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    打卡範圍
+                                </label>
+                                <div class="flex items-center space-x-4">
+                                    <input 
+                                        type="range" 
+                                        id="location-radius" 
+                                        min="50" 
+                                        max="500" 
+                                        step="10" 
+                                        value="200" 
+                                        class="flex-1 h-2 bg-indigo-200 rounded-lg appearance-none cursor-pointer dark:bg-indigo-700">
+                                    <div class="flex items-center space-x-2">
+                                        <span id="radius-value" class="text-lg font-bold text-indigo-600 dark:text-indigo-400">200</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">m</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    拖移滑桿以調整允許打卡的半徑（公尺）。
+                                </p>
+                            </div>
+                    
+                            <!-- 按鈕組 -->
+                            <div class="space-y-2">
+                                <button 
+                                    data-i18n="GET_LOCATION_BTN" 
+                                    id="get-location-btn" 
+                                    class="w-full py-3 px-4 rounded-lg font-bold btn-secondary">
+                                    取得當前位置
+                                </button>
+                                <button 
+                                    data-i18n="ADD_LOCATION_BTN" 
+                                    id="add-location-btn" 
+                                    class="w-full py-3 px-4 rounded-lg font-bold btn-primary" 
+                                    disabled>
+                                    新增地點
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="card p-6 mt-6">
