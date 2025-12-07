@@ -200,7 +200,47 @@
                                 下班打卡
                             </button>
                         </div>
-                        
+                        <!-- 👇 新增：生物辨識快速打卡區 -->
+                        <div id="biometric-punch-section" class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
+                                        生物辨識快速打卡
+                                    </h3>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        使用 Face ID 或指紋一鍵打卡
+                                    </p>
+                                </div>
+                                <div id="biometric-status" class="text-xs">
+                                    <span id="biometric-not-setup" class="text-gray-400">未設定</span>
+                                    <span id="biometric-ready" class="text-green-600 hidden">已啟用</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 設定生物辨識按鈕 -->
+                            <button id="setup-biometric-btn" 
+                                    class="w-full py-2 px-4 rounded-lg font-semibold text-sm bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 transition-all mb-2">
+                                設定生物辨識打卡
+                            </button>
+                            
+                            <!-- 快速打卡按鈕（設定後顯示） -->
+                            <div id="biometric-punch-buttons" class="grid grid-cols-2 gap-3 hidden">
+                                <button id="biometric-punch-in-btn" 
+                                        class="py-2 px-4 rounded-lg font-semibold text-sm bg-green-600 hover:bg-green-700 text-white transition-all flex items-center justify-center space-x-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <span>上班打卡</span>
+                                </button>
+                                <button id="biometric-punch-out-btn" 
+                                        class="py-2 px-4 rounded-lg font-semibold text-sm bg-red-600 hover:bg-red-700 text-white transition-all flex items-center justify-center space-x-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <span>下班打卡</span>
+                                </button>
+                            </div>
+                        </div>
                         <!-- 👇 新增 LINE 頻道快速加入按鈕 -->
                         <a href="https://line.me/R/ti/p/@625rauip" 
                         target="_blank"

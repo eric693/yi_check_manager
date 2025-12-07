@@ -1767,6 +1767,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 localStorage.setItem("sessionToken", res.sToken);
                 history.replaceState({}, '', window.location.pathname);
                 ensureLogin();
+                initBiometricPunch();
             } else {
                 showNotification(t("ERROR_LOGIN_FAILED", { msg: res.msg || t("UNKNOWN_ERROR") }), "error");
                 loginBtn.style.display = 'block';
@@ -1777,6 +1778,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } else {
         ensureLogin();
+        initBiometricPunch();
     }
     
     // 綁定按鈕事件
@@ -2962,4 +2964,220 @@ function getDayOfWeek(dateString) {
 function timeToDecimal(timeStr) {
     const [hours, minutes] = timeStr.split(':').map(Number);
     return hours + (minutes / 60);
+}
+
+// ==================== 生物辨識快速打卡功能 ====================
+
+/**
+ * 檢查瀏覽器是否支援 WebAuthn
+ */
+function checkBiometricSupport() {
+    return window.PublicKeyCredential !== undefined && 
+           navigator.credentials !== undefined;
+}
+
+/**
+ * 初始化生物辨識打卡功能
+ */
+async function initBiometricPunch() {
+    const setupBtn = document.getElementById('setup-biometric-btn');
+    const biometricInBtn = document.getElementById('biometric-punch-in-btn');
+    const biometricOutBtn = document.getElementById('biometric-punch-out-btn');
+    const notSetupStatus = document.getElementById('biometric-not-setup');
+    const readyStatus = document.getElementById('biometric-ready');
+    const biometricButtons = document.getElementById('biometric-punch-buttons');
+    
+    if (!setupBtn) return;
+    
+    // 檢查支援度
+    if (!checkBiometricSupport()) {
+        setupBtn.textContent = '您的瀏覽器不支援生物辨識';
+        setupBtn.disabled = true;
+        setupBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        return;
+    }
+    
+    // 檢查是否已設定
+    const credentialId = localStorage.getItem('biometric_credential_id');
+    if (credentialId) {
+        setupBtn.classList.add('hidden');
+        biometricButtons.classList.remove('hidden');
+        notSetupStatus.classList.add('hidden');
+        readyStatus.classList.remove('hidden');
+    }
+    
+    // 設定生物辨識
+    setupBtn.addEventListener('click', async () => {
+        try {
+            showNotification('請使用 Face ID 或指紋進行驗證...', 'info');
+            
+            const userId = localStorage.getItem('sessionUserId');
+            if (!userId) {
+                showNotification('請先登入', 'error');
+                return;
+            }
+            
+            // 建立 credential
+            const credential = await registerBiometric(userId);
+            
+            if (credential) {
+                // 儲存 credential ID
+                localStorage.setItem('biometric_credential_id', credential.id);
+                localStorage.setItem('biometric_user_id', userId);
+                
+                // 更新 UI
+                setupBtn.classList.add('hidden');
+                biometricButtons.classList.remove('hidden');
+                notSetupStatus.classList.add('hidden');
+                readyStatus.classList.remove('hidden');
+                
+                showNotification('生物辨識設定成功！', 'success');
+            }
+            
+        } catch (error) {
+            console.error('生物辨識設定失敗:', error);
+            showNotification('設定失敗，請稍後再試', 'error');
+        }
+    });
+    
+    // 生物辨識上班打卡
+    if (biometricInBtn) {
+        biometricInBtn.addEventListener('click', () => biometricPunch('上班'));
+    }
+    
+    // 生物辨識下班打卡
+    if (biometricOutBtn) {
+        biometricOutBtn.addEventListener('click', () => biometricPunch('下班'));
+    }
+}
+
+/**
+ * 註冊生物辨識
+ */
+async function registerBiometric(userId) {
+    try {
+        // 產生隨機 challenge
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        
+        const publicKeyCredentialCreationOptions = {
+            challenge: challenge,
+            rp: {
+                name: "出勤管家",
+                id: window.location.hostname
+            },
+            user: {
+                id: Uint8Array.from(userId, c => c.charCodeAt(0)),
+                name: userId,
+                displayName: document.getElementById('user-name')?.textContent || userId
+            },
+            pubKeyCredParams: [
+                { alg: -7, type: "public-key" },  // ES256
+                { alg: -257, type: "public-key" } // RS256
+            ],
+            authenticatorSelection: {
+                authenticatorAttachment: "platform", // 使用裝置內建的生物辨識
+                userVerification: "required"
+            },
+            timeout: 60000,
+            attestation: "none"
+        };
+        
+        const credential = await navigator.credentials.create({
+            publicKey: publicKeyCredentialCreationOptions
+        });
+        
+        return credential;
+        
+    } catch (error) {
+        console.error('註冊失敗:', error);
+        throw error;
+    }
+}
+
+/**
+ * 使用生物辨識進行打卡
+ */
+async function biometricPunch(type) {
+    try {
+        const credentialId = localStorage.getItem('biometric_credential_id');
+        const storedUserId = localStorage.getItem('biometric_user_id');
+        const currentUserId = localStorage.getItem('sessionUserId');
+        
+        if (!credentialId || storedUserId !== currentUserId) {
+            showNotification('請重新設定生物辨識', 'error');
+            return;
+        }
+        
+        showNotification(`請使用 Face ID 或指紋驗證...`, 'info');
+        
+        // 驗證生物辨識
+        const verified = await verifyBiometric(credentialId);
+        
+        if (verified) {
+            // 驗證成功，執行打卡
+            await doPunch(type);
+        } else {
+            showNotification('驗證失敗', 'error');
+        }
+        
+    } catch (error) {
+        console.error('生物辨識打卡失敗:', error);
+        
+        if (error.name === 'NotAllowedError') {
+            showNotification('您取消了驗證', 'warning');
+        } else {
+            showNotification('驗證失敗，請使用一般打卡', 'error');
+        }
+    }
+}
+
+/**
+ * 驗證生物辨識
+ */
+async function verifyBiometric(credentialId) {
+    try {
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        
+        const publicKeyCredentialRequestOptions = {
+            challenge: challenge,
+            allowCredentials: [{
+                id: Uint8Array.from(atob(credentialId), c => c.charCodeAt(0)),
+                type: 'public-key'
+            }],
+            timeout: 60000,
+            userVerification: "required"
+        };
+        
+        const assertion = await navigator.credentials.get({
+            publicKey: publicKeyCredentialRequestOptions
+        });
+        
+        return assertion !== null;
+        
+    } catch (error) {
+        console.error('驗證失敗:', error);
+        throw error;
+    }
+}
+
+/**
+ * 重置生物辨識設定
+ */
+function resetBiometric() {
+    localStorage.removeItem('biometric_credential_id');
+    localStorage.removeItem('biometric_user_id');
+    
+    const setupBtn = document.getElementById('setup-biometric-btn');
+    const biometricButtons = document.getElementById('biometric-punch-buttons');
+    const notSetupStatus = document.getElementById('biometric-not-setup');
+    const readyStatus = document.getElementById('biometric-ready');
+    
+    if (setupBtn) setupBtn.classList.remove('hidden');
+    if (biometricButtons) biometricButtons.classList.add('hidden');
+    if (notSetupStatus) notSetupStatus.classList.remove('hidden');
+    if (readyStatus) readyStatus.classList.add('hidden');
+    
+    showNotification('生物辨識已重置', 'success');
 }
