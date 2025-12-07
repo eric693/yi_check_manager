@@ -847,11 +847,11 @@ async function renderCalendar(date) {
  * @param {Array} records - 本月的出勤記錄
  */
 function updateMonthlyStats(records) {
-    // 取得統計元素
-    const totalHoursEl = document.getElementById('stats-total-hours');
-    const workDaysEl = document.getElementById('stats-work-days');
-    const abnormalCountEl = document.getElementById('stats-abnormal-count');
-    const normalDaysEl = document.getElementById('stats-normal-days');
+    // 取得統計元素（只取數值部分）
+    const totalHoursEl = document.getElementById('stats-total-hours-value');
+    const workDaysEl = document.getElementById('stats-work-days-value');
+    const abnormalCountEl = document.getElementById('stats-abnormal-count-value');
+    const normalDaysEl = document.getElementById('stats-normal-days-value');
     
     if (!totalHoursEl || !workDaysEl || !abnormalCountEl || !normalDaysEl) {
         console.warn('找不到統計元素');
@@ -901,11 +901,11 @@ function updateMonthlyStats(records) {
         }
     });
     
-    // 更新 DOM
-    totalHoursEl.textContent = totalHours > 0 ? `${totalHours.toFixed(1)} 小時` : '0 小時';
-    workDaysEl.textContent = `${workDays} 天`;
-    abnormalCountEl.textContent = `${abnormalCount} 筆`;
-    normalDaysEl.textContent = `${normalDays} 天`;
+    // 更新 DOM（只更新數值，不含單位）
+    totalHoursEl.textContent = totalHours > 0 ? totalHours.toFixed(1) : '0';
+    workDaysEl.textContent = workDays;
+    abnormalCountEl.textContent = abnormalCount;
+    normalDaysEl.textContent = normalDays;
 }
 async function submitAdjustPunch(date, type, note) {
     try {

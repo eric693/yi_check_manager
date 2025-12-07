@@ -305,35 +305,39 @@
                         <!-- 統計數據網格 -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <!-- 總工時 -->
-                            <div class="relative overflow-hidden text-center p-5 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20 rounded-xl border border-indigo-200 dark:border-indigo-700/50 transition-all hover:shadow-md">
-                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide whitespace-nowrap">總工時</p>
-                                <p id="stats-total-hours" class="text-2xl md:text-3xl font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
-                                    -- 小時
-                                </p>
+                            <div class="relative overflow-hidden flex flex-col items-center justify-center p-5 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20 rounded-xl border border-indigo-200 dark:border-indigo-700/50 transition-all hover:shadow-md">
+                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">總工時</p>
+                                <div class="flex items-baseline justify-center">
+                                    <span id="stats-total-hours-value" class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">0</span>
+                                    <span class="text-base font-medium text-indigo-500 dark:text-indigo-400 ml-1">小時</span>
+                                </div>
                             </div>
                             
                             <!-- 出勤天數 -->
-                            <div class="relative overflow-hidden text-center p-5 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20 rounded-xl border border-green-200 dark:border-green-700/50 transition-all hover:shadow-md">
-                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide whitespace-nowrap">出勤天數</p>
-                                <p id="stats-work-days" class="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400 whitespace-nowrap">
-                                    -- 天
-                                </p>
+                            <div class="relative overflow-hidden flex flex-col items-center justify-center p-5 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20 rounded-xl border border-green-200 dark:border-green-700/50 transition-all hover:shadow-md">
+                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">出勤天數</p>
+                                <div class="flex items-baseline justify-center">
+                                    <span id="stats-work-days-value" class="text-3xl font-bold text-green-600 dark:text-green-400">0</span>
+                                    <span class="text-base font-medium text-green-500 dark:text-green-400 ml-1">天</span>
+                                </div>
                             </div>
                             
                             <!-- 異常記錄 -->
-                            <div class="relative overflow-hidden text-center p-5 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20 rounded-xl border border-red-200 dark:border-red-700/50 transition-all hover:shadow-md">
-                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide whitespace-nowrap">異常記錄</p>
-                                <p id="stats-abnormal-count" class="text-2xl md:text-3xl font-bold text-red-600 dark:text-red-400 whitespace-nowrap">
-                                    -- 筆
-                                </p>
+                            <div class="relative overflow-hidden flex flex-col items-center justify-center p-5 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20 rounded-xl border border-red-200 dark:border-red-700/50 transition-all hover:shadow-md">
+                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">異常記錄</p>
+                                <div class="flex items-baseline justify-center">
+                                    <span id="stats-abnormal-count-value" class="text-3xl font-bold text-red-600 dark:text-red-400">0</span>
+                                    <span class="text-base font-medium text-red-500 dark:text-red-400 ml-1">筆</span>
+                                </div>
                             </div>
                             
                             <!-- 正常打卡 -->
-                            <div class="relative overflow-hidden text-center p-5 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 rounded-xl border border-blue-200 dark:border-blue-700/50 transition-all hover:shadow-md">
-                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide whitespace-nowrap">正常打卡</p>
-                                <p id="stats-normal-days" class="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">
-                                    -- 天
-                                </p>
+                            <div class="relative overflow-hidden flex flex-col items-center justify-center p-5 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 rounded-xl border border-blue-200 dark:border-blue-700/50 transition-all hover:shadow-md">
+                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">正常打卡</p>
+                                <div class="flex items-baseline justify-center">
+                                    <span id="stats-normal-days-value" class="text-3xl font-bold text-blue-600 dark:text-blue-400">0</span>
+                                    <span class="text-base font-medium text-blue-500 dark:text-blue-400 ml-1">天</span>
+                                </div>
                             </div>
                         </div>
                     </div>
