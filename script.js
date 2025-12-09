@@ -846,8 +846,10 @@ async function renderCalendar(date) {
  * ✨ 更新本月出勤統計
  * @param {Array} records - 本月的出勤記錄
  */
+/**
+ * ✅ 更新本月出勤統計（含加班時數）
+ */
 function updateMonthlyStats(records) {
-    // 取得統計元素（只取數值部分）
     const totalHoursEl = document.getElementById('stats-total-hours-value');
     const workDaysEl = document.getElementById('stats-work-days-value');
     const abnormalCountEl = document.getElementById('stats-abnormal-count-value');
@@ -858,13 +860,12 @@ function updateMonthlyStats(records) {
         return;
     }
     
-    // 初始化統計變數
     let totalHours = 0;
     let workDays = 0;
     let abnormalCount = 0;
     let normalDays = 0;
+    let totalOvertimeHours = 0;  // 👈 新增：加班時數統計
     
-    // 遍歷所有記錄計算統計
     records.forEach(record => {
         // 計算工時
         const punchIn = record.record ? record.record.find(r => r.type === '上班') : null;
@@ -886,6 +887,11 @@ function updateMonthlyStats(records) {
             }
         }
         
+        // 👉 累計加班時數
+        if (record.overtime && record.overtime.hours) {
+            totalOvertimeHours += record.overtime.hours;
+        }
+        
         // 判斷是否為異常記錄
         const abnormalReasons = [
             'STATUS_PUNCH_IN_MISSING',
@@ -901,12 +907,76 @@ function updateMonthlyStats(records) {
         }
     });
     
-    // 更新 DOM（只更新數值，不含單位）
+    // 更新 DOM
     totalHoursEl.textContent = totalHours > 0 ? totalHours.toFixed(1) : '0';
     workDaysEl.textContent = workDays;
     abnormalCountEl.textContent = abnormalCount;
     normalDaysEl.textContent = normalDays;
+    
+    // 👉 顯示加班時數（如果有的話）
+    console.log(`📊 本月統計：工時 ${totalHours.toFixed(1)}h，加班 ${totalOvertimeHours.toFixed(1)}h`);
 }
+// function updateMonthlyStats(records) {
+//     // 取得統計元素（只取數值部分）
+//     const totalHoursEl = document.getElementById('stats-total-hours-value');
+//     const workDaysEl = document.getElementById('stats-work-days-value');
+//     const abnormalCountEl = document.getElementById('stats-abnormal-count-value');
+//     const normalDaysEl = document.getElementById('stats-normal-days-value');
+    
+//     if (!totalHoursEl || !workDaysEl || !abnormalCountEl || !normalDaysEl) {
+//         console.warn('找不到統計元素');
+//         return;
+//     }
+    
+//     // 初始化統計變數
+//     let totalHours = 0;
+//     let workDays = 0;
+//     let abnormalCount = 0;
+//     let normalDays = 0;
+    
+//     // 遍歷所有記錄計算統計
+//     records.forEach(record => {
+//         // 計算工時
+//         const punchIn = record.record ? record.record.find(r => r.type === '上班') : null;
+//         const punchOut = record.record ? record.record.find(r => r.type === '下班') : null;
+        
+//         if (punchIn && punchOut) {
+//             try {
+//                 const inTime = new Date(`${record.date} ${punchIn.time}`);
+//                 const outTime = new Date(`${record.date} ${punchOut.time}`);
+//                 const diffMs = outTime - inTime;
+//                 const hours = diffMs / (1000 * 60 * 60);
+                
+//                 if (hours > 0) {
+//                     totalHours += hours;
+//                     workDays++;
+//                 }
+//             } catch (e) {
+//                 console.error('計算工時失敗:', e);
+//             }
+//         }
+        
+//         // 判斷是否為異常記錄
+//         const abnormalReasons = [
+//             'STATUS_PUNCH_IN_MISSING',
+//             'STATUS_PUNCH_OUT_MISSING',
+//             'STATUS_REPAIR_PENDING',
+//             'STATUS_REPAIR_REJECTED'
+//         ];
+        
+//         if (abnormalReasons.includes(record.reason)) {
+//             abnormalCount++;
+//         } else if (record.reason === 'STATUS_PUNCH_NORMAL' || record.reason === 'STATUS_REPAIR_APPROVED') {
+//             normalDays++;
+//         }
+//     });
+    
+//     // 更新 DOM（只更新數值，不含單位）
+//     totalHoursEl.textContent = totalHours > 0 ? totalHours.toFixed(1) : '0';
+//     workDaysEl.textContent = workDays;
+//     abnormalCountEl.textContent = abnormalCount;
+//     normalDaysEl.textContent = normalDays;
+// }
 async function submitAdjustPunch(date, type, note) {
     try {
         showNotification("正在提交補打卡...", "info");
@@ -954,25 +1024,21 @@ async function submitAdjustPunch(date, type, note) {
 
 // 新增一個獨立的渲染函式，以便從快取或 API 回應中調用
 function renderCalendarWithData(year, month, today, records, calendarGrid, monthTitle) {
-    // 確保日曆網格在每次渲染前被清空
     calendarGrid.innerHTML = '';
     monthTitle.textContent = t("MONTH_YEAR_TEMPLATE", {
         year: year,
         month: month+1
     });
     
-    // 取得該月第一天是星期幾
     const firstDayOfMonth = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     
-    // 填補月初的空白格子
     for (let i = 0; i < firstDayOfMonth; i++) {
         const emptyCell = document.createElement('div');
         emptyCell.className = 'day-cell';
         calendarGrid.appendChild(emptyCell);
     }
     
-    // 根據資料渲染每一天的顏色
     for (let i = 1; i <= daysInMonth; i++) {
         const dayCell = document.createElement('div');
         const cellDate = new Date(year, month, i);
@@ -983,11 +1049,12 @@ function renderCalendarWithData(year, month, today, records, calendarGrid, month
         const todayRecords = records.filter(r => r.date === dateKey);
         
         if (todayRecords.length > 0) {
-            const reason = todayRecords[0].reason;
+            const record = todayRecords[0];
+            const reason = record.reason;
+            
+            // 👉 判斷打卡狀態
             switch (reason) {
                 case "STATUS_PUNCH_IN_MISSING":
-                    dateClass = 'abnormal-day';
-                    break;
                 case "STATUS_PUNCH_OUT_MISSING":
                     dateClass = 'abnormal-day';
                     break;
@@ -1002,9 +1069,19 @@ function renderCalendarWithData(year, month, today, records, calendarGrid, month
                     break;
                 default:
                     if (reason && reason !== "") {
-                        dateClass = 'pending-adjustment'; // 假設所有有備註的都算 pending
+                        dateClass = 'pending-adjustment';
                     }
                     break;
+            }
+            
+            // 👉 如果有加班記錄，加上特殊標記
+            if (record.overtime) {
+                dayCell.innerHTML = `
+                    <div class="relative">
+                        <span>${i}</span>
+                        <span class="absolute top-0 right-0 text-xs">⏰</span>
+                    </div>
+                `;
             }
         }
         
@@ -1013,20 +1090,93 @@ function renderCalendarWithData(year, month, today, records, calendarGrid, month
             dayCell.classList.add('today');
         } else if (cellDate > today) {
             dayCell.classList.add('future-day');
-            dayCell.style.pointerEvents = 'none'; // 未來日期不可點擊
+            dayCell.style.pointerEvents = 'none';
         } else {
             dayCell.classList.add(dateClass);
         }
         
         dayCell.classList.add('day-cell');
         dayCell.dataset.date = dateKey;
-        dayCell.dataset.records = JSON.stringify(todayRecords); // 儲存當天資料
+        dayCell.dataset.records = JSON.stringify(todayRecords);
         calendarGrid.appendChild(dayCell);
     }
 }
+// function renderCalendarWithData(year, month, today, records, calendarGrid, monthTitle) {
+//     // 確保日曆網格在每次渲染前被清空
+//     calendarGrid.innerHTML = '';
+//     monthTitle.textContent = t("MONTH_YEAR_TEMPLATE", {
+//         year: year,
+//         month: month+1
+//     });
+    
+//     // 取得該月第一天是星期幾
+//     const firstDayOfMonth = new Date(year, month, 1).getDay();
+//     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+//     // 填補月初的空白格子
+//     for (let i = 0; i < firstDayOfMonth; i++) {
+//         const emptyCell = document.createElement('div');
+//         emptyCell.className = 'day-cell';
+//         calendarGrid.appendChild(emptyCell);
+//     }
+    
+//     // 根據資料渲染每一天的顏色
+//     for (let i = 1; i <= daysInMonth; i++) {
+//         const dayCell = document.createElement('div');
+//         const cellDate = new Date(year, month, i);
+//         dayCell.textContent = i;
+//         let dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+//         let dateClass = 'normal-day';
+        
+//         const todayRecords = records.filter(r => r.date === dateKey);
+        
+//         if (todayRecords.length > 0) {
+//             const reason = todayRecords[0].reason;
+//             switch (reason) {
+//                 case "STATUS_PUNCH_IN_MISSING":
+//                     dateClass = 'abnormal-day';
+//                     break;
+//                 case "STATUS_PUNCH_OUT_MISSING":
+//                     dateClass = 'abnormal-day';
+//                     break;
+//                 case "STATUS_PUNCH_NORMAL":
+//                     dateClass = 'day-off';
+//                     break;
+//                 case "STATUS_REPAIR_PENDING":
+//                     dateClass = 'pending-virtual';
+//                     break;
+//                 case "STATUS_REPAIR_APPROVED":
+//                     dateClass = 'approved-virtual';
+//                     break;
+//                 default:
+//                     if (reason && reason !== "") {
+//                         dateClass = 'pending-adjustment'; // 假設所有有備註的都算 pending
+//                     }
+//                     break;
+//             }
+//         }
+        
+//         const isToday = (year === today.getFullYear() && month === today.getMonth() && i === today.getDate());
+//         if (isToday) {
+//             dayCell.classList.add('today');
+//         } else if (cellDate > today) {
+//             dayCell.classList.add('future-day');
+//             dayCell.style.pointerEvents = 'none'; // 未來日期不可點擊
+//         } else {
+//             dayCell.classList.add(dateClass);
+//         }
+        
+//         dayCell.classList.add('day-cell');
+//         dayCell.dataset.date = dateKey;
+//         dayCell.dataset.records = JSON.stringify(todayRecords); // 儲存當天資料
+//         calendarGrid.appendChild(dayCell);
+//     }
+// }
 
+/**
+ * ✅ 渲染每日打卡記錄（含加班時數顯示）
+ */
 async function renderDailyRecords(dateKey) {
-    // 1. 取得所有需要的 DOM 元素
     const dailyRecordsCard = document.getElementById('daily-records-card');
     const dailyRecordsTitle = document.getElementById('daily-records-title');
     const dailyRecordsList = document.getElementById('daily-records-list');
@@ -1034,27 +1184,13 @@ async function renderDailyRecords(dateKey) {
     const recordsLoading = document.getElementById("daily-records-loading");
     const adjustmentFormContainer = document.getElementById('daily-adjustment-form-container');
     
-    // 2. ✅ 檢查必要元素是否存在
     if (!dailyRecordsCard || !dailyRecordsTitle || !dailyRecordsList || !dailyRecordsEmpty) {
         console.error('❌ renderDailyRecords: 找不到必要的 DOM 元素');
-        console.log('元素檢查結果:', {
-            'daily-records-card': !!dailyRecordsCard,
-            'daily-records-title': !!dailyRecordsTitle,
-            'daily-records-list': !!dailyRecordsList,
-            'daily-records-empty': !!dailyRecordsEmpty,
-            'daily-records-loading': !!recordsLoading,
-            'daily-adjustment-form-container': !!adjustmentFormContainer
-        });
-        
         showNotification('介面元素載入失敗，請重新整理頁面', 'error');
         return;
     }
     
-    // 3. 安全地設置內容
-    dailyRecordsTitle.textContent = t("DAILY_RECORDS_TITLE", {
-        dateKey: dateKey
-    });
-    
+    dailyRecordsTitle.textContent = t("DAILY_RECORDS_TITLE", { dateKey: dateKey });
     dailyRecordsList.innerHTML = '';
     dailyRecordsEmpty.style.display = 'none';
     
@@ -1066,7 +1202,6 @@ async function renderDailyRecords(dateKey) {
         recordsLoading.style.display = 'block';
     }
     
-    // 4. 繼續原有邏輯
     const dateObject = new Date(dateKey);
     const month = dateObject.getFullYear() + "-" + String(dateObject.getMonth() + 1).padStart(2, "0");
     const userId = localStorage.getItem("sessionUserId");
@@ -1097,7 +1232,6 @@ async function renderDailyRecords(dateKey) {
         }
     }
     
-    // 5. renderRecords 函數（保持不變）
     function renderRecords(records) {
         const dailyRecords = records.filter(record => record.date === dateKey);
         
@@ -1105,30 +1239,65 @@ async function renderDailyRecords(dateKey) {
             dailyRecordsEmpty.style.display = 'none';
             dailyRecords.forEach(recordData => {
                 const li = document.createElement('li');
-                li.className = 'p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
+                li.className = 'p-4 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-3';
                 
+                // 👉 打卡記錄
                 const recordHtml = recordData.record.map(r => {
                     const typeKey = r.type === '上班' ? 'PUNCH_IN' : 'PUNCH_OUT';
                     return `
-                        <p class="font-medium text-gray-800 dark:text-white">${r.time} - ${t(typeKey)}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">${r.location}</p>
-                        <p data-i18n="RECORD_NOTE_PREFIX" class="text-sm text-gray-500 dark:text-gray-400">備註：${r.note}</p>
+                        <div class="border-b border-gray-200 dark:border-gray-600 pb-2">
+                            <p class="font-medium text-gray-800 dark:text-white">
+                                ${r.time} - ${t(typeKey)}
+                            </p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                📍 ${r.location}
+                            </p>
+                            ${r.note ? `<p class="text-sm text-gray-500 dark:text-gray-400">📝 備註：${r.note}</p>` : ''}
+                        </div>
                     `;
                 }).join("");
                 
-                li.innerHTML = `
-                    ${recordHtml}
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        <span data-i18n="RECORD_REASON_PREFIX">系統判斷：</span>
-                        ${t(recordData.reason)}
+                // 👉 加班資訊顯示（新增）
+                let overtimeHtml = '';
+                if (recordData.overtime) {
+                    const ot = recordData.overtime;
+                    overtimeHtml = `
+                        <div class="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border-2 border-orange-300 dark:border-orange-700 rounded-lg p-3 mt-3">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="font-bold text-orange-800 dark:text-orange-300 flex items-center">
+                                    <span class="text-lg mr-2">⏰</span>
+                                    加班時段
+                                </p>
+                                <span class="px-2 py-1 bg-orange-600 text-white text-xs font-bold rounded-full">
+                                    ${ot.hours} 小時
+                                </span>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-sm text-orange-700 dark:text-orange-400">
+                                    🕐 ${ot.startTime} - ${ot.endTime}
+                                </p>
+                                ${ot.reason ? `
+                                    <p class="text-sm text-orange-600 dark:text-orange-300">
+                                        📝 ${ot.reason}
+                                    </p>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // 👉 系統判斷狀態
+                const statusHtml = `
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                        <span class="font-medium">系統判斷：</span>
+                        <span class="font-semibold">${t(recordData.reason)}</span>
                     </p>
                 `;
+                
+                li.innerHTML = recordHtml + overtimeHtml + statusHtml;
                 dailyRecordsList.appendChild(li);
                 renderTranslations(li);
             });
-            
-            // 檢查是否需要顯示補打卡按鈕
-            
         } else {
             dailyRecordsEmpty.style.display = 'block';
         }
@@ -1136,6 +1305,117 @@ async function renderDailyRecords(dateKey) {
         dailyRecordsCard.style.display = 'block';
     }
 }
+// async function renderDailyRecords(dateKey) {
+//     // 1. 取得所有需要的 DOM 元素
+//     const dailyRecordsCard = document.getElementById('daily-records-card');
+//     const dailyRecordsTitle = document.getElementById('daily-records-title');
+//     const dailyRecordsList = document.getElementById('daily-records-list');
+//     const dailyRecordsEmpty = document.getElementById('daily-records-empty');
+//     const recordsLoading = document.getElementById("daily-records-loading");
+//     const adjustmentFormContainer = document.getElementById('daily-adjustment-form-container');
+    
+//     // 2. ✅ 檢查必要元素是否存在
+//     if (!dailyRecordsCard || !dailyRecordsTitle || !dailyRecordsList || !dailyRecordsEmpty) {
+//         console.error('❌ renderDailyRecords: 找不到必要的 DOM 元素');
+//         console.log('元素檢查結果:', {
+//             'daily-records-card': !!dailyRecordsCard,
+//             'daily-records-title': !!dailyRecordsTitle,
+//             'daily-records-list': !!dailyRecordsList,
+//             'daily-records-empty': !!dailyRecordsEmpty,
+//             'daily-records-loading': !!recordsLoading,
+//             'daily-adjustment-form-container': !!adjustmentFormContainer
+//         });
+        
+//         showNotification('介面元素載入失敗，請重新整理頁面', 'error');
+//         return;
+//     }
+    
+//     // 3. 安全地設置內容
+//     dailyRecordsTitle.textContent = t("DAILY_RECORDS_TITLE", {
+//         dateKey: dateKey
+//     });
+    
+//     dailyRecordsList.innerHTML = '';
+//     dailyRecordsEmpty.style.display = 'none';
+    
+//     if (adjustmentFormContainer) {
+//         adjustmentFormContainer.innerHTML = '';
+//     }
+    
+//     if (recordsLoading) {
+//         recordsLoading.style.display = 'block';
+//     }
+    
+//     // 4. 繼續原有邏輯
+//     const dateObject = new Date(dateKey);
+//     const month = dateObject.getFullYear() + "-" + String(dateObject.getMonth() + 1).padStart(2, "0");
+//     const userId = localStorage.getItem("sessionUserId");
+    
+//     if (monthDataCache[month]) {
+//         renderRecords(monthDataCache[month]);
+//         if (recordsLoading) {
+//             recordsLoading.style.display = 'none';
+//         }
+//     } else {
+//         try {
+//             const res = await callApifetch(`getAttendanceDetails&month=${month}&userId=${userId}`);
+//             if (recordsLoading) {
+//                 recordsLoading.style.display = 'none';
+//             }
+//             if (res.ok) {
+//                 monthDataCache[month] = res.records;
+//                 renderRecords(res.records);
+//             } else {
+//                 console.error("Failed to fetch attendance records:", res.msg);
+//                 showNotification(t("ERROR_FETCH_RECORDS"), "error");
+//             }
+//         } catch (err) {
+//             console.error(err);
+//             if (recordsLoading) {
+//                 recordsLoading.style.display = 'none';
+//             }
+//         }
+//     }
+    
+//     // 5. renderRecords 函數（保持不變）
+//     function renderRecords(records) {
+//         const dailyRecords = records.filter(record => record.date === dateKey);
+        
+//         if (dailyRecords.length > 0) {
+//             dailyRecordsEmpty.style.display = 'none';
+//             dailyRecords.forEach(recordData => {
+//                 const li = document.createElement('li');
+//                 li.className = 'p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
+                
+//                 const recordHtml = recordData.record.map(r => {
+//                     const typeKey = r.type === '上班' ? 'PUNCH_IN' : 'PUNCH_OUT';
+//                     return `
+//                         <p class="font-medium text-gray-800 dark:text-white">${r.time} - ${t(typeKey)}</p>
+//                         <p class="text-sm text-gray-500 dark:text-gray-400">${r.location}</p>
+//                         <p data-i18n="RECORD_NOTE_PREFIX" class="text-sm text-gray-500 dark:text-gray-400">備註：${r.note}</p>
+//                     `;
+//                 }).join("");
+                
+//                 li.innerHTML = `
+//                     ${recordHtml}
+//                     <p class="text-sm text-gray-500 dark:text-gray-400">
+//                         <span data-i18n="RECORD_REASON_PREFIX">系統判斷：</span>
+//                         ${t(recordData.reason)}
+//                     </p>
+//                 `;
+//                 dailyRecordsList.appendChild(li);
+//                 renderTranslations(li);
+//             });
+            
+//             // 檢查是否需要顯示補打卡按鈕
+            
+//         } else {
+//             dailyRecordsEmpty.style.display = 'block';
+//         }
+        
+//         dailyRecordsCard.style.display = 'block';
+//     }
+// }
 
 // ==================== 地點搜尋功能 ====================
 

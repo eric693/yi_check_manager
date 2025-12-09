@@ -187,6 +187,11 @@
     "OVERTIME_REJECTED": "❌ 加班申請已拒絕",
     "OVERTIME_REJECT_REASON_PROMPT": "請輸入拒絕原因（選填）",
     
+    "OVERTIME_APPROVED_INFO": "✅ 已核准加班",
+    "OVERTIME_HOURS": "{hours} 小時",
+    "OVERTIME_TIME_RANGE": "加班時段：{startTime} - {endTime}",
+    "OVERTIME_REASON": "加班原因：{reason}",
+
     "ERROR_LOAD_OVERTIME": "載入加班記錄失敗",
     "ERROR_SUBMIT_OVERTIME": "提交加班申請失敗",
     "ERR_NO_PERMISSION": "您沒有權限執行此操作",

@@ -574,3 +574,41 @@ html.dark #search-results-list li:hover {
 #search-results-list li:last-child {
     border-bottom: none;
 }
+
+/* 加班資訊卡片樣式 */
+.overtime-card {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    border: 2px solid #fb923c;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    box-shadow: 0 2px 8px rgba(251, 146, 60, 0.15);
+}
+
+.dark .overtime-card {
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
+    border-color: rgba(251, 146, 60, 0.5);
+}
+
+/* 加班時數標籤 */
+.overtime-badge {
+    background: #ea580c;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* 日曆上的加班標記 */
+.day-cell.has-overtime {
+    position: relative;
+}
+
+.day-cell.has-overtime::after {
+    content: '⏰';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 10px;
+}
