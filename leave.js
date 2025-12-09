@@ -1,5 +1,4 @@
 // leave.js - 請假系統前端邏輯（完整修正版）
-
 /**
  * 🆕 格式化日期函數
  * 將任何日期格式轉換為 YYYY-MM-DD
@@ -152,24 +151,21 @@ async function loadLeaveRecords() {
         
         const res = await callApifetch(`getEmployeeLeaveRecords&employeeId=${userId}`);
         
-        console.log('API 回應:', res);
-        console.log('ok:', res.ok);
-        console.log('records:', res.records);
-        console.log('records 數量:', res.records?.length);
+        console.log('📥 API 回應:', res);
         
         loadingEl.style.display = 'none';
         
-        // ✅ 修正：根據實際 API 回應格式判斷
-        if (res.success && res.data && res.data.length > 0) {
+        // ✅ 修正：根據後端實際返回格式判斷
+        if (res.ok && res.records && res.records.length > 0) {
             emptyEl.style.display = 'none';
-            renderLeaveRecords(res.data);  // 使用 res.data 而非 res.records
+            renderLeaveRecords(res.records);
         } else {
-            console.log('沒有記錄');
+            console.log('ℹ️ 沒有請假記錄');
             emptyEl.style.display = 'block';
         }
         
     } catch (error) {
-        console.error('載入請假記錄失敗:', error);
+        console.error('❌ 載入請假記錄失敗:', error);
         loadingEl.style.display = 'none';
         emptyEl.style.display = 'block';
     }
