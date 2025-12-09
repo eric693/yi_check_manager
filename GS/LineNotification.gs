@@ -165,7 +165,7 @@ function createForgotPunchNotification(employeeName, date, punchType) {
             action: {
               type: "uri",
               label: "立即補打卡",
-              uri: "https://eric693.github.io/checkBBT_check_manager/"
+              uri: "https://eric693.github.io/check_manager_plus/"
             },
             color: "#4CAF50"
           },
@@ -176,7 +176,7 @@ function createForgotPunchNotification(employeeName, date, punchType) {
             action: {
               type: "uri",
               label: "查看打卡記錄",
-              uri: "https://eric693.github.io/checkBBT_check_manager/"
+              uri: "https://eric693.github.io/check_manager_plus/"
             }
           }
         ],
@@ -347,7 +347,7 @@ function createPunchApprovedNotification(employeeName, date, time, punchType, re
             action: {
               type: "uri",
               label: "查看詳情",
-              uri: "https://eric693.github.io/checkBBT_check_manager/"
+              uri: "https://eric693.github.io/check_manager_plus/"
             },
             color: "#4CAF50"
           }
@@ -523,7 +523,7 @@ function createPunchRejectedNotification(employeeName, date, time, punchType, re
             action: {
               type: "uri",
               label: "查看詳情",
-              uri: "https://eric693.github.io/checkBBT_check_manager/"
+              uri: "https://eric693.github.io/check_manager_plus/"
             }
           }
         ],
@@ -707,7 +707,7 @@ function createLeaveApprovedNotification(employeeName, leaveType, startDate, end
             action: {
               type: "uri",
               label: "查看假期餘額",
-              uri: "https://eric693.github.io/checkBBT_check_manager/"
+              uri: "https://eric693.github.io/check_manager_plus/"
             },
             color: "#2196F3"
           }
@@ -882,7 +882,7 @@ function createLeaveRejectedNotification(employeeName, leaveType, startDate, end
             action: {
               type: "uri",
               label: "重新申請",
-              uri: "https://eric693.github.io/checkBBT_check_manager/"
+              uri: "https://eric693.github.io/check_manager_plus/"
             }
           }
         ],
@@ -1043,7 +1043,7 @@ function createOvertimeApprovedNotification(employeeName, date, hours, reviewer)
             action: {
               type: "uri",
               label: "查看詳情",
-              uri: "https://eric693.github.io/checkBBT_check_manager/"
+              uri: "https://eric693.github.io/check_manager_plus/"
             },
             color: "#FF9800"
           }
@@ -1217,7 +1217,7 @@ function createOvertimeRejectedNotification(employeeName, date, hours, reviewer,
             action: {
               type: "uri",
               label: "重新申請",
-              uri: "https://eric693.github.io/checkBBT_check_manager/"
+              uri: "https://eric693.github.io/check_manager_plus/"
             }
           }
         ],

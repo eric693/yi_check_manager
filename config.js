@@ -2,10 +2,10 @@
 
 const API_CONFIG = {
   // 正式環境的 API URL
-  apiUrl: "https://script.google.com/macros/s/AKfycbwIazOkGLfp6ufVAnA4xLgGM14JaxIsy4p7djM_avhYOkWseYUiQXCCZkVb7r2OCXdY/exec",
+  apiUrl: "https://script.google.com/macros/s/AKfycbwip-XxLPYl02S0VPj_5Xi9lFpW59yQ9Hr419RvJmOGqpMxy3hQqYraPWfecq99Qc4V/exec",
   
   // 新增回呼網址
-  redirectUrl: "https://eric693.github.io/checkBBT_check_manager/"
+  redirectUrl: "https://eric693.github.io/check_manager_plus/"
   // 你也可以在這裡加入其他設定，例如：
   // timeout: 5000,
   // version: 'v4.2.2'
