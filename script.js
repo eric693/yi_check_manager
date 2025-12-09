@@ -1069,7 +1069,7 @@ function renderCalendarWithData(year, month, today, records, calendarGrid, month
                     break;
                 case "STATUS_NO_RECORD":
                     if (record.overtime) {
-                        dateClass = 'day-off';  // 綠色底
+                        dateClass = 'day-off';
                     }
                     break;
                 default:

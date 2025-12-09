@@ -602,6 +602,26 @@
                 <!-- 👇 請假頁面 (Leave View) -->
                 <section id="leave-view" class="space-y-6" style="display: none;">
                     
+                    <!-- 👇 新增：假期餘額顯示區塊 -->
+                    <div class="card p-6">
+                        <h2 data-i18n="LEAVE_BALANCE_TITLE" 
+                            class="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                            假期餘額
+                        </h2>
+                        <p data-i18n="LEAVE_BALANCE_DESCRIPTION" 
+                        class="text-gray-500 dark:text-gray-400 mb-4">
+                            查看您目前可用的各類假期天數
+                        </p>
+                        
+                        <div id="leave-balance-container">
+                            <div id="leave-balance-loading" 
+                                data-i18n="RECORDS_LOADING" 
+                                class="text-center text-gray-500 dark:text-gray-400 py-4">
+                                正在載入餘額...
+                            </div>
+                            <div id="leave-balance-list" class="space-y-2"></div>
+                        </div>
+                    </div>
                     <!-- 請假申請表單 -->
                     <div class="card p-6">
                         <h2 data-i18n="LEAVE_APPLY_TITLE" 
