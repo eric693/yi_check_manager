@@ -1057,6 +1057,11 @@ function renderCalendarWithData(year, month, today, records, calendarGrid, month
             const record = todayRecords[0];
             const reason = record.reason;
             
+            if (dateKey === '2025-12-10') {
+                console.log('🔍 12/10 記錄:', record);
+                console.log('   - leave:', record.leave);
+                console.log('   - statusIcons:', statusIcons);
+            }
             // 👉 判斷打卡狀態
             switch (reason) {
                 case "STATUS_PUNCH_IN_MISSING":
