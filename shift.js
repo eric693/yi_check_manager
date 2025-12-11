@@ -95,21 +95,32 @@ function autoFillShiftTime(shiftType) {
         '早班': ['08:00', '16:00'],
         '中班': ['12:00', '20:00'],
         '晚班': ['16:00', '00:00'],
-        '全日班': ['09:00', '18:00']
+        '全日班': ['09:00', '18:00'],
+        '排休': ['00:00', '00:00'] 
     };
     
     const startTimeInput = document.getElementById('start-time');
     const endTimeInput = document.getElementById('end-time');
     
-    if (shiftType === '自訂') {
-        // 選擇「自訂」時,清空時間並讓使用者自行輸入
+    if (shiftType === '排休') {
+        // 排休時禁用時間選擇
+        startTimeInput.value = '00:00';
+        endTimeInput.value = '00:00';
+        startTimeInput.disabled = true;
+        endTimeInput.disabled = true;
+    } else if (shiftType === '自訂') {
+        // 選擇「自訂」時,清空時間並啟用輸入
         startTimeInput.value = '';
         endTimeInput.value = '';
-        startTimeInput.focus(); // 自動聚焦到上班時間
+        startTimeInput.disabled = false;
+        endTimeInput.disabled = false;
+        startTimeInput.focus();
     } else if (times[shiftType]) {
-        // 選擇預設班別時,自動填入時間(但仍可修改)
+        // 選擇預設班別時,自動填入時間並啟用
         startTimeInput.value = times[shiftType][0];
         endTimeInput.value = times[shiftType][1];
+        startTimeInput.disabled = false;
+        endTimeInput.disabled = false;
     }
 }
 
@@ -509,6 +520,7 @@ function getShiftTypeBadge(shiftType) {
         '中班': 'badge-afternoon',
         '晚班': 'badge-night',
         '全日班': 'badge-full',
+        '排休': 'badge-dayoff',
         '自訂': 'badge-custom'
     }[shiftType] || 'badge-morning';
     
@@ -1123,6 +1135,7 @@ function displayMonthlyStats(shifts) {
         afternoon: 0,
         night: 0,
         full: 0,
+        dayoff: 0,  // 新增
         custom: 0
     };
     
@@ -1132,6 +1145,7 @@ function displayMonthlyStats(shifts) {
             case '中班': stats.afternoon++; break;
             case '晚班': stats.night++; break;
             case '全日班': stats.full++; break;
+            case '排休': stats.dayoff++; break;  // 新增
             case '自訂': stats.custom++; break;
         }
     });
@@ -1152,6 +1166,10 @@ function displayMonthlyStats(shifts) {
         <div class="stat-card">
             <div class="stat-label">晚班</div>
             <div class="stat-value" style="color: #9c27b0;">${stats.night}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">排休</div>
+            <div class="stat-value" style="color: #757575;">${stats.dayoff}</div>
         </div>
         ${stats.custom > 0 ? `
         <div class="stat-card">
@@ -1236,7 +1254,7 @@ function displayMonthCalendar(shifts) {
             <div class="calendar-day ${otherMonthClass} ${todayClass} ${hasShiftsClass}">
                 <div class="day-number">${dayNumber}</div>
                 <div class="day-shifts">
-                    ${dayShifts.slice(0, 3).map(shift => {
+                    ${dayShifts.slice(0, 10).map(shift => {
                         const startTime = formatTimeOnly(shift.startTime);
                         const endTime = formatTimeOnly(shift.endTime);
                         return `
@@ -1262,6 +1280,7 @@ function getShiftClass(shiftType) {
         '中班': 'shift-afternoon',
         '晚班': 'shift-night',
         '全日班': 'shift-full',
+        '排休': 'shift-dayoff',
         '自訂': 'shift-custom'
     };
     return classMap[shiftType] || 'shift-morning';
@@ -1305,6 +1324,7 @@ function displayShiftDistribution(shifts) {
         '中班': 0, 
         '晚班': 0, 
         '全日班': 0,
+        '排休': 0,
         '自訂': 0
     };
     
@@ -1355,6 +1375,7 @@ function displayShiftDistribution(shifts) {
         '中班': '#2196f3',
         '晚班': '#9c27b0',
         '全日班': '#4caf50',
+        '排休': '#9e9e9e',
         '自訂': '#fbc02d'
     };
     
