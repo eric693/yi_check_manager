@@ -1212,8 +1212,15 @@ function renderCalendarWithData(year, month, today, records, calendarGrid, month
 // }
 
 /**
- * ✅ 渲染每日打卡記錄（含加班時數顯示）
+ * ✅ 渲染每日打卡記錄（改進版 - 請假資訊顯示在打卡記錄下方）
+ * 
+ * 修改說明：
+ * 1. 添加標題區塊，清楚標示日期
+ * 2. 打卡記錄使用卡片樣式，更清晰
+ * 3. 請假資訊緊接在打卡記錄下方，而非獨立區塊
+ * 4. 優化視覺層次，使用圖標和顏色增強可讀性
  */
+
 async function renderDailyRecords(dateKey) {
     const dailyRecordsCard = document.getElementById('daily-records-card');
     const dailyRecordsTitle = document.getElementById('daily-records-title');
@@ -1270,7 +1277,7 @@ async function renderDailyRecords(dateKey) {
         }
     }
     
-    // 在 script.js 的 renderDailyRecords 函數中，找到 renderRecords 內部函數並修改：
+    // ✨ 改進的 renderRecords 函數
     function renderRecords(records) {
         const dailyRecords = records.filter(record => record.date === dateKey);
         
@@ -1281,72 +1288,108 @@ async function renderDailyRecords(dateKey) {
                 const li = document.createElement('li');
                 li.className = 'p-4 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-3';
                 
-                // 打卡記錄（可能為空）
+                // 📋 標題區塊
+                const titleHtml = `
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b-2 border-gray-300 dark:border-gray-600">
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-white">
+                            📅 ${dateKey} 出勤記錄
+                        </h4>
+                    </div>
+                `;
+                
+                // ⏰ 打卡記錄區塊（使用卡片樣式）
                 let recordHtml = '';
                 if (recordData.record && recordData.record.length > 0) {
-                    recordHtml = recordData.record.map(r => {
-                        const typeKey = r.type === '上班' ? 'PUNCH_IN' : 'PUNCH_OUT';
-                        return `
-                            <div class="border-b border-gray-200 dark:border-gray-600 pb-2">
-                                <p class="font-medium text-gray-800 dark:text-white">
-                                    ${r.time} - ${t(typeKey)}
-                                </p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    地點：${r.location}
-                                </p>
-                                ${r.note ? `<p class="text-sm text-gray-500 dark:text-gray-400">備註：${r.note}</p>` : ''}
+                    recordHtml = `
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                            <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                                打卡紀錄
+                            </h5>
+                            <div class="space-y-2">
+                                ${recordData.record.map(r => {
+                                    const typeKey = r.type === '上班' ? 'PUNCH_IN' : 'PUNCH_OUT';
+                                    const typeColor = r.type === '上班' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+                                    return `
+                                        <div class="flex items-start space-x-2 py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                                            <span class="${typeColor} font-bold text-sm">●</span>
+                                            <div class="flex-1">
+                                                <p class="font-medium text-gray-800 dark:text-white">
+                                                    ${r.time} - ${t(typeKey)}
+                                                </p>
+                                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                    📍 ${r.location}
+                                                </p>
+                                                ${r.note ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">💭 ${r.note}</p>` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join("")}
                             </div>
-                        `;
-                    }).join("");
+                        </div>
+                    `;
                 } else {
                     recordHtml = `
-                        <div class="border-b border-gray-200 dark:border-gray-600 pb-2">
-                            <p class="text-sm text-gray-500 dark:text-gray-400 italic">
-                                該日沒有打卡紀錄
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 italic text-center py-2">
+                                ⚠️ 該日沒有打卡紀錄
                             </p>
                         </div>
                     `;
                 }
                 
-                // 👇 新增：請假資訊顯示
+                // 🏖️ 請假資訊區塊（緊接在打卡記錄下方）
                 let leaveHtml = '';
                 if (recordData.leave) {
                     const leave = recordData.leave;
                     let statusClass = 'bg-yellow-50 border-yellow-300 dark:bg-yellow-900/20 dark:border-yellow-700';
+                    let statusBadgeClass = 'bg-yellow-600 text-white';
                     let statusText = t('PENDING');
+                    let statusIcon = '⏳';
                     
                     if (leave.status === 'APPROVED') {
-                        statusClass = 'bg-blue-50 border-blue-300 dark:bg-blue-900/20 dark:border-blue-700';
+                        statusClass = 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700';
+                        statusBadgeClass = 'bg-green-600 text-white';
                         statusText = t('APPROVED');
+                        statusIcon = '✅';
                     } else if (leave.status === 'REJECTED') {
                         statusClass = 'bg-red-50 border-red-300 dark:bg-red-900/20 dark:border-red-700';
+                        statusBadgeClass = 'bg-red-600 text-white';
                         statusText = t('REJECTED');
+                        statusIcon = '❌';
                     }
                     
                     leaveHtml = `
-                        <div class="${statusClass} border-2 rounded-lg p-3 mt-3">
+                        <div class="${statusClass} border-2 rounded-lg p-3">
                             <div class="flex items-center justify-between mb-2">
-                                <p class="font-bold text-blue-800 dark:text-blue-300">
+                                <h5 class="text-sm font-semibold flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                                    </svg>
                                     🏖️ 請假資訊
-                                </p>
-                                <span class="px-2 py-1 text-xs font-bold rounded-full ${
-                                    leave.status === 'APPROVED' ? 'bg-green-600 text-white' :
-                                    leave.status === 'REJECTED' ? 'bg-red-600 text-white' :
-                                    'bg-yellow-600 text-white'
-                                }">
-                                    ${statusText}
+                                </h5>
+                                <span class="px-2 py-1 text-xs font-bold rounded-full ${statusBadgeClass}">
+                                    ${statusIcon} ${statusText}
                                 </span>
                             </div>
-                            <div class="space-y-1">
-                                <p class="text-sm text-blue-700 dark:text-blue-400">
-                                    假別：${t(leave.leaveType)}
+                            <div class="space-y-1 pl-6">
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    假別：<span class="text-blue-600 dark:text-blue-400 font-semibold">${t(leave.leaveType)}</span>
                                 </p>
-                                <p class="text-sm text-blue-700 dark:text-blue-400">
-                                    天數：${leave.days} 天
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    天數：<span class="font-semibold">${leave.days}</span> 天
                                 </p>
                                 ${leave.reason ? `
-                                    <p class="text-sm text-blue-600 dark:text-blue-300">
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
                                         原因：${leave.reason}
+                                    </p>
+                                ` : ''}
+                                ${leave.reviewComment ? `
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                                        審核意見：${leave.reviewComment}
                                     </p>
                                 ` : ''}
                             </div>
@@ -1354,23 +1397,26 @@ async function renderDailyRecords(dateKey) {
                     `;
                 }
                 
-                // 加班資訊顯示（保持原有）
+                // ⏰ 加班資訊區塊
                 let overtimeHtml = '';
                 if (recordData.overtime) {
                     const ot = recordData.overtime;
                     overtimeHtml = `
-                        <div class="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border-2 border-orange-300 dark:border-orange-700 rounded-lg p-3 mt-3">
+                        <div class="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border-2 border-orange-300 dark:border-orange-700 rounded-lg p-3">
                             <div class="flex items-center justify-between mb-2">
-                                <p class="font-bold text-orange-800 dark:text-orange-300">
+                                <h5 class="text-sm font-semibold flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                    </svg>
                                     ⏰ 加班時段
-                                </p>
+                                </h5>
                                 <span class="px-2 py-1 bg-orange-600 text-white text-xs font-bold rounded-full">
                                     ${ot.hours} 小時
                                 </span>
                             </div>
-                            <div class="space-y-1">
+                            <div class="space-y-1 pl-6">
                                 <p class="text-sm text-orange-700 dark:text-orange-400">
-                                    時間：${ot.startTime} - ${ot.endTime}
+                                    時間：<span class="font-semibold">${ot.startTime} - ${ot.endTime}</span>
                                 </p>
                                 ${ot.reason ? `
                                     <p class="text-sm text-orange-600 dark:text-orange-300">
@@ -1382,15 +1428,18 @@ async function renderDailyRecords(dateKey) {
                     `;
                 }
                 
-                // 系統判斷狀態
+                // 📊 系統判斷狀態
                 const statusHtml = `
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-3">
-                        <span class="font-medium">系統判斷：</span>
-                        <span class="font-semibold">${t(recordData.reason)}</span>
-                    </p>
+                    <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-2 text-center">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            <span class="font-medium">系統判斷：</span>
+                            <span class="font-semibold text-gray-800 dark:text-white">${t(recordData.reason)}</span>
+                        </p>
+                    </div>
                 `;
                 
-                li.innerHTML = recordHtml + leaveHtml + overtimeHtml + statusHtml;
+                // 組合所有區塊
+                li.innerHTML = titleHtml + recordHtml + leaveHtml + overtimeHtml + statusHtml;
                 dailyRecordsList.appendChild(li);
                 renderTranslations(li);
             });
