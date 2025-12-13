@@ -77,7 +77,59 @@ function renderTranslations(container = document) {
              }
         }
     });
+
+    // 👇 新增：處理 select option 的翻譯
+    const selectElements = container.querySelectorAll('select');
+    selectElements.forEach(select => {
+        const options = select.querySelectorAll('option[data-i18n-option]');
+        options.forEach(option => {
+            const key = option.getAttribute('data-i18n-option');
+            if (key) {
+                const translatedText = t(key);
+                if (translatedText !== key) {
+                    option.textContent = translatedText;
+                }
+            }
+        });
+    });
 }
+// renderTranslations 可接受一個容器參數
+// function renderTranslations(container = document) {
+//     // 翻譯網頁標題（只在整頁翻譯時執行）
+//     if (container === document) {
+//         document.title = t("APP_TITLE");
+//     }
+
+//     // 處理靜態內容：[data-i18n]
+//     const elementsToTranslate = container.querySelectorAll('[data-i18n]');
+//     elementsToTranslate.forEach(element => {
+//         const key = element.getAttribute('data-i18n');
+//         const translatedText = t(key);
+        
+//         // 檢查翻譯結果是否為空字串，或是否回傳了原始鍵值
+//         if (translatedText !== key) {
+//             if (element.tagName === 'INPUT') {
+//                 element.placeholder = translatedText;
+//             } else {
+//                 element.textContent = translatedText;
+//             }
+//         }
+//     });
+
+//     // ✨ 新增邏輯：處理動態內容的翻譯，使用 [data-i18n-key]
+//     const dynamicElements = container.querySelectorAll('[data-i18n-key]');
+//     dynamicElements.forEach(element => {
+//         const key = element.getAttribute('data-i18n-key');
+//         if (key) {
+//              const translatedText = t(key);
+             
+//              // 只有當翻譯結果不是原始鍵值時才進行更新
+//              if (translatedText !== key) {
+//                  element.textContent = translatedText;
+//              }
+//         }
+//     });
+// }
 
 /**
  * 透過 fetch API 呼叫後端 API。
@@ -2858,11 +2910,28 @@ function formatShiftDate(dateString) {
     const date = new Date(dateString);
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    const weekdays = [
+        t('WEEK_SUNDAY'),
+        t('WEEK_MONDAY'),
+        t('WEEK_TUESDAY'),
+        t('WEEK_WEDNESDAY'),
+        t('WEEK_THURSDAY'),
+        t('WEEK_FRIDAY'),
+        t('WEEK_SATURDAY')
+    ];
     const weekday = weekdays[date.getDay()];
     
     return `${month}/${day} (${weekday})`;
 }
+// function formatShiftDate(dateString) {
+//     const date = new Date(dateString);
+//     const month = date.getMonth() + 1;
+//     const day = date.getDate();
+//     const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+//     const weekday = weekdays[date.getDay()];
+    
+//     return `${month}/${day} (${weekday})`;
+// }
 
 /**
  * 清除排班快取（當有更新時使用）
@@ -3341,9 +3410,22 @@ async function exportEmployeePunchReport() {
  */
 function getDayOfWeek(dateString) {
     const date = new Date(dateString);
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-    return `星期${weekdays[date.getDay()]}`;
+    const weekdays = [
+        t('WEEKDAY_SUNDAY') || 'Sunday',
+        t('WEEKDAY_MONDAY') || 'Monday',
+        t('WEEKDAY_TUESDAY') || 'Tuesday',
+        t('WEEKDAY_WEDNESDAY') || 'Wednesday',
+        t('WEEKDAY_THURSDAY') || 'Thursday',
+        t('WEEKDAY_FRIDAY') || 'Friday',
+        t('WEEKDAY_SATURDAY') || 'Saturday'
+    ];
+    return weekdays[date.getDay()];
 }
+// function getDayOfWeek(dateString) {
+//     const date = new Date(dateString);
+//     const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+//     return `星期${weekdays[date.getDay()]}`;
+// }
 
 /**
  * 將時間字串轉換為小數
