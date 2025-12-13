@@ -1281,7 +1281,11 @@ async function renderDailyRecords(dateKey) {
     // ✨ 改進的 renderRecords 函數
     function renderRecords(records) {
         const dailyRecords = records.filter(record => record.date === dateKey);
-        
+        // ⭐⭐⭐ 加入除錯 log
+        console.log('🔍 renderRecords 被呼叫');
+        console.log('   dateKey:', dateKey);
+        console.log('   總記錄數:', records.length);
+        console.log('   當日記錄數:', dailyRecords.length);
         if (dailyRecords.length > 0) {
             dailyRecordsEmpty.style.display = 'none';
             
