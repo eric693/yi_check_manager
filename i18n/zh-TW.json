@@ -421,5 +421,22 @@
     "CHART_WORK_HOURS_TITLE": "每日工作時數",
     "CHART_PUNCH_TIME_TITLE": "打卡時間分布",
     "ANALYSIS_LOADING": "正在載入分析資料...",
-    "ANALYSIS_NO_DATA": "該月份無打卡記錄"
+    "ANALYSIS_NO_DATA": "該月份無打卡記錄",
+
+
+    "MAKEUP_PUNCH_TITLE": "補打卡：{date}（{type}）",
+    "SELECT_PUNCH_TIME": "選擇{type}時間：",
+    "BTN_CANCEL": "取消",
+    "BTN_SUBMIT_PUNCH_IN": "提交補上班卡",
+    "BTN_SUBMIT_PUNCH_OUT": "提交補下班卡",
+
+
+    "BTN_SUBMIT_OVERTIME": "提交加班申請",
+    "BTN_SUBMIT_LEAVE": "提交請假申請",
+    "ERROR_FETCH_RECORDS": "無法取得記錄",
+    "CONNECTION_FAILED": "連線失敗",
+    "UNKNOWN_ERROR": "未知錯誤",
+    "CHECKING": "檢查中...",
+    "NETWORK_ERROR": "網路錯誤",
+    "ERR_AFTER_TODAY": "⚠️ 不能選擇今天以後的時間"
 }

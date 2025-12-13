@@ -2185,9 +2185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     punchOutBtn.addEventListener('click', () => doPunch("下班"));
 
     // 處理補打卡表單
-    // ✅ 修正：使用事件委派處理補打卡按鈕
     abnormalList.addEventListener('click', (e) => {
-        // ⭐ 關鍵：使用 closest 找到被點擊的按鈕
         const button = e.target.closest('.adjust-btn');
         
         if (button) {
@@ -2196,17 +2194,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             console.log(`點擊補打卡: ${date} - ${type}`);
             
+            // 翻譯打卡類型
+            const typeText = t(type === '上班' ? 'PUNCH_IN' : 'PUNCH_OUT');
+            
             const formHtml = `
                 <div class="p-4 border-t border-gray-200 dark:border-gray-600 fade-in">
                     <p class="font-semibold mb-2 dark:text-white">
-                        補打卡：<span class="text-indigo-600 dark:text-indigo-400">${date}</span>
-                        <span class="ml-2 text-sm ${type === '上班' ? 'text-indigo-600' : 'text-purple-600'}">
-                            (${type})
-                        </span>
+                        ${t('MAKEUP_PUNCH_TITLE', { date: date, type: typeText })}
                     </p>
                     <div class="form-group mb-3">
                         <label for="adjustDateTime" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
-                            選擇${type}時間：
+                            ${t('SELECT_PUNCH_TIME', { type: typeText })}
                         </label>
                         <input id="adjustDateTime" 
                             type="datetime-local" 
@@ -2214,14 +2212,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <button id="cancel-adjust-btn" 
+                                data-i18n="BTN_CANCEL"
                                 class="py-2 px-4 rounded-lg font-bold bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-500">
-                            取消
+                            ${t('BTN_CANCEL')}
                         </button>
                         <button id="submit-adjust-btn" 
                                 data-type="${type}"
                                 data-date="${date}"
                                 class="py-2 px-4 rounded-lg font-bold btn-primary">
-                            提交補${type}卡
+                            ${t(type === '上班' ? 'BTN_SUBMIT_PUNCH_IN' : 'BTN_SUBMIT_PUNCH_OUT')}
                         </button>
                     </div>
                 </div>
@@ -2233,7 +2232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const defaultTime = type === '上班' ? '09:00' : '18:00';
             adjustDateTimeInput.value = `${date}T${defaultTime}`;
             
-            // ⭐ 綁定取消按鈕
+            // 綁定取消按鈕
             document.getElementById('cancel-adjust-btn').addEventListener('click', () => {
                 adjustmentFormContainer.innerHTML = '';
             });
@@ -2721,7 +2720,7 @@ function clearShiftCache() {
 
 // ==================== 📢 佈告欄功能 ====================
 
-function loadAnnouncements() {
+function  loadAnnouncements() {
     const data = localStorage.getItem('announcements');
     return data ? JSON.parse(data) : [];
 }

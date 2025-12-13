@@ -402,5 +402,22 @@
   "CHART_WORK_HOURS_TITLE": "Daily Work Hours",
   "CHART_PUNCH_TIME_TITLE": "Punch Time Distribution",
   "ANALYSIS_LOADING": "Loading analysis data...",
-  "ANALYSIS_NO_DATA": "No punch records for this month"
+  "ANALYSIS_NO_DATA": "No punch records for this month",
+
+
+  "MAKEUP_PUNCH_TITLE": "Make-up Punch: {date} ({type})",
+  "SELECT_PUNCH_TIME": "Select {type} Time:",
+  "BTN_CANCEL": "Cancel",
+  "BTN_SUBMIT_PUNCH_IN": "Submit Punch In",
+  "BTN_SUBMIT_PUNCH_OUT": "Submit Punch Out",
+
+
+  "BTN_SUBMIT_OVERTIME": "Submit Overtime Application",
+  "BTN_SUBMIT_LEAVE": "Submit Leave Application",
+  "ERROR_FETCH_RECORDS": "Failed to fetch records",
+  "CONNECTION_FAILED": "Connection failed",
+  "UNKNOWN_ERROR": "Unknown error",
+  "CHECKING": "Checking...",
+  "NETWORK_ERROR": "Network error",
+  "ERR_AFTER_TODAY": "⚠️ Cannot select a date after today"
 }
