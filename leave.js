@@ -1,4 +1,5 @@
-// leave.js - 請假系統前端邏輯（完整修正版）
+// leave.js - 請假系統前端邏輯（15種假別完整版）
+
 /**
  * 🆕 格式化日期函數
  * 將任何日期格式轉換為 YYYY-MM-DD
@@ -22,7 +23,7 @@ function formatLeaveDate(dateInput) {
  * 初始化請假頁籤
  */
 async function initLeaveTab() {
-    console.log('📋 初始化請假系統...');
+    console.log('📋 初始化請假系統（15種假別）...');
     
     // 載入假期餘額
     await loadLeaveBalance();
@@ -53,7 +54,7 @@ function bindLeaveEventListeners() {
         leaveTypeSelect.addEventListener('change', handleLeaveTypeChange);
     }
     
-    // 開始日期改變時自動計算天數
+    // 開始日期/結束日期改變時自動計算天數
     const startDateInput = document.getElementById('leave-start-date');
     const endDateInput = document.getElementById('leave-end-date');
     
@@ -66,7 +67,7 @@ function bindLeaveEventListeners() {
 }
 
 /**
- * 載入假期餘額
+ * 載入假期餘額（15種假別）
  */
 async function loadLeaveBalance() {
     const balanceContainer = document.getElementById('leave-balance-container');
@@ -91,7 +92,7 @@ async function loadLeaveBalance() {
 }
 
 /**
- * 渲染假期餘額
+ * 渲染假期餘額（15種假別）
  */
 function renderLeaveBalance(balance) {
     const listEl = document.getElementById('leave-balance-list');
@@ -99,17 +100,23 @@ function renderLeaveBalance(balance) {
     
     listEl.innerHTML = '';
     
-    // 定義假別順序
+    // 定義假別順序（15種）
     const leaveOrder = [
-        'ANNUAL_LEAVE',
-        'SICK_LEAVE', 
-        'PERSONAL_LEAVE',
-        'MARRIAGE_LEAVE',
-        'BEREAVEMENT_LEAVE',
-        'MATERNITY_LEAVE',
-        'PATERNITY_LEAVE',
-        'FAMILY_CARE_LEAVE',
-        'MENSTRUAL_LEAVE'
+        'ANNUAL_LEAVE',              // 特休假
+        'COMP_TIME_OFF',             // 加班補休假
+        'PERSONAL_LEAVE',            // 事假
+        'SICK_LEAVE',                // 未住院病假
+        'HOSPITALIZATION_LEAVE',     // 住院病假
+        'BEREAVEMENT_LEAVE',         // 喪假
+        'MARRIAGE_LEAVE',            // 婚假
+        'PATERNITY_LEAVE',           // 陪產檢及陪產假
+        'MATERNITY_LEAVE',           // 產假
+        'OFFICIAL_LEAVE',            // 公假（含兵役假）
+        'WORK_INJURY_LEAVE',         // 公傷假
+        'ABSENCE_WITHOUT_LEAVE',     // 曠工
+        'NATURAL_DISASTER_LEAVE',    // 天然災害停班
+        'FAMILY_CARE_LEAVE',         // 家庭照顧假
+        'MENSTRUAL_LEAVE'            // 生理假
     ];
     
     leaveOrder.forEach(leaveType => {
@@ -122,9 +129,15 @@ function renderLeaveBalance(balance) {
             typeSpan.setAttribute('data-i18n-key', leaveType);
             typeSpan.textContent = t(leaveType);
             
+            // 特殊處理：曠工用紅色顯示
             const daysSpan = document.createElement('span');
-            daysSpan.className = 'text-indigo-600 dark:text-indigo-400 font-bold';
-            daysSpan.textContent = `${balance[leaveType]} ${t('DAYS')}`;
+            if (leaveType === 'ABSENCE_WITHOUT_LEAVE') {
+                daysSpan.className = 'text-red-600 dark:text-red-400 font-bold';
+                daysSpan.textContent = `${balance[leaveType]} ${t('DAYS')}`;
+            } else {
+                daysSpan.className = 'text-indigo-600 dark:text-indigo-400 font-bold';
+                daysSpan.textContent = `${balance[leaveType]} ${t('DAYS')}`;
+            }
             
             item.appendChild(typeSpan);
             item.appendChild(daysSpan);
@@ -170,6 +183,7 @@ async function loadLeaveRecords() {
         emptyEl.style.display = 'block';
     }
 }
+
 /**
  * 渲染請假紀錄（修正版）
  */
@@ -234,11 +248,14 @@ function handleLeaveTypeChange(e) {
     const leaveType = e.target.value;
     const reasonContainer = document.getElementById('leave-reason-container');
     
-    // 某些假別需要特別說明
+    // 需要特別說明的假別
     const requiresReason = [
-        'BEREAVEMENT_LEAVE',
-        'MATERNITY_LEAVE',
-        'PATERNITY_LEAVE'
+        'BEREAVEMENT_LEAVE',          // 喪假
+        'MATERNITY_LEAVE',            // 產假
+        'PATERNITY_LEAVE',            // 陪產檢及陪產假
+        'HOSPITALIZATION_LEAVE',      // 住院病假
+        'WORK_INJURY_LEAVE',          // 公傷假
+        'OFFICIAL_LEAVE'              // 公假（含兵役假）
     ];
     
     if (requiresReason.includes(leaveType)) {

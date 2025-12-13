@@ -637,21 +637,58 @@
                             <!-- 請假類型 -->
                             <div>
                                 <label data-i18n="LEAVE_TYPE_LABEL" 
-                                       for="leave-type" 
-                                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    for="leave-type" 
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     請假類型
                                 </label>
                                 <select id="leave-type" 
                                         class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
                                     <option value="">請選擇請假類型</option>
-                                    <!-- 👇 修正：使用英文代碼 -->
-                                    <option value="PERSONAL_LEAVE" data-i18n-option="LEAVE_TYPE_PERSONAL">事假</option>
-                                    <option value="SICK_LEAVE" data-i18n-option="LEAVE_TYPE_SICK">病假</option>
-                                    <option value="ANNUAL_LEAVE" data-i18n-option="LEAVE_TYPE_ANNUAL">特休</option>
-                                    <option value="MARRIAGE_LEAVE" data-i18n-option="LEAVE_TYPE_MARRIAGE">婚假</option>
-                                    <option value="BEREAVEMENT_LEAVE" data-i18n-option="LEAVE_TYPE_BEREAVEMENT">喪假</option>
-                                    <option value="MATERNITY_LEAVE" data-i18n-option="LEAVE_TYPE_MATERNITY">產假</option>
-                                    <option value="PATERNITY_LEAVE" data-i18n-option="LEAVE_TYPE_PATERNITY">陪產假</option>
+                                    
+                                    <!-- 1. 特休假 -->
+                                    <option value="ANNUAL_LEAVE" data-i18n-option="ANNUAL_LEAVE">特休假</option>
+                                    
+                                    <!-- 2. 加班補休假 -->
+                                    <option value="COMP_TIME_OFF" data-i18n-option="COMP_TIME_OFF">加班補休假</option>
+                                    
+                                    <!-- 3. 事假 -->
+                                    <option value="PERSONAL_LEAVE" data-i18n-option="PERSONAL_LEAVE">事假</option>
+                                    
+                                    <!-- 4. 未住院病假 -->
+                                    <option value="SICK_LEAVE" data-i18n-option="SICK_LEAVE">未住院病假</option>
+                                    
+                                    <!-- 5. 住院病假 -->
+                                    <option value="HOSPITALIZATION_LEAVE" data-i18n-option="HOSPITALIZATION_LEAVE">住院病假</option>
+                                    
+                                    <!-- 6. 喪假 -->
+                                    <option value="BEREAVEMENT_LEAVE" data-i18n-option="BEREAVEMENT_LEAVE">喪假</option>
+                                    
+                                    <!-- 7. 婚假 -->
+                                    <option value="MARRIAGE_LEAVE" data-i18n-option="MARRIAGE_LEAVE">婚假</option>
+                                    
+                                    <!-- 8. 陪產檢及陪產假 -->
+                                    <option value="PATERNITY_LEAVE" data-i18n-option="PATERNITY_LEAVE">陪產檢及陪產假</option>
+                                    
+                                    <!-- 9. 產假 -->
+                                    <option value="MATERNITY_LEAVE" data-i18n-option="MATERNITY_LEAVE">產假</option>
+                                    
+                                    <!-- 10. 公假（含兵役假） -->
+                                    <option value="OFFICIAL_LEAVE" data-i18n-option="OFFICIAL_LEAVE">公假（含兵役假）</option>
+                                    
+                                    <!-- 11. 公傷假 -->
+                                    <option value="WORK_INJURY_LEAVE" data-i18n-option="WORK_INJURY_LEAVE">公傷假</option>
+                                    
+                                    <!-- 12. 曠工（通常不開放申請，管理員使用） -->
+                                    <!-- <option value="ABSENCE_WITHOUT_LEAVE" data-i18n-option="ABSENCE_WITHOUT_LEAVE">曠工</option> -->
+                                    
+                                    <!-- 13. 天然災害停班 -->
+                                    <option value="NATURAL_DISASTER_LEAVE" data-i18n-option="NATURAL_DISASTER_LEAVE">天然災害停班</option>
+                                    
+                                    <!-- 14. 家庭照顧假 -->
+                                    <option value="FAMILY_CARE_LEAVE" data-i18n-option="FAMILY_CARE_LEAVE">家庭照顧假</option>
+                                    
+                                    <!-- 15. 生理假 -->
+                                    <option value="MENSTRUAL_LEAVE" data-i18n-option="MENSTRUAL_LEAVE">生理假</option>
                                 </select>
                             </div>
                             <!-- 開始日期與結束日期 -->
