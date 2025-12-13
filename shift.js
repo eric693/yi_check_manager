@@ -8,14 +8,82 @@ let currentShifts = [];
 let allEmployees = [];
 let allLocations = [];
 let batchData = [];
+let translations = {}; // 👈 新增：翻譯物件
+let currentLang = localStorage.getItem("lang") || "zh-TW"; // 👈 新增：當前語言
 
 // 月曆專用全域變數
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth(); // 0-11
 let allMonthShifts = [];
 
+// 👇 新增：翻譯函式
+function t(code, params = {}) {
+    let text = translations[code] || code;
+    
+    for (const key in params) {
+        let paramValue = params[key];
+        if (paramValue in translations) {
+            paramValue = translations[paramValue];
+        }
+        text = text.replace(`{${key}}`, paramValue);
+    }
+    return text;
+}
+
+// 👇 新增：載入翻譯檔案
+async function loadTranslations(lang) {
+    try {
+        const res = await fetch(`https://eric693.github.io/check_manager_plus/i18n/${lang}.json`);
+        if (!res.ok) {
+            throw new Error(`HTTP 錯誤: ${res.status}`);
+        }
+        translations = await res.json();
+        currentLang = lang;
+        localStorage.setItem("lang", lang);
+        renderTranslations();
+    } catch (err) {
+        console.error("載入語系失敗:", err);
+    }
+}
+
+// 👇 新增：渲染翻譯
+function renderTranslations(container = document) {
+    if (container === document) {
+        document.title = t("SHIFT_PAGE_TITLE");
+    }
+
+    const elementsToTranslate = container.querySelectorAll('[data-i18n]');
+    elementsToTranslate.forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translatedText = t(key);
+        
+        if (translatedText !== key) {
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.placeholder = translatedText;
+            } else {
+                element.textContent = translatedText;
+            }
+        }
+    });
+
+    const selectElements = container.querySelectorAll('select');
+    selectElements.forEach(select => {
+        const options = select.querySelectorAll('option[data-i18n-option]');
+        options.forEach(option => {
+            const key = option.getAttribute('data-i18n-option');
+            if (key) {
+                const translatedText = t(key);
+                if (translatedText !== key) {
+                    option.textContent = translatedText;
+                }
+            }
+        });
+    });
+}
+
 // ========== 初始化 ==========
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() { 
+    await loadTranslations(currentLang);
     initializeTabs();
     loadEmployees();
     loadLocations();

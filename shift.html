@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>排班管理 - 出勤系統</title>
+    <title data-i18n="SHIFT_PAGE_TITLE">排班管理 - 出勤系統</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .shift-container {
@@ -790,117 +790,117 @@
 <body>
     <div class="shift-container">
         <div class="page-header">
-            <h1>排班管理</h1>
-            <button class="btn btn-secondary" onclick="goBack()">返回</button>
+            <h1 data-i18n="SHIFT_MANAGEMENT_TITLE">排班管理</h1>
+            <button class="btn btn-secondary" onclick="goBack()" data-i18n="BTN_BACK">返回</button>
         </div>
 
         <div class="shift-tabs">
-            <button class="shift-tab active" data-tab="view">查看排班</button>
-            <button class="shift-tab" data-tab="add">新增排班</button>
-            <button class="shift-tab" data-tab="batch">批量排班</button>
-            <button class="shift-tab" data-tab="stats">統計分析</button>
+            <button class="shift-tab active" data-tab="view" data-i18n="SHIFT_TAB_VIEW">查看排班</button>
+            <button class="shift-tab" data-tab="add" data-i18n="SHIFT_TAB_ADD">新增排班</button>
+            <button class="shift-tab" data-tab="batch" data-i18n="SHIFT_TAB_BATCH">批量排班</button>
+            <button class="shift-tab" data-tab="stats" data-i18n="SHIFT_TAB_STATS">統計分析</button>
         </div>
 
         <!-- 查看排班 -->
         <div id="view-tab" class="tab-content active">
             <div class="filter-section">
-                <h3>篩選條件</h3>
+                <h3 data-i18n="SHIFT_FILTER_TITLE">篩選條件</h3>
                 <div class="filter-row">
                     <div class="form-group">
-                        <label>開始日期</label>
+                        <label data-i18n="SHIFT_START_DATE">開始日期</label>
                         <input type="date" id="filter-start-date">
                     </div>
                     <div class="form-group">
-                        <label>結束日期</label>
+                        <label data-i18n="SHIFT_END_DATE">結束日期</label>
                         <input type="date" id="filter-end-date">
                     </div>
                     <div class="form-group">
-                        <label>班別</label>
+                        <label data-i18n="SHIFT_TYPE_LABEL">班別</label>
                         <select id="filter-shift-type">
-                            <option value="">全部</option>
-                            <option value="早班">早班</option>
-                            <option value="中班">中班</option>
-                            <option value="晚班">晚班</option>
-                            <option value="全日班">全日班</option>
-                            <option value="排休">排休</option>
-                            <option value="自訂">自訂</option>
+                            <option value="" data-i18n-option="OPTION_ALL">全部</option>
+                            <option value="早班" data-i18n-option="SHIFT_TYPE_MORNING">早班</option>
+                            <option value="中班" data-i18n-option="SHIFT_TYPE_AFTERNOON">中班</option>
+                            <option value="晚班" data-i18n-option="SHIFT_TYPE_NIGHT">晚班</option>
+                            <option value="全日班" data-i18n-option="SHIFT_TYPE_FULL">全日班</option>
+                            <option value="排休" data-i18n-option="SHIFT_TYPE_DAYOFF">排休</option>
+                            <option value="自訂" data-i18n-option="SHIFT_TYPE_CUSTOM">自訂</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>地點</label>
+                        <label data-i18n="SHIFT_LOCATION_LABEL">地點</label>
                         <select id="filter-location">
-                            <option value="">全部</option>
+                            <option value="" data-i18n-option="OPTION_ALL">全部</option>
                         </select>
                     </div>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="filterShifts()">套用篩選</button>
-                    <button class="btn btn-secondary" onclick="clearFilters()">清除篩選</button>
-                    <button class="btn btn-secondary" onclick="exportShifts()">匯出排班表</button>
+                    <button class="btn btn-primary" onclick="filterShifts()" data-i18n="BTN_APPLY_FILTER">套用篩選</button>
+                    <button class="btn btn-secondary" onclick="clearFilters()" data-i18n="BTN_CLEAR_FILTER">清除篩選</button>
+                    <button class="btn btn-secondary" onclick="exportShifts()" data-i18n="BTN_EXPORT_SHIFTS">匯出排班表</button>
                 </div>
             </div>
 
             <div class="shift-list" id="shift-list">
-                <div class="loading">載入中</div>
+                <div class="loading" data-i18n="SHIFT_LOADING">載入中</div>
             </div>
         </div>
 
         <!-- 新增排班 -->
         <div id="add-tab" class="tab-content">
             <div class="shift-card">
-                <h2>新增排班</h2>
+                <h2 data-i18n="SHIFT_ADD_TITLE">新增排班</h2>
                 <form class="shift-form" id="add-shift-form">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">員工</label>
+                            <label class="required" data-i18n="SHIFT_EMPLOYEE_LABEL">員工</label>
                             <select id="employee-select" required>
-                                <option value="">請選擇員工</option>
+                                <option value="" data-i18n-option="SHIFT_SELECT_EMPLOYEE">請選擇員工</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="required">日期</label>
+                            <label class="required" data-i18n="SHIFT_DATE_LABEL">日期</label>
                             <input type="date" id="shift-date" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">班別</label>
+                            <label class="required" data-i18n="SHIFT_TYPE_LABEL">班別</label>
                             <select id="shift-type" required>
-                                <option value="">請選擇班別</option>
-                                <option value="早班">早班 (08:00-16:00)</option>
-                                <option value="中班">中班 (12:00-20:00)</option>
-                                <option value="晚班">晚班 (16:00-24:00)</option>
-                                <option value="全日班">全日班 (09:00-18:00)</option>
-                                <option value="排休">排休 (休假日)</option>
-                                <option value="自訂">自訂時間</option>
+                                <option value="" data-i18n-option="SHIFT_SELECT_TYPE">請選擇班別</option>
+                                <option value="早班" data-i18n-option="SHIFT_MORNING_DESC">早班 (08:00-16:00)</option>
+                                <option value="中班" data-i18n-option="SHIFT_AFTERNOON_DESC">中班 (12:00-20:00)</option>
+                                <option value="晚班" data-i18n-option="SHIFT_NIGHT_DESC">晚班 (16:00-24:00)</option>
+                                <option value="全日班" data-i18n-option="SHIFT_FULL_DESC">全日班 (09:00-18:00)</option>
+                                <option value="排休" data-i18n-option="SHIFT_DAYOFF_DESC">排休 (休假日)</option>
+                                <option value="自訂" data-i18n-option="SHIFT_CUSTOM_DESC">自訂時間</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="required">上班時間</label>
+                            <label class="required" data-i18n="SHIFT_START_TIME">上班時間</label>
                             <input type="time" id="start-time" required>
                         </div>
                         <div class="form-group">
-                            <label class="required">下班時間</label>
+                            <label class="required" data-i18n="SHIFT_END_TIME">下班時間</label>
                             <input type="time" id="end-time" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="required">地點</label>
+                        <label class="required" data-i18n="SHIFT_LOCATION_LABEL">地點</label>
                         <select id="shift-location" required>
-                            <option value="">請選擇地點</option>
+                            <option value="" data-i18n-option="SHIFT_SELECT_LOCATION">請選擇地點</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>備註</label>
-                        <textarea id="shift-note" placeholder="輸入備註資訊..."></textarea>
+                        <label data-i18n="SHIFT_NOTE_LABEL">備註</label>
+                        <textarea id="shift-note" data-i18n="SHIFT_NOTE_PLACEHOLDER" placeholder="輸入備註資訊..."></textarea>
                     </div>
 
                     <div class="btn-group">
-                        <button type="submit" class="btn btn-primary">新增排班</button>
-                        <button type="button" class="btn btn-secondary" onclick="resetForm()">重置</button>
+                        <button type="submit" class="btn btn-primary" data-i18n="BTN_ADD_SHIFT">新增排班</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()" data-i18n="BTN_RESET">重置</button>
                     </div>
                 </form>
             </div>
@@ -909,65 +909,65 @@
         <!-- 批量排班 -->
         <div id="batch-tab" class="tab-content">
             <div class="shift-card">
-                <h2>批量新增排班</h2>
-                <p style="color: #666; margin-bottom: 20px;">
+                <h2 data-i18n="SHIFT_BATCH_TITLE">批量新增排班</h2>
+                <p style="color: #666; margin-bottom: 20px;" data-i18n="SHIFT_BATCH_DESC">
                     上傳 CSV 或 Excel 檔案批量新增排班。檔案格式: 員工ID, 員工姓名, 日期, 班別, 上班時間, 下班時間, 地點, 備註
                 </p>
                 
                 <div class="batch-upload-area" id="upload-area">
                     <div class="empty-state-icon">📄</div>
-                    <p>拖放檔案到此處，或點擊選擇檔案</p>
+                    <p data-i18n="SHIFT_UPLOAD_DESC">拖放檔案到此處，或點擊選擇檔案</p>
                     <input type="file" id="batch-file-input" accept=".csv,.xlsx,.xls" style="display: none;">
-                    <button class="btn btn-primary" onclick="document.getElementById('batch-file-input').click()">
+                    <button class="btn btn-primary" onclick="document.getElementById('batch-file-input').click()" data-i18n="BTN_SELECT_FILE">
                         選擇檔案
                     </button>
                 </div>
 
                 <div id="batch-preview" style="display: none; margin-top: 20px;">
-                    <h3>預覽資料</h3>
+                    <h3 data-i18n="SHIFT_PREVIEW_TITLE">預覽資料</h3>
                     <div id="preview-table"></div>
                     <div class="btn-group">
-                        <button class="btn btn-primary" onclick="confirmBatchUpload()">確認上傳</button>
-                        <button class="btn btn-secondary" onclick="cancelBatchUpload()">取消</button>
+                        <button class="btn btn-primary" onclick="confirmBatchUpload()" data-i18n="BTN_CONFIRM_UPLOAD">確認上傳</button>
+                        <button class="btn btn-secondary" onclick="cancelBatchUpload()" data-i18n="BTN_CANCEL">取消</button>
                     </div>
                 </div>
 
                 <div style="margin-top: 20px;">
-                    <button class="btn btn-secondary" onclick="downloadTemplate()">下載範本檔案</button>
+                    <button class="btn btn-secondary" onclick="downloadTemplate()" data-i18n="BTN_DOWNLOAD_TEMPLATE">下載範本檔案</button>
                 </div>
             </div>
         </div>
 
-        <!-- 統計分析 - 完整月曆版 -->
+        <!-- 統計分析 -->
         <div id="stats-tab" class="tab-content">
             <!-- 統計卡片 -->
             <div id="stats-grid" class="stats-grid">
-                <div class="loading">載入統計資料中</div>
+                <div class="loading" data-i18n="SHIFT_STATS_LOADING">載入統計資料中</div>
             </div>
 
             <!-- 月份選擇器 -->
             <div class="calendar-header">
                 <div class="month-selector">
-                    <button class="month-btn" onclick="previousMonth()">◀ 上個月</button>
+                    <button class="month-btn" onclick="previousMonth()" data-i18n="BTN_PREV_MONTH">◀ 上個月</button>
                     <div class="current-month" id="current-month">2025年10月</div>
-                    <button class="month-btn" onclick="nextMonth()">下個月 ▶</button>
+                    <button class="month-btn" onclick="nextMonth()" data-i18n="BTN_NEXT_MONTH">下個月 ▶</button>
                 </div>
-                <button class="today-btn" onclick="goToToday()">回到今天</button>
+                <button class="today-btn" onclick="goToToday()" data-i18n="BTN_TODAY">回到今天</button>
             </div>
 
             <!-- 完整月曆 -->
             <div class="calendar-container">
                 <div class="calendar-weekdays">
-                    <div class="calendar-weekday">日</div>
-                    <div class="calendar-weekday">一</div>
-                    <div class="calendar-weekday">二</div>
-                    <div class="calendar-weekday">三</div>
-                    <div class="calendar-weekday">四</div>
-                    <div class="calendar-weekday">五</div>
-                    <div class="calendar-weekday">六</div>
+                    <div class="calendar-weekday" data-i18n="WEEK_SUNDAY">日</div>
+                    <div class="calendar-weekday" data-i18n="WEEK_MONDAY">一</div>
+                    <div class="calendar-weekday" data-i18n="WEEK_TUESDAY">二</div>
+                    <div class="calendar-weekday" data-i18n="WEEK_WEDNESDAY">三</div>
+                    <div class="calendar-weekday" data-i18n="WEEK_THURSDAY">四</div>
+                    <div class="calendar-weekday" data-i18n="WEEK_FRIDAY">五</div>
+                    <div class="calendar-weekday" data-i18n="WEEK_SATURDAY">六</div>
                 </div>
                 <div id="calendar-grid" class="calendar-grid">
-                    <div class="loading">載入月曆中</div>
+                    <div class="loading" data-i18n="SHIFT_CALENDAR_LOADING">載入月曆中</div>
                 </div>
             </div>
 

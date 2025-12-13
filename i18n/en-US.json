@@ -419,5 +419,69 @@
   "UNKNOWN_ERROR": "Unknown error",
   "CHECKING": "Checking...",
   "NETWORK_ERROR": "Network error",
-  "ERR_AFTER_TODAY": "⚠️ Cannot select a date after today"
+  "ERR_AFTER_TODAY": "⚠️ Cannot select a date after today",
+
+
+
+  "SHIFT_PAGE_TITLE": "Shift Management - Attendance System",
+  "SHIFT_MANAGEMENT_TITLE": "Shift Management",
+  "BTN_BACK": "Back",
+  
+  "SHIFT_TAB_VIEW": "View Shifts",
+  "SHIFT_TAB_ADD": "Add Shift",
+  "SHIFT_TAB_BATCH": "Batch Upload",
+  "SHIFT_TAB_STATS": "Statistics",
+  
+  "SHIFT_FILTER_TITLE": "Filter Criteria",
+  "SHIFT_START_DATE": "Start Date",
+  "SHIFT_END_DATE": "End Date",
+  "OPTION_ALL": "All",
+  
+  "SHIFT_TYPE_MORNING": "Morning",
+  "SHIFT_TYPE_AFTERNOON": "Afternoon",
+  "SHIFT_TYPE_NIGHT": "Night",
+  "SHIFT_TYPE_FULL": "Full Day",
+  "SHIFT_TYPE_DAYOFF": "Day Off",
+  "SHIFT_TYPE_CUSTOM": "Custom",
+  
+  "BTN_APPLY_FILTER": "Apply Filter",
+  "BTN_CLEAR_FILTER": "Clear Filter",
+  "BTN_EXPORT_SHIFTS": "Export Shift Schedule",
+  
+  "SHIFT_ADD_TITLE": "Add Shift",
+  "SHIFT_EMPLOYEE_LABEL": "Employee",
+  "SHIFT_SELECT_EMPLOYEE": "Select Employee",
+  "SHIFT_DATE_LABEL": "Date",
+  "SHIFT_SELECT_TYPE": "Select Shift Type",
+  
+  "SHIFT_MORNING_DESC": "Morning (08:00-16:00)",
+  "SHIFT_AFTERNOON_DESC": "Afternoon (12:00-20:00)",
+  "SHIFT_NIGHT_DESC": "Night (16:00-24:00)",
+  "SHIFT_FULL_DESC": "Full Day (09:00-18:00)",
+  "SHIFT_DAYOFF_DESC": "Day Off (Rest Day)",
+  "SHIFT_CUSTOM_DESC": "Custom Time",
+  
+  "SHIFT_START_TIME": "Start Time",
+  "SHIFT_END_TIME": "End Time",
+  "SHIFT_SELECT_LOCATION": "Select Location",
+  "SHIFT_NOTE_LABEL": "Notes",
+  "SHIFT_NOTE_PLACEHOLDER": "Enter notes...",
+  
+  "BTN_ADD_SHIFT": "Add Shift",
+  "BTN_RESET": "Reset",
+  
+  "SHIFT_BATCH_TITLE": "Batch Add Shifts",
+  "SHIFT_BATCH_DESC": "Upload CSV or Excel file for batch shift upload. Format: Employee ID, Name, Date, Shift Type, Start Time, End Time, Location, Notes",
+  "SHIFT_UPLOAD_DESC": "Drag and drop file here, or click to select",
+  "BTN_SELECT_FILE": "Select File",
+  "SHIFT_PREVIEW_TITLE": "Preview Data",
+  "BTN_CONFIRM_UPLOAD": "Confirm Upload",
+  "BTN_DOWNLOAD_TEMPLATE": "Download Template",
+  
+  "SHIFT_STATS_LOADING": "Loading statistics...",
+  "BTN_PREV_MONTH": "◀ Previous Month",
+  "BTN_NEXT_MONTH": "Next Month ▶",
+  "BTN_TODAY": "Today",
+  "SHIFT_CALENDAR_LOADING": "Loading calendar..."
+
 }

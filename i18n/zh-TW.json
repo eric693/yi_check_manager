@@ -438,5 +438,67 @@
     "UNKNOWN_ERROR": "未知錯誤",
     "CHECKING": "檢查中...",
     "NETWORK_ERROR": "網路錯誤",
-    "ERR_AFTER_TODAY": "⚠️ 不能選擇今天以後的時間"
+    "ERR_AFTER_TODAY": "⚠️ 不能選擇今天以後的時間",
+
+
+    "SHIFT_PAGE_TITLE": "排班管理 - 出勤系統",
+  "SHIFT_MANAGEMENT_TITLE": "排班管理",
+  "BTN_BACK": "返回",
+  
+  "SHIFT_TAB_VIEW": "查看排班",
+  "SHIFT_TAB_ADD": "新增排班",
+  "SHIFT_TAB_BATCH": "批量排班",
+  "SHIFT_TAB_STATS": "統計分析",
+  
+  "SHIFT_FILTER_TITLE": "篩選條件",
+  "SHIFT_START_DATE": "開始日期",
+  "SHIFT_END_DATE": "結束日期",
+  "OPTION_ALL": "全部",
+  
+  "SHIFT_TYPE_MORNING": "早班",
+  "SHIFT_TYPE_AFTERNOON": "中班",
+  "SHIFT_TYPE_NIGHT": "晚班",
+  "SHIFT_TYPE_FULL": "全日班",
+  "SHIFT_TYPE_DAYOFF": "排休",
+  "SHIFT_TYPE_CUSTOM": "自訂",
+  
+  "BTN_APPLY_FILTER": "套用篩選",
+  "BTN_CLEAR_FILTER": "清除篩選",
+  "BTN_EXPORT_SHIFTS": "匯出排班表",
+  
+  "SHIFT_ADD_TITLE": "新增排班",
+  "SHIFT_EMPLOYEE_LABEL": "員工",
+  "SHIFT_SELECT_EMPLOYEE": "請選擇員工",
+  "SHIFT_DATE_LABEL": "日期",
+  "SHIFT_SELECT_TYPE": "請選擇班別",
+  
+  "SHIFT_MORNING_DESC": "早班 (08:00-16:00)",
+  "SHIFT_AFTERNOON_DESC": "中班 (12:00-20:00)",
+  "SHIFT_NIGHT_DESC": "晚班 (16:00-24:00)",
+  "SHIFT_FULL_DESC": "全日班 (09:00-18:00)",
+  "SHIFT_DAYOFF_DESC": "排休 (休假日)",
+  "SHIFT_CUSTOM_DESC": "自訂時間",
+  
+  "SHIFT_START_TIME": "上班時間",
+  "SHIFT_END_TIME": "下班時間",
+  "SHIFT_SELECT_LOCATION": "請選擇地點",
+  "SHIFT_NOTE_LABEL": "備註",
+  "SHIFT_NOTE_PLACEHOLDER": "輸入備註資訊...",
+  
+  "BTN_ADD_SHIFT": "新增排班",
+  "BTN_RESET": "重置",
+  
+  "SHIFT_BATCH_TITLE": "批量新增排班",
+  "SHIFT_BATCH_DESC": "上傳 CSV 或 Excel 檔案批量新增排班。檔案格式: 員工ID, 員工姓名, 日期, 班別, 上班時間, 下班時間, 地點, 備註",
+  "SHIFT_UPLOAD_DESC": "拖放檔案到此處，或點擊選擇檔案",
+  "BTN_SELECT_FILE": "選擇檔案",
+  "SHIFT_PREVIEW_TITLE": "預覽資料",
+  "BTN_CONFIRM_UPLOAD": "確認上傳",
+  "BTN_DOWNLOAD_TEMPLATE": "下載範本檔案",
+  
+  "SHIFT_STATS_LOADING": "載入統計資料中",
+  "BTN_PREV_MONTH": "◀ 上個月",
+  "BTN_NEXT_MONTH": "下個月 ▶",
+  "BTN_TODAY": "回到今天",
+  "SHIFT_CALENDAR_LOADING": "載入月曆中"
 }
