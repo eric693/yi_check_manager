@@ -13,13 +13,20 @@
     "TAB_MONTHLY": "บันทึกการเข้างาน",
     "TAB_LOCATION": "ตำแหน่ง",
     "TAB_ADMIN": "ผู้ดูแลระบบ",
+    "TAB_OVERTIME": "ทำงานล่วงเวลา",
+    "TAB_SALARY": "เงินเดือน",
+  
     "PUNCH_SECTION_TITLE": "พื้นที่ลงเวลา",
     "PUNCH_SECTION_DESCRIPTION": "กรุณาคลิกปุ่มด้านล่างเพื่อลงเวลาเข้างานหรือออกงาน",
+    "PUNCH_SECTION_DESC": "กรุณาคลิกปุ่มด้านล่างเพื่อลงเวลาเข้างานหรือออกงาน",
+  
     "ABNORMAL_RECORDS_TITLE": "บันทึกการเข้างาน",
     "ABNORMAL_RECORDS_DESCRIPTION": "ระบบจะตรวจจับบันทึกที่ผิดปกติในเดือนนี้โดยอัตโนมัติ คุณสามารถเพิ่มเวลาลงเวลาได้ที่นี่",
     "RECORDS_LOADING": "กำลังโหลดบันทึก...",
     "RECORDS_EMPTY_TITLE": "ยอดเยี่ยม!",
     "RECORDS_EMPTY_MESSAGE": "ไม่มีบันทึกที่ผิดปกติในเดือนนี้",
+    "ERROR_FETCH_RECORDS": "ไม่สามารถดึงบันทึกได้",
+  
     "MONTHLY_VIEW_TITLE": "บันทึกการเข้างาน",
     "WEEK_SUNDAY": "อา",
     "WEEK_MONDAY": "จ",
@@ -28,7 +35,9 @@
     "WEEK_THURSDAY": "พฤ",
     "WEEK_FRIDAY": "ศ",
     "WEEK_SATURDAY": "ส",
+  
     "DAILY_RECORDS_EMPTY": "ไม่มีบันทึกการลงเวลาในวันนี้",
+  
     "CURRENT_LOCATION_TITLE": "ตำแหน่งปัจจุบัน",
     "CURRENT_LOCATION_DESCRIPTION": "ระบบจะตรวจจับตำแหน่งของคุณผ่าน GPS",
     "MAP_LOADING": "กำลังโหลดแผนที่...",
@@ -36,11 +45,13 @@
     "LOCATION_STATUS_PENDING": "ยังไม่ได้ตรวจจับ",
     "COORDINATES_LABEL": "พิกัด：",
     "COORDINATES_UNKNOWN": "ไม่ทราบ",
+  
     "PENDING_REQUESTS_TITLE": "คำขอที่รออนุมัติ",
     "PENDING_REQUESTS_DESCRIPTION": "กรุณาจัดการคำขอเพิ่มเวลาลงเวลาหรือบัตรเสมือนจากพนักงาน",
     "REQUESTS_LOADING": "กำลังโหลดคำขอ...",
     "REQUESTS_EMPTY_TITLE": "ยอดเยี่ยม!",
     "REQUESTS_EMPTY_MESSAGE": "ไม่มีคำขอที่รออนุมัติ",
+  
     "ADD_LOCATION_TITLE": "เพิ่มสถานที่ลงเวลา",
     "ADD_LOCATION_DESCRIPTION": "กรอกชื่อสถานที่และใช้ตำแหน่งปัจจุบันของคุณเป็นพิกัด",
     "LOCATION_NAME_LABEL": "ชื่อสถานที่",
@@ -49,47 +60,63 @@
     "LONGITUDE_PLACEHOLDER": "ลองจิจูด",
     "GET_LOCATION_BTN": "รับตำแหน่งปัจจุบัน",
     "ADD_LOCATION_BTN": "เพิ่มสถานที่",
+  
     "API_TEST_TITLE": "พื้นที่ทดสอบ API",
     "API_TEST_DESCRIPTION": "คลิกปุ่มด้านล่างเพื่อทดสอบฟังก์ชัน API ใหม่",
     "API_TEST_BTN": "ทดสอบ API",
+  
     "FOOTER_VERSION": "ระบบจัดการเวลาทำงาน v4.2.2",
     "FOOTER_CREDITS_PREFIX": "พัฒนาโดย",
     "FOOTER_CREDITS_SUFFIX": "",
     "FOOTER_SPONSOR": "คลิกที่นี่เพื่อสนับสนุนโปรเจกต์นี้",
     "FOOTER_OPEN_SOURCE": "นี่คือโปรเจกต์โอเพนซอร์ส ยินดีต้อนรับการมีส่วนร่วม",
     "LOGIN_INFO": "กรุณาคลิกเข้าสู่ระบบเพื่อดำเนินการต่อ",
+  
     "_comment1": "＿＿＿＿＿ภาษาไทย - การแปล JavaScript ส่วนหน้าบ้าน＿＿＿＿",
     "LOADING": "⏳ กำลังดำเนินการ...",
+    "CHECKING": "กำลังตรวจสอบ...",
+    "NETWORK_ERROR": "ข้อผิดพลาดของเครือข่าย",
+    "UNKNOWN_ERROR": "ข้อผิดพลาดที่ไม่ทราบสาเหตุ",
+    "CONNECTION_FAILED": "การเชื่อมต่อล้มเหลว",
+  
     "ADJUST_BUTTON_TEXT": "เพิ่มเวลาลงเวลา",
     "MONTH_YEAR_TEMPLATE": "{month} {year}",
     "DAILY_RECORDS_TITLE": "บันทึกการลงเวลา {dateKey}",
     "RECORD_NOTE_PREFIX": "หมายเหตุ：",
     "RECORD_REASON_PREFIX": "ระบบตัดสิน：",
+  
     "ADMIN_APPROVE_BUTTON": "อนุมัติ",
     "ADMIN_REJECT_BUTTON": "ปฏิเสธ",
     "REQUEST_APPROVED": "อนุมัติคำขอแล้ว!",
     "REQUEST_REJECTED": "ปฏิเสธคำขอแล้ว!",
     "REVIEW_FAILED": "การตรวจสอบล้มเหลว：{msg}",
     "REVIEW_NETWORK_ERROR": "การตรวจสอบล้มเหลว กรุณาตรวจสอบการเชื่อมต่อเครือข่าย",
+  
     "SELECT_DATETIME_LABEL": "เลือกวันที่และเวลา：",
     "BTN_ADJUST_IN": "เพิ่มเวลาเข้างาน",
     "BTN_ADJUST_OUT": "เพิ่มเวลาออกงาน",
+  
     "DETECTING_LOCATION": "กำลังตรวจจับตำแหน่ง...",
     "UNKNOWN_LOCATION": "ไม่ทราบ",
     "DETECTION_SUCCESS": "ตรวจจับสำเร็จ",
     "CURRENT_LOCATION": "ตำแหน่งปัจจุบัน",
     "DETECTION_FAILED": "ตรวจจับล้มเหลว",
+  
     "ERROR_GEOLOCATION_PERMISSION_DENIED": "ผู้ใช้ปฏิเสธคำขอตำแหน่ง",
-    "ERROR_GEOLOCATION_UNAVAILABLE": "ผู้ใช้ปฏิเสธคำขอตำแหน่ง",
+    "ERROR_GEOLOCATION_UNAVAILABLE": "ข้อมูลตำแหน่งไม่พร้อมใช้งาน",
     "ERROR_GEOLOCATION_TIMEOUT": "คำขอตำแหน่งหมดเวลา",
     "ERROR_GEOLOCATION_UNKNOWN": "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ",
     "ERROR_BROWSER_NOT_SUPPORTED": "เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่งทางภูมิศาสตร์",
+  
     "_comment2": "＿＿＿＿＿ภาษาไทย - การแปลส่วนหลังบ้าน＿＿＿＿",
     "FOOTER_NOTICE": "※ สถานะการเข้าสู่ระบบจะถูกบันทึกในเบราว์เซอร์ของคุณเป็นเวลา 1 วัน หากเปลี่ยนอุปกรณ์หรือล้างข้อมูลจะต้องเข้าสู่ระบบใหม่",
+  
     "ADJUST_PUNCH_TITLE": "เพิ่มเวลาลงเวลา",
     "ADJUST_PUNCH_DATETIME_LABEL": "เลือกวันที่และเวลาสำหรับการเพิ่มเวลาลงเวลา：",
+  
     "PUNCH_SUCCESS": "✅ ลงเวลา{type}สำเร็จ",
     "ADJUST_PUNCH_SUCCESS": "✅ เพิ่มเวลาลงเวลา{type}สำเร็จ",
+  
     "ERR_SESSION_INVALID": "🔄 ข้อมูลการเข้าสู่ระบบหมดอายุ「กรุณาเข้าสู่ระบบใหม่」",
     "ERR_SESSION_EXPIRED": "เซสชันหมดอายุ",
     "ERR_SESSION_TOKEN": "sessionToken ไม่ถูกต้อง",
@@ -103,19 +130,25 @@
     "ERR_ACCOUNT_DISABLED": "บัญชีไม่ได้เปิดใช้งาน! กรุณาแจ้งผู้ดูแลระบบ!",
     "ERR_NO_DATA": "ไม่มีข้อมูล",
     "ERR_OUT_OF_RANGE": "❌ ลงเวลาล้มเหลว! ไม่อยู่ในพื้นที่ลงเวลาที่อนุญาต",
+  
     "ABNORMAL_MISSING_ALL": "{date} ขาดบัตร（ไม่ได้ลงเวลาทั้งวัน）",
     "ABNORMAL_MISSING_OUT": "{date} ขาดบัตรออกงาน",
     "ABNORMAL_MISSING_IN": "{date} ขาดบัตรเข้างาน",
+  
     "BTN_RELOGIN": "เข้าสู่ระบบใหม่",
     "PLEASE_RELOGIN": "กรุณาเข้าสู่ระบบใหม่",
+  
     "BTN_PUNCH_IN": "ลงเวลาเข้างาน",
     "BTN_PUNCH_OUT": "ลงเวลาออกงาน",
     "BTN_VIEW_ABNORMAL": "⚠️ ดูบันทึกที่ผิดปกติ 👀",
+  
     "INVALID_ADJUST_TIME": "⚠️ เวลาที่เลือกไม่ถูกต้อง",
     "SELECT_ADJUST_DATETIME": "กรุณาเลือกวันที่และเวลาสำหรับการเพิ่มเวลาลงเวลา",
+  
     "LOGIN_SUCCESS": "✅ เข้าสู่ระบบสำเร็จ!",
     "ERROR_GEOLOCATION": "⚠️ ไม่สามารถรับตำแหน่งได้：{msg}",
     "ERROR_LOGIN_FAILED": "❌ เข้าสู่ระบบล้มเหลว：{msg}",
+  
     "calendar_title": "ปฏิทินลงเวลาของฉัน",
     "prev_month": "เดือนก่อนหน้า",
     "next_month": "เดือนถัดไป",
@@ -123,26 +156,49 @@
     "modal_detail_title": "รายละเอียดการลงเวลา",
     "close": "ปิด",
     "load_failed": "โหลดบันทึกล้มเหลว",
+  
     "year": "ปี",
     "month": "เดือน",
+  
     "status_normal": "✔️",
     "status_abnormal": "⚠️",
     "status_virtual": "เสมือน",
     "status_repair": "เพิ่ม",
+  
     "repair_approved": "ตรวจสอบแล้ว",
     "repair_pending": "รอตรวจสอบ",
+  
     "no_record": "ไม่มีบันทึก",
+  
     "ERR_BEFORE_MONTH_START": "⚠️ ไม่สามารถเลือกเวลาก่อนเดือนนี้",
+    "ERR_AFTER_TODAY": "⚠️ ไม่สามารถเลือกวันที่ถัดจากวันนี้",
+  
     "STATUS_PUNCH_NORMAL": "ลงเวลาปกติ",
     "STATUS_NO_RECORD": "ไม่ได้ลงเวลา",
     "STATUS_PUNCH_OUT_MISSING": "ไม่ได้ลงเวลาออกงาน",
     "STATUS_PUNCH_IN_MISSING": "ไม่ได้ลงเวลาเข้างาน",
     "STATUS_REPAIR_PENDING": "เพิ่มเวลาลงเวลา(รอตรวจสอบ)",
     "STATUS_REPAIR_APPROVED": "เพิ่มเวลาลงเวลาผ่าน",
+    "STATUS_REPAIR_PENDING_IN": "เพิ่มเวลาเข้างาน (รอตรวจสอบ)",
+    "STATUS_REPAIR_PENDING_OUT": "เพิ่มเวลาออกงาน (รอตรวจสอบ)",
+    "STATUS_REPAIR_APPROVED_IN": "เพิ่มเวลาเข้างานผ่าน",
+    "STATUS_REPAIR_APPROVED_OUT": "เพิ่มเวลาออกงานผ่าน",
+    "STATUS_REPAIR_REJECTED_IN": "การเพิ่มเวลาเข้างานถูกปฏิเสธ",
+    "STATUS_REPAIR_REJECTED_OUT": "การเพิ่มเวลาออกงานถูกปฏิเสธ",
+    "REAPPLY": "ยื่นคำขอใหม่",
+  
     "PUNCH_IN": "เข้างาน",
     "PUNCH_OUT": "ออกงาน",
-
-    "TAB_OVERTIME": "ทำงานล่วงเวลา",
+  
+    "MAKEUP_PUNCH_TITLE": "เพิ่มเวลาลงเวลา: {date} ({type})",
+    "SELECT_PUNCH_TIME": "เลือกเวลาสำหรับ{type}：",
+    "BTN_CANCEL": "ยกเลิก",
+    "BTN_SUBMIT_PUNCH_IN": "ส่งการเพิ่มเวลาเข้างาน",
+    "BTN_SUBMIT_PUNCH_OUT": "ส่งการเพิ่มเวลาออกงาน",
+  
+    "BTN_SUBMIT_OVERTIME": "ส่งคำขอทำงานล่วงเวลา",
+    "BTN_SUBMIT_LEAVE": "ส่งคำขอลางาน",
+  
     "OVERTIME_APPLY_TITLE": "ยื่นขอทำงานล่วงเวลา",
     "OVERTIME_APPLY_DESCRIPTION": "กรอกข้อมูลด้านล่างเพื่อยื่นขอทำงานล่วงเวลา",
     "OVERTIME_DATE_LABEL": "วันที่ทำงานล่วงเวลา",
@@ -152,60 +208,91 @@
     "OVERTIME_REASON_LABEL": "เหตุผลในการยื่นขอ：",
     "OVERTIME_REASON_PLACEHOLDER": "กรุณาระบุเหตุผลในการทำงานล่วงเวลา...",
     "OVERTIME_SUBMIT_BTN": "ส่งคำขอ",
+  
     "OVERTIME_RECORDS_TITLE": "บันทึกการทำงานล่วงเวลาของฉัน",
     "OVERTIME_RECORDS_DESCRIPTION": "ดูประวัติการยื่นขอทำงานล่วงเวลาของคุณ",
     "OVERTIME_NO_RECORDS": "ไม่มีบันทึกการทำงานล่วงเวลา",
+  
     "OVERTIME_STATUS_PENDING": "รอตรวจสอบ",
     "OVERTIME_STATUS_APPROVED": "อนุมัติแล้ว",
     "OVERTIME_STATUS_REJECTED": "ปฏิเสธแล้ว",
+  
     "OVERTIME_REVIEW_COMMENT": "ความเห็นในการตรวจสอบ：",
+  
     "OVERTIME_PENDING_TITLE": "คำขอทำงานล่วงเวลาที่รออนุมัติ",
     "OVERTIME_PENDING_DESCRIPTION": "ตรวจสอบคำขอทำงานล่วงเวลาของพนักงาน",
     "OVERTIME_NO_PENDING": "ยอดเยี่ยม! ไม่มีคำขอทำงานล่วงเวลาที่รออนุมัติ",
+  
     "OVERTIME_FILL_ALL_FIELDS": "กรุณากรอกข้อมูลทุกช่อง",
     "OVERTIME_INVALID_HOURS": "ชั่วโมงทำงานล่วงเวลาต้องมากกว่า 0",
     "OVERTIME_SUBMIT_SUCCESS": "✅ ยื่นขอทำงานล่วงเวลาแล้ว",
     "OVERTIME_APPROVED": "✅ อนุมัติคำขอทำงานล่วงเวลาแล้ว",
     "OVERTIME_REJECTED": "❌ ปฏิเสธคำขอทำงานล่วงเวลาแล้ว",
     "OVERTIME_REJECT_REASON_PROMPT": "กรุณากรอกเหตุผลในการปฏิเสธ（ไม่บังคับ）",
+  
+    "OVERTIME_APPROVED_INFO": "✅ อนุมัติการทำงานล่วงเวลาแล้ว",
+    "OVERTIME_HOURS": "{hours} ชั่วโมง",
+    "OVERTIME_TIME_RANGE": "ช่วงเวลาทำงานล่วงเวลา: {startTime} - {endTime}",
+    "OVERTIME_REASON": "เหตุผลในการทำงานล่วงเวลา: {reason}",
+  
     "ERROR_LOAD_OVERTIME": "โหลดบันทึกการทำงานล่วงเวลาล้มเหลว",
     "ERROR_SUBMIT_OVERTIME": "ยื่นขอทำงานล่วงเวลาล้มเหลว",
     "ERR_NO_PERMISSION": "คุณไม่มีสิทธิ์ในการดำเนินการนี้",
-
+  
     "TAB_LEAVE": "ลางาน",
     "LEAVE_BALANCE_TITLE": "ยอดวันลาคงเหลือ",
     "LEAVE_BALANCE_DESCRIPTION": "จำนวนวันลาที่ใช้ได้ของคุณ",
+  
     "LEAVE_APPLY_TITLE": "ยื่นขอลางาน",
     "LEAVE_APPLY_DESCRIPTION": "กรอกข้อมูลด้านล่างเพื่อยื่นขอลางาน",
+  
     "LEAVE_TYPE_LABEL": "ประเภทการลา",
     "LEAVE_START_DATE_LABEL": "วันที่เริ่มต้น",
     "LEAVE_END_DATE_LABEL": "วันที่สิ้นสุด",
     "LEAVE_DAYS_LABEL": "จำนวนวันลา",
     "LEAVE_REASON_LABEL": "เหตุผลในการลา:",
     "LEAVE_SUBMIT_BTN": "ส่งคำขอ",
+  
     "ANNUAL_LEAVE": "ลาพักร้อน",
-    "SICK_LEAVE": "ลาป่วย",
+    "COMP_TIME_OFF": "ลาชดเชยจากการทำงานล่วงเวลา",
     "PERSONAL_LEAVE": "ลากิจ",
-    "MARRIAGE_LEAVE": "ลาแต่งงาน",
+    "SICK_LEAVE": "ลาป่วย",
+    "HOSPITALIZATION_LEAVE": "ลาป่วย (นอนโรงพยาบาล)",
     "BEREAVEMENT_LEAVE": "ลาเพื่อจัดการศพ",
-    "MATERNITY_LEAVE": "ลาคลอด",
+    "MARRIAGE_LEAVE": "ลาแต่งงาน",
     "PATERNITY_LEAVE": "ลาเพื่อดูแลภริยาที่คลอดบุตร",
+    "MATERNITY_LEAVE": "ลาคลอด",
+    "OFFICIAL_LEAVE": "ลาราชการ (รวมถึงการเกณฑ์ทหาร)",
+    "WORK_INJURY_LEAVE": "ลาจากอุบัติเหตุจากการทำงาน",
+    "ABSENCE_WITHOUT_LEAVE": "ขาดงานโดยไม่ได้รับอนุญาต",
+    "NATURAL_DISASTER_LEAVE": "หยุดงานเนื่องจากภัยพิบัติธรรมชาติ",
     "FAMILY_CARE_LEAVE": "ลาเพื่อดูแลครอบครัว",
     "MENSTRUAL_LEAVE": "ลาประจำเดือน",
+  
     "DAYS": "วัน",
+  
     "LEAVE_RECORDS_TITLE": "บันทึกการลางานของฉัน",
     "LEAVE_RECORDS_DESCRIPTION": "ดูประวัติการยื่นขอลางานของคุณ",
     "LEAVE_NO_RECORDS": "ไม่มีบันทึกการลางาน",
+  
     "PENDING": "รอตรวจสอบ",
     "APPROVED": "อนุมัติแล้ว",
     "REJECTED": "ปฏิเสธแล้ว",
+  
     "LEAVE_PENDING_TITLE": "คำขอลางานที่รออนุมัติ",
     "LEAVE_PENDING_DESCRIPTION": "ตรวจสอบคำขอลางานของพนักงาน",
     "LEAVE_NO_PENDING": "ยอดเยี่ยม! ไม่มีคำขอลางานที่รออนุมัติ",
+  
     "LEAVE_SUBMIT_SUCCESS": "ยื่นขอลางานแล้ว รอผู้บังคับบัญชาอนุมัติ",
     "LEAVE_SUBMIT_FAILED": "ยื่นขอลางานล้มเหลว",
     "LEAVE_APPROVED": "อนุมัติคำขอลางานแล้ว",
     "LEAVE_REJECTED": "ปฏิเสธคำขอลางานแล้ว",
+  
+    "LEGEND_OVERTIME": "ทำงานล่วงเวลา",
+    "LEGEND_LEAVE_APPROVED": "ลางาน (อนุมัติแล้ว)",
+    "LEGEND_LEAVE_PENDING": "ลางาน (รอตรวจสอบ)",
+    "LEGEND_LEAVE_REJECTED": "ลางาน (ปฏิเสธแล้ว)",
+  
     "ERROR_FETCH_LEAVE_BALANCE": "ไม่สามารถโหลดยอดวันลาคงเหลือ",
     "ERR_INVALID_LEAVE_TYPE": "ประเภทการลาไม่ถูกต้อง",
     "ERR_INSUFFICIENT_LEAVE_BALANCE": "{leaveType} ยอดคงเหลือไม่เพียงพอ（ต้องการ {required} วัน เหลือ {available} วัน）",
@@ -218,48 +305,163 @@
     "ERR_MISSING_REJECT_REASON": "เมื่อปฏิเสธการลางานต้องกรอกเหตุผล",
     "ENTER_REJECT_REASON": "กรุณากรอกเหตุผลในการปฏิเสธ：",
     "REVIEW_COMMENT_LABEL": "ความเห็นในการตรวจสอบ：",
-
+  
     "EXPORT_ATTENDANCE_BTN": "ส่งออกรายงานการเข้างานประจำเดือน",
     "EXPORT_LOADING": "กำลังเตรียมรายงาน...",
     "EXPORT_SUCCESS": "ส่งออกรายงานสำเร็จ!",
     "EXPORT_FAILED": "ส่งออกล้มเหลว กรุณาลองใหม่ภายหลัง",
     "EXPORT_NO_DATA": "ไม่มีบันทึกการเข้างานในเดือนนี้",
-
+  
+    "EXPORT_DATE": "วันที่",
+    "EXPORT_WEEKDAY": "วันในสัปดาห์",
+    "EXPORT_PUNCH_IN_TIME": "เวลาเข้างาน",
+    "EXPORT_PUNCH_IN_LOCATION": "สถานที่เข้างาน",
+    "EXPORT_PUNCH_OUT_TIME": "เวลาออกงาน",
+    "EXPORT_PUNCH_OUT_LOCATION": "สถานที่ออกงาน",
+    "EXPORT_WORK_HOURS": "ชั่วโมงทำงาน",
+    "EXPORT_WORK_HOURS_DECIMAL": "ชั่วโมง (ทศนิยม)",
+    "EXPORT_STATUS": "สถานะ",
+    "EXPORT_NOTES": "หมายเหตุ",
+    "EXPORT_STATISTICS": "สถิติ",
+    "EXPORT_TOTAL_DAYS": "รวม {count} วัน",
+    "EXPORT_AVERAGE": "ค่าเฉลี่ย: {avg}",
+  
     "ADMIN_EXPORT_TITLE": "ส่งออกรายงาน",
     "ADMIN_EXPORT_DESCRIPTION": "ส่งออกรายงานการเข้างานของพนักงานทั้งหมด",
     "ADMIN_EXPORT_MONTH_LABEL": "เลือกเดือน",
     "ADMIN_EXPORT_ALL_BTN": "ส่งออกรายงานพนักงานทั้งหมด",
-
+  
     "TAB_SHIFT": "ตารางเวลาทำงาน",
     "SHIFT_TITLE": "จัดการตารางเวลาทำงาน",
     "SHIFT_DESCRIPTION": "ดูและจัดการข้อมูลตารางเวลาทำงานของพนักงาน",
     "BTN_SHIFT_MANAGEMENT": "เข้าสู่การจัดการตารางเวลาทำงาน",
+  
     "SHIFT_TODAY_TITLE": "ตารางเวลาทำงานวันนี้",
     "SHIFT_TODAY_EMPTY": "ไม่มีตารางเวลาทำงานวันนี้",
     "SHIFT_WEEK_TITLE": "ตารางเวลาทำงานสัปดาห์นี้",
     "SHIFT_WEEK_EMPTY": "ไม่มีตารางเวลาทำงานสัปดาห์นี้",
     "SHIFT_LOADING": "กำลังโหลด...",
+  
     "SHIFT_TYPE_LABEL": "กะการทำงาน",
     "SHIFT_TIME_LABEL": "เวลา",
     "SHIFT_LOCATION_LABEL": "สถานที่",
-
+  
     "SHIFT_INFO_NOTIFICATION": "ตารางเวลาทำงานวันนี้：{shiftType} ({startTime}-{endTime})",
     "EARLY_PUNCH_WARNING": "แจ้งเตือน：ตารางเวลาทำงานของคุณคือ {startTime} ปัจจุบันคุณลงเวลาเร็วกว่ากำหนดมากกว่า 30 นาที",
     "LATE_PUNCH_WARNING": "แจ้งเตือน：ตารางเวลาทำงานของคุณคือ {startTime} ปัจจุบันคุณมาสายมากกว่า 30 นาที",
     "NO_SHIFT_TODAY": "ไม่มีบันทึกตารางเวลาทำงานวันนี้",
-
-    "TAB_SALARY": "เงินเดือน",
+  
+    "SHIFT_PAGE_TITLE": "จัดการตารางเวลาทำงาน - ระบบจัดการเวลาทำงาน",
+    "SHIFT_MANAGEMENT_TITLE": "จัดการตารางเวลาทำงาน",
+    "BTN_BACK": "กลับ",
+  
+    "SHIFT_TAB_VIEW": "ดูตารางงาน",
+    "SHIFT_TAB_ADD": "เพิ่มตารางงาน",
+    "SHIFT_TAB_BATCH": "เพิ่มแบบกลุ่ม",
+    "SHIFT_TAB_STATS": "สถิติ",
+  
+    "SHIFT_FILTER_TITLE": "เงื่อนไขการกรอง",
+    "SHIFT_START_DATE": "วันที่เริ่มต้น",
+    "SHIFT_END_DATE": "วันที่สิ้นสุด",
+    "OPTION_ALL": "ทั้งหมด",
+  
+    "SHIFT_TYPE_MORNING": "กะเช้า",
+    "SHIFT_TYPE_AFTERNOON": "กะบ่าย",
+    "SHIFT_TYPE_NIGHT": "กะดึก",
+    "SHIFT_TYPE_FULL": "กะเต็มวัน",
+    "SHIFT_TYPE_DAYOFF": "วันหยุด",
+    "SHIFT_TYPE_CUSTOM": "กำหนดเอง",
+  
+    "SHIFT_MORNING_DESC": "กะเช้า (08:00-16:00)",
+    "SHIFT_AFTERNOON_DESC": "กะบ่าย (12:00-20:00)",
+    "SHIFT_NIGHT_DESC": "กะดึก (16:00-24:00)",
+    "SHIFT_FULL_DESC": "กะเต็มวัน (09:00-18:00)",
+    "SHIFT_DAYOFF_DESC": "วันหยุด (ไม่ต้องทำงาน)",
+    "SHIFT_CUSTOM_DESC": "เวลาแบบกำหนดเอง",
+  
+    "SHIFT_START_TIME": "เวลาเริ่มต้น",
+    "SHIFT_END_TIME": "เวลาสิ้นสุด",
+    "SHIFT_SELECT_LOCATION": "เลือกสถานที่",
+    "SHIFT_NOTE_LABEL": "หมายเหตุ",
+    "SHIFT_NOTE_PLACEHOLDER": "กรอกหมายเหตุ...",
+  
+    "BTN_ADD_SHIFT": "เพิ่มตารางงาน",
+    "BTN_RESET": "รีเซ็ต",
+  
+    "SHIFT_BATCH_TITLE": "เพิ่มตารางงานแบบกลุ่ม",
+    "SHIFT_BATCH_DESC": "อัปโหลดไฟล์ CSV หรือ Excel เพื่อเพิ่มตารางงานแบบกลุ่ม รูปแบบไฟล์: รหัสพนักงาน, ชื่อ, วันที่, กะการทำงาน, เวลาเริ่มต้น, เวลาสิ้นสุด, สถานที่, หมายเหตุ",
+    "SHIFT_UPLOAD_DESC": "ลากและวางไฟล์ที่นี่ หรือคลิกเพื่อเลือกไฟล์",
+    "BTN_SELECT_FILE": "เลือกไฟล์",
+    "SHIFT_PREVIEW_TITLE": "ตัวอย่างข้อมูล",
+    "BTN_CONFIRM_UPLOAD": "ยืนยันการอัปโหลด",
+    "BTN_DOWNLOAD_TEMPLATE": "ดาวน์โหลดไฟล์ตัวอย่าง",
+  
+    "SHIFT_STATS_LOADING": "กำลังโหลดข้อมูลสถิติ...",
+    "BTN_PREV_MONTH": "◀ เดือนก่อนหน้า",
+    "BTN_NEXT_MONTH": "เดือนถัดไป ▶",
+    "BTN_TODAY": "กลับไปยังวันนี้",
+    "SHIFT_CALENDAR_LOADING": "กำลังโหลดปฏิทิน...",
+  
+    "SHIFT_NO_DATA": "ไม่มีข้อมูลตารางงาน",
+    "SHIFT_LOAD_FAILED": "โหลดล้มเหลว",
+    "SHIFT_LOAD_ERROR": "โหลดล้มเหลว",
+  
+    "BTN_EDIT": "แก้ไข",
+  
+    "SHIFT_STATS_TOTAL": "จำนวนตารางงานรวมในเดือนนี้",
+  
+    "SHIFT_FILL_TIME": "กรุณากรอกเวลาเริ่มต้นและเวลาสิ้นสุด",
+    "SHIFT_CONFIRM_CROSS_DAY": "เวลาสิ้นสุดเร็วกกว่าเวลาเริ่มต้น ต้องการบันทึกเป็นกะข้ามวันหรือไม่?",
+    "SHIFT_ADD_SUCCESS": "เพิ่มตารางงานสำเร็จ!",
+    "SHIFT_ADD_FAILED": "เพิ่มตารางงานล้มเหลว",
+    "SHIFT_UPDATE_SUCCESS": "อัปเดตตารางงานสำเร็จ!",
+    "SHIFT_UPDATE_FAILED": "อัปเดตตารางงานล้มเหลว",
+    "SHIFT_DELETE_CONFIRM": "คุณแน่ใจหรือไม่ว่าต้องการลบตารางงานนี้?",
+    "SHIFT_DELETE_SUCCESS": "ลบตารางงานแล้ว",
+    "SHIFT_DELETE_FAILED": "ลบตารางงานล้มเหลว",
+  
+    "SHIFT_NO_EXPORT_DATA": "ไม่มีข้อมูลสำหรับส่งออก",
+    "SHIFT_EXPORT_SUCCESS": "ส่งออกสำเร็จ",
+  
+    "SHIFT_BATCH_CSV_ONLY": "ขณะนี้รองรับเฉพาะไฟล์ CSV เท่านั้น",
+    "SHIFT_BATCH_NO_DATA": "ไม่มีข้อมูลที่ถูกต้องภายในไฟล์",
+    "SHIFT_BATCH_UPLOAD_SUCCESS": "อัปโหลดแบบกลุ่มสำเร็จ",
+    "SHIFT_BATCH_UPLOAD_FAILED": "อัปโหลดแบบกลุ่มล้มเหลว",
+    "SHIFT_BATCH_NETWORK_ERROR": "อัปโหลดแบบกลุ่มล้มเหลว: ข้อผิดพลาดของเครือข่าย",
+  
+    "SHIFT_DETAIL_TITLE": "รายละเอียดตารางงาน",
+    "SHIFT_NO_NOTE": "ไม่มี",
+  
+    "SHIFT_DISTRIBUTION_TITLE": "การกระจายตารางงานของพนักงานประจำเดือน",
+    "SHIFT_TYPE_DISTRIBUTION_TITLE": "การกระจายประเภทกะประจำเดือน",
+    "SHIFT_SHIFTS_COUNT": "{count} กะ",
+  
+    "SHIFT_LOGIN_REQUIRED": "กรุณาเข้าสู่ระบบก่อน",
+    "SHIFT_NO_EMPLOYEE_DATA": "ไม่มีข้อมูลพนักงาน",
+    "SHIFT_LOAD_EMPLOYEES_FAILED": "โหลดรายชื่อพนักงานล้มเหลว",
+    "SHIFT_LOAD_EMPLOYEES_ERROR": "โหลดรายชื่อพนักงานล้มเหลว",
+  
+    "SHIFT_ADD_ERROR": "เพิ่มตารางงานล้มเหลว",
+  
+    "SHIFT_EDIT_TITLE": "แก้ไขตารางงาน",
+    "BTN_UPDATE_SHIFT": "อัปเดตตารางงาน",
+  
+    "SHIFT_BATCH_UPLOAD_ERROR": "อัปโหลดแบบกลุ่มล้มเหลว",
+  
     "SALARY_CURRENT_TITLE": "เงินเดือนประจำเดือนนี้",
     "SALARY_NOT_CALCULATED": "เงินเดือนประจำเดือนนี้ยังไม่ได้คำนวณ",
     "SALARY_CONTACT_ADMIN": "กรุณาติดต่อผู้ดูแลระบบเพื่อคำนวณเงินเดือน",
+  
     "SALARY_GROSS": "ยอดรวมที่ควรจ่าย",
     "SALARY_DEDUCTIONS": "ยอดรวมหักเงิน",
     "SALARY_NET": "จำนวนเงินที่จ่ายจริง",
+  
     "SALARY_EARNINGS": "รายการที่ควรจ่าย",
     "SALARY_BASE": "เงินเดือนพื้นฐาน",
     "SALARY_WEEKDAY_OT": "ค่าล่วงเวลาวันธรรมดา",
     "SALARY_REST_OT": "ค่าล่วงเวลาวันหยุด",
     "SALARY_HOLIDAY_OT": "ค่าล่วงเวลาวันหยุดนักขัตฤกษ์",
+  
     "SALARY_DEDUCTIONS_DETAIL": "รายการหักเงิน",
     "SALARY_LABOR_INS": "ค่าประกันแรงงาน",
     "SALARY_HEALTH_INS": "ค่าประกันสุขภาพ",
@@ -267,12 +469,14 @@
     "SALARY_PENSION": "เงินบำนาญสมทบ",
     "SALARY_TAX": "ภาษีเงินได้",
     "SALARY_LEAVE_DEDUCT": "หักเงินจากการลา",
+  
     "SALARY_BANK_INFO": "ข้อมูลการโอนเงิน",
     "SALARY_BANK": "ธนาคาร",
     "SALARY_ACCOUNT": "เลขที่บัญชี",
+  
     "SALARY_HISTORY_TITLE": "ประวัติเงินเดือน",
     "SALARY_NO_HISTORY": "ยังไม่มีประวัติ",
-
+  
     "SALARY_MANAGEMENT_TITLE": "จัดการเงินเดือน",
     "SALARY_MANAGEMENT_DESC": "ดูและจัดการข้อมูลเงินเดือนของพนักงาน",
     "BTN_SALARY_SYSTEM": "เข้าสู่ระบบจัดการเงินเดือน",
@@ -281,10 +485,88 @@
     "SALARY_FEATURE_2": "คำนวณค่าล่วงเวลา รายการหักเงินโดยอัตโนมัติ",
     "SALARY_FEATURE_3": "สร้างและจัดการใบเงินเดือน",
     "SALARY_FEATURE_4": "ติดตามรายละเอียดค่าจ้างรายชั่วโมง",
+  
     "SALARY_THIS_MONTH": "เงินเดือนประจำเดือนนี้",
     "WORK_HOURS": "ชั่วโมงทำงาน",
     "SALARY_CALCULATED": "ระบบกำลังคำนวณ...",
     "HOURS_THIS_MONTH": "สถิติประจำเดือนนี้",
+  
     "SALARY_REMINDER_TITLE": "เตือนใจ",
-    "SALARY_REMINDER_TEXT": "ระบบเงินเดือนจะรวมบันทึกการลงเวลา การทำงานล่วงเวลา และการลางานของคุณโดยอัตโนมัติเพื่อคำนวณ กรุณาตรวจสอบให้แน่ใจว่าคุณลงเวลาตรงเวลาเพื่อความแม่นยำในการคำนวณเงินเดือน"
-}
+    "SALARY_REMINDER_TEXT": "ระบบเงินเดือนจะรวมบันทึกการลงเวลา การทำงานล่วงเวลา และการลางานของคุณโดยอัตโนมัติเพื่อคำนวณ กรุณาตรวจสอบให้แน่ใจว่าคุณลงเวลาตรงเวลาเพื่อความแม่นยำในการคำนวณเงินเดือน",
+  
+    "WEEKDAY_SUNDAY": "วันอาทิตย์",
+    "WEEKDAY_MONDAY": "วันจันทร์",
+    "WEEKDAY_TUESDAY": "วันอังคาร",
+    "WEEKDAY_WEDNESDAY": "วันพุธ",
+    "WEEKDAY_THURSDAY": "วันพฤหัสบดี",
+    "WEEKDAY_FRIDAY": "วันศุกร์",
+    "WEEKDAY_SATURDAY": "วันเสาร์",
+  
+    "ANNOUNCEMENT_TITLE": "📢 ประกาศล่าสุด",
+    "ANNOUNCEMENT_EMPTY": "ขณะนี้ยังไม่มีประกาศ",
+  
+    "BIOMETRIC_PUNCH_TITLE": "ลงเวลาด้วยชีวมิติแบบด่วน",
+    "BIOMETRIC_PUNCH_DESC": "ใช้ Face ID หรือสแกนนิ้วเพื่อลงเวลาง่าย ๆ เพียงครั้งเดียว",
+    "BIOMETRIC_STATUS_NOT_SETUP": "ยังไม่ตั้งค่า",
+    "BIOMETRIC_STATUS_ENABLED": "เปิดใช้งานแล้ว",
+    "BIOMETRIC_SETUP_BTN": "ตั้งค่าระบบลงเวลาด้วยชีวมิติ",
+    "BIOMETRIC_PUNCH_IN_BTN": "ลงเวลาเข้างาน",
+    "BIOMETRIC_PUNCH_OUT_BTN": "ลงเวลาออกงาน",
+  
+    "LINE_CHANNEL_TITLE": "เข้าร่วม LINE ช่องพนักงานเพื่อรับประกาศล่าสุด!",
+    "LINE_CHANNEL_ID": "@789cdyeg",
+  
+    "MONTHLY_STATS_TITLE": "สถิติการเข้างานประจำเดือน",
+    "STATS_TOTAL_HOURS": "ชั่วโมงรวม",
+    "STATS_WORK_DAYS": "จำนวนวันที่มาทำงาน",
+    "STATS_ABNORMAL_COUNT": "จำนวนบันทึกผิดปกติ",
+    "STATS_NORMAL_DAYS": "จำนวนวันที่ลงเวลาปกติ",
+    "UNIT_HOURS": "ชั่วโมง",
+    "UNIT_DAYS": "วัน",
+    "UNIT_RECORDS": "รายการ",
+  
+    "DAILY_ATTENDANCE_TITLE": "บันทึกการเข้างาน",
+    "PUNCH_RECORDS_TITLE": "บันทึกการลงเวลา",
+    "OVERTIME_PERIOD": "ช่วงเวลาทำงานล่วงเวลา",
+    "TIME_LABEL": "เวลา",
+    "REASON_LABEL": "เหตุผล",
+    "SYSTEM_JUDGMENT": "การตัดสินของระบบ",
+  
+    "LEAVE_INFO_TITLE": "ข้อมูลการลางาน",
+    "LEAVE_TYPE": "ประเภทการลา",
+    "LEAVE_DAYS_COUNT": "วัน",
+    "LEAVE_REASON_DISPLAY": "เหตุผล",
+  
+    "ADMIN_ANNOUNCEMENT_MANAGEMENT": "📢 จัดการประกาศ",
+    "ANNOUNCEMENT_TITLE_PLACEHOLDER": "หัวข้อประกาศ",
+    "ANNOUNCEMENT_CONTENT_PLACEHOLDER": "เนื้อหาประกาศ",
+    "ANNOUNCEMENT_PRIORITY_NORMAL": "🔵 ปกติ",
+    "ANNOUNCEMENT_PRIORITY_MEDIUM": "🟡 ปานกลาง",
+    "ANNOUNCEMENT_PRIORITY_HIGH": "🔴 สำคัญ",
+    "BTN_PUBLISH_ANNOUNCEMENT": "เผยแพร่ประกาศ",
+    "BTN_DELETE": "ลบ",
+    "DELETE_ANNOUNCEMENT_CONFIRM": "คุณแน่ใจหรือไม่ว่าต้องการลบประกาศนี้?",
+    "ANNOUNCEMENT_DELETED": "ลบประกาศแล้ว",
+  
+    "SEARCH_LOCATION_LABEL": "🔍 ค้นหาสถานที่",
+    "SEARCH_LOCATION_PLACEHOLDER": "กรอกที่อยู่หรือชื่อสถานที่...",
+    "LOCATION_NAME_PLACEHOLDER": "เช่น เซ็นทรัลเวิลด์",
+    "LATITUDE_LABEL": "ละติจูด",
+    "LONGITUDE_LABEL": "ลองจิจูด",
+    "PUNCH_RANGE_LABEL": "ระยะการลงเวลา",
+    "PUNCH_RANGE_DESCRIPTION": "ลากแถบเลื่อนเพื่อปรับรัศมีการลงเวลาที่อนุญาต (100-2000 เมตร)",
+  
+    "ADMIN_PUNCH_ANALYSIS_TITLE": "วิเคราะห์การลงเวลาของพนักงาน",
+    "ADMIN_PUNCH_ANALYSIS_DESC": "ดูการกระจายเวลาเข้างานและสถิติชั่วโมงทำงานรายเดือนของพนักงาน",
+    "SELECT_EMPLOYEE_LABEL": "เลือกพนักงาน",
+    "SELECT_EMPLOYEE_PLACEHOLDER": "กรุณาเลือกพนักงาน",
+    "SELECT_MONTH_LABEL": "เลือกเดือน",
+    "BTN_LOAD_ANALYSIS": "โหลดกราฟวิเคราะห์",
+    "BTN_EXPORT_PUNCH_REPORT": "ส่งออกรายงานการลงเวลา",
+  
+    "CHART_WORK_HOURS_TITLE": "ชั่วโมงทำงานต่อวัน",
+    "CHART_PUNCH_TIME_TITLE": "การกระจายเวลาลงงาน",
+    "ANALYSIS_LOADING": "กำลังโหลดข้อมูลวิเคราะห์...",
+    "ANALYSIS_NO_DATA": "ไม่มีบันทึกการลงเวลาในเดือนนี้"
+  }
+  
