@@ -363,5 +363,30 @@
     "BIOMETRIC_PUNCH_IN_BTN": "上班打卡",
     "BIOMETRIC_PUNCH_OUT_BTN": "下班打卡",
     "LINE_CHANNEL_TITLE": "加入員工 LINE 頻道，掌握最新公告！",
-    "LINE_CHANNEL_ID": "@789cdyeg"
+    "LINE_CHANNEL_ID": "@789cdyeg",
+
+
+
+
+    "MONTHLY_STATS_TITLE": "本月出勤統計",
+    "STATS_TOTAL_HOURS": "總工時",
+    "STATS_WORK_DAYS": "出勤天數",
+    "STATS_ABNORMAL_COUNT": "異常記錄",
+    "STATS_NORMAL_DAYS": "正常打卡",
+    "UNIT_HOURS": "小時",
+    "UNIT_DAYS": "天",
+    "UNIT_RECORDS": "筆",
+    
+    "DAILY_ATTENDANCE_TITLE": "出勤記錄",
+    "PUNCH_RECORDS_TITLE": "打卡紀錄",
+    "OVERTIME_PERIOD": "加班時段",
+    "TIME_LABEL": "時間",
+    "REASON_LABEL": "原因",
+    "SYSTEM_JUDGMENT": "系統判斷",
+    
+    "LEAVE_INFO_TITLE": "請假資訊",
+    "LEAVE_TYPE": "假別",
+    "LEAVE_DAYS_COUNT": "天數",
+    "LEAVE_REASON_DISPLAY": "原因",
+    "REVIEW_COMMENT": "審核意見"
 }

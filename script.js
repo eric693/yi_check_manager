@@ -93,44 +93,6 @@ function renderTranslations(container = document) {
         });
     });
 }
-// renderTranslations 可接受一個容器參數
-// function renderTranslations(container = document) {
-//     // 翻譯網頁標題（只在整頁翻譯時執行）
-//     if (container === document) {
-//         document.title = t("APP_TITLE");
-//     }
-
-//     // 處理靜態內容：[data-i18n]
-//     const elementsToTranslate = container.querySelectorAll('[data-i18n]');
-//     elementsToTranslate.forEach(element => {
-//         const key = element.getAttribute('data-i18n');
-//         const translatedText = t(key);
-        
-//         // 檢查翻譯結果是否為空字串，或是否回傳了原始鍵值
-//         if (translatedText !== key) {
-//             if (element.tagName === 'INPUT') {
-//                 element.placeholder = translatedText;
-//             } else {
-//                 element.textContent = translatedText;
-//             }
-//         }
-//     });
-
-//     // ✨ 新增邏輯：處理動態內容的翻譯，使用 [data-i18n-key]
-//     const dynamicElements = container.querySelectorAll('[data-i18n-key]');
-//     dynamicElements.forEach(element => {
-//         const key = element.getAttribute('data-i18n-key');
-//         if (key) {
-//              const translatedText = t(key);
-             
-//              // 只有當翻譯結果不是原始鍵值時才進行更新
-//              if (translatedText !== key) {
-//                  element.textContent = translatedText;
-//              }
-//         }
-//     });
-// }
-
 /**
  * 透過 fetch API 呼叫後端 API。
  * @param {string} action - API 的動作名稱。
@@ -1192,77 +1154,6 @@ function renderCalendarWithData(year, month, today, records, calendarGrid, month
         calendarGrid.appendChild(dayCell);
     }
 }
-// function renderCalendarWithData(year, month, today, records, calendarGrid, monthTitle) {
-//     // 確保日曆網格在每次渲染前被清空
-//     calendarGrid.innerHTML = '';
-//     monthTitle.textContent = t("MONTH_YEAR_TEMPLATE", {
-//         year: year,
-//         month: month+1
-//     });
-    
-//     // 取得該月第一天是星期幾
-//     const firstDayOfMonth = new Date(year, month, 1).getDay();
-//     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-//     // 填補月初的空白格子
-//     for (let i = 0; i < firstDayOfMonth; i++) {
-//         const emptyCell = document.createElement('div');
-//         emptyCell.className = 'day-cell';
-//         calendarGrid.appendChild(emptyCell);
-//     }
-    
-//     // 根據資料渲染每一天的顏色
-//     for (let i = 1; i <= daysInMonth; i++) {
-//         const dayCell = document.createElement('div');
-//         const cellDate = new Date(year, month, i);
-//         dayCell.textContent = i;
-//         let dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-//         let dateClass = 'normal-day';
-        
-//         const todayRecords = records.filter(r => r.date === dateKey);
-        
-//         if (todayRecords.length > 0) {
-//             const reason = todayRecords[0].reason;
-//             switch (reason) {
-//                 case "STATUS_PUNCH_IN_MISSING":
-//                     dateClass = 'abnormal-day';
-//                     break;
-//                 case "STATUS_PUNCH_OUT_MISSING":
-//                     dateClass = 'abnormal-day';
-//                     break;
-//                 case "STATUS_PUNCH_NORMAL":
-//                     dateClass = 'day-off';
-//                     break;
-//                 case "STATUS_REPAIR_PENDING":
-//                     dateClass = 'pending-virtual';
-//                     break;
-//                 case "STATUS_REPAIR_APPROVED":
-//                     dateClass = 'approved-virtual';
-//                     break;
-//                 default:
-//                     if (reason && reason !== "") {
-//                         dateClass = 'pending-adjustment'; // 假設所有有備註的都算 pending
-//                     }
-//                     break;
-//             }
-//         }
-        
-//         const isToday = (year === today.getFullYear() && month === today.getMonth() && i === today.getDate());
-//         if (isToday) {
-//             dayCell.classList.add('today');
-//         } else if (cellDate > today) {
-//             dayCell.classList.add('future-day');
-//             dayCell.style.pointerEvents = 'none'; // 未來日期不可點擊
-//         } else {
-//             dayCell.classList.add(dateClass);
-//         }
-        
-//         dayCell.classList.add('day-cell');
-//         dayCell.dataset.date = dateKey;
-//         dayCell.dataset.records = JSON.stringify(todayRecords); // 儲存當天資料
-//         calendarGrid.appendChild(dayCell);
-//     }
-// }
 
 /**
  * ✅ 渲染每日打卡記錄（改進版 - 請假資訊顯示在打卡記錄下方）
@@ -1301,7 +1192,7 @@ async function renderDailyRecords(dateKey) {
     }
     
     const dateObject = new Date(dateKey);
-    const month = dateObject.getFullYear() + "-" + String(dateObject.getMonth() + 1).padStart(2, "0");
+    const month = dateObject.getFullYear() + "-" + String(dateObject.getMonth() + 1).padStart(2, '0');
     const userId = localStorage.getItem("sessionUserId");
     
     if (monthDataCache[month]) {
@@ -1330,7 +1221,6 @@ async function renderDailyRecords(dateKey) {
         }
     }
     
-    // ✨ 改進的 renderRecords 函數
     function renderRecords(records) {
         const dailyRecords = records.filter(record => record.date === dateKey);
         
@@ -1345,12 +1235,12 @@ async function renderDailyRecords(dateKey) {
                 const titleHtml = `
                     <div class="flex items-center justify-between mb-3 pb-2 border-b-2 border-gray-300 dark:border-gray-600">
                         <h4 class="text-lg font-bold text-gray-800 dark:text-white">
-                            📅 ${dateKey} 出勤記錄
+                            📅 ${dateKey} <span data-i18n="DAILY_ATTENDANCE_TITLE">出勤記錄</span>
                         </h4>
                     </div>
                 `;
                 
-                // ⏰ 打卡記錄區塊（使用卡片樣式）
+                // ⏰ 打卡記錄區塊
                 let recordHtml = '';
                 if (recordData.record && recordData.record.length > 0) {
                     recordHtml = `
@@ -1359,7 +1249,7 @@ async function renderDailyRecords(dateKey) {
                                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                                 </svg>
-                                打卡紀錄
+                                <span data-i18n="PUNCH_RECORDS_TITLE">打卡紀錄</span>
                             </h5>
                             <div class="space-y-2">
                                 ${recordData.record.map(r => {
@@ -1370,7 +1260,7 @@ async function renderDailyRecords(dateKey) {
                                             <span class="${typeColor} font-bold text-sm">●</span>
                                             <div class="flex-1">
                                                 <p class="font-medium text-gray-800 dark:text-white">
-                                                    ${r.time} - ${t(typeKey)}
+                                                    ${r.time} - <span data-i18n="${typeKey}">${t(typeKey)}</span>
                                                 </p>
                                                 <p class="text-sm text-gray-500 dark:text-gray-400">
                                                     📍 ${r.location}
@@ -1387,13 +1277,13 @@ async function renderDailyRecords(dateKey) {
                     recordHtml = `
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
                             <p class="text-sm text-gray-500 dark:text-gray-400 italic text-center py-2">
-                                ⚠️ 該日沒有打卡紀錄
+                                ⚠️ <span data-i18n="DAILY_RECORDS_EMPTY">該日沒有打卡紀錄</span>
                             </p>
                         </div>
                     `;
                 }
                 
-                // ⏰ 加班資訊區塊（緊接在打卡記錄下方）
+                // ⏰ 加班資訊區塊
                 let overtimeHtml = '';
                 if (recordData.overtime) {
                     const ot = recordData.overtime;
@@ -1404,19 +1294,19 @@ async function renderDailyRecords(dateKey) {
                                     <svg class="w-4 h-4 mr-2 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                                     </svg>
-                                    ⏰ 加班時段
+                                    ⏰ <span data-i18n="OVERTIME_PERIOD">加班時段</span>
                                 </h5>
                                 <span class="px-2 py-1 bg-orange-600 text-white text-xs font-bold rounded-full">
-                                    ${ot.hours} 小時
+                                    ${ot.hours} <span data-i18n="UNIT_HOURS">小時</span>
                                 </span>
                             </div>
                             <div class="space-y-1 pl-6">
                                 <p class="text-sm text-orange-700 dark:text-orange-400">
-                                    時間：<span class="font-semibold">${ot.startTime} - ${ot.endTime}</span>
+                                    <span data-i18n="TIME_LABEL">時間</span>：<span class="font-semibold">${ot.startTime} - ${ot.endTime}</span>
                                 </p>
                                 ${ot.reason ? `
                                     <p class="text-sm text-orange-600 dark:text-orange-300">
-                                        原因：${ot.reason}
+                                        <span data-i18n="REASON_LABEL">原因</span>：${ot.reason}
                                     </p>
                                 ` : ''}
                             </div>
@@ -1424,7 +1314,7 @@ async function renderDailyRecords(dateKey) {
                     `;
                 }
                 
-                // 🏖️ 請假資訊區塊（緊接在加班記錄下方）
+                // 🏖️ 請假資訊區塊
                 let leaveHtml = '';
                 if (recordData.leave) {
                     const leave = recordData.leave;
@@ -1453,7 +1343,7 @@ async function renderDailyRecords(dateKey) {
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
                                     </svg>
-                                    🏖️ 請假資訊
+                                    🏖️ <span data-i18n="LEAVE_INFO_TITLE">請假資訊</span>
                                 </h5>
                                 <span class="px-2 py-1 text-xs font-bold rounded-full ${statusBadgeClass}">
                                     ${statusIcon} ${statusText}
@@ -1461,19 +1351,19 @@ async function renderDailyRecords(dateKey) {
                             </div>
                             <div class="space-y-1 pl-6">
                                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    假別：<span class="text-blue-600 dark:text-blue-400 font-semibold">${t(leave.leaveType)}</span>
+                                    <span data-i18n="LEAVE_TYPE">假別</span>：<span class="text-blue-600 dark:text-blue-400 font-semibold" data-i18n="${leave.leaveType}">${t(leave.leaveType)}</span>
                                 </p>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    天數：<span class="font-semibold">${leave.days}</span> 天
+                                    <span data-i18n="LEAVE_DAYS_COUNT">天數</span>：<span class="font-semibold">${leave.days}</span> <span data-i18n="UNIT_DAYS">天</span>
                                 </p>
                                 ${leave.reason ? `
                                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        原因：${leave.reason}
+                                        <span data-i18n="LEAVE_REASON_DISPLAY">原因</span>：${leave.reason}
                                     </p>
                                 ` : ''}
                                 ${leave.reviewComment ? `
                                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                                        審核意見：${leave.reviewComment}
+                                        <span data-i18n="REVIEW_COMMENT">審核意見</span>：${leave.reviewComment}
                                     </p>
                                 ` : ''}
                             </div>
@@ -1485,13 +1375,12 @@ async function renderDailyRecords(dateKey) {
                 const statusHtml = `
                     <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-2 text-center">
                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                            <span class="font-medium">系統判斷：</span>
-                            <span class="font-semibold text-gray-800 dark:text-white">${t(recordData.reason)}</span>
+                            <span data-i18n="SYSTEM_JUDGMENT">系統判斷</span>：
+                            <span class="font-semibold text-gray-800 dark:text-white" data-i18n="${recordData.reason}">${t(recordData.reason)}</span>
                         </p>
                     </div>
                 `;
                 
-                // ⭐ 組合所有區塊（順序：標題 → 打卡 → 加班 → 請假 → 狀態）
                 li.innerHTML = titleHtml + recordHtml + overtimeHtml + leaveHtml + statusHtml;
                 dailyRecordsList.appendChild(li);
                 renderTranslations(li);
@@ -1503,117 +1392,6 @@ async function renderDailyRecords(dateKey) {
         dailyRecordsCard.style.display = 'block';
     }
 }
-// async function renderDailyRecords(dateKey) {
-//     // 1. 取得所有需要的 DOM 元素
-//     const dailyRecordsCard = document.getElementById('daily-records-card');
-//     const dailyRecordsTitle = document.getElementById('daily-records-title');
-//     const dailyRecordsList = document.getElementById('daily-records-list');
-//     const dailyRecordsEmpty = document.getElementById('daily-records-empty');
-//     const recordsLoading = document.getElementById("daily-records-loading");
-//     const adjustmentFormContainer = document.getElementById('daily-adjustment-form-container');
-    
-//     // 2. ✅ 檢查必要元素是否存在
-//     if (!dailyRecordsCard || !dailyRecordsTitle || !dailyRecordsList || !dailyRecordsEmpty) {
-//         console.error('❌ renderDailyRecords: 找不到必要的 DOM 元素');
-//         console.log('元素檢查結果:', {
-//             'daily-records-card': !!dailyRecordsCard,
-//             'daily-records-title': !!dailyRecordsTitle,
-//             'daily-records-list': !!dailyRecordsList,
-//             'daily-records-empty': !!dailyRecordsEmpty,
-//             'daily-records-loading': !!recordsLoading,
-//             'daily-adjustment-form-container': !!adjustmentFormContainer
-//         });
-        
-//         showNotification('介面元素載入失敗，請重新整理頁面', 'error');
-//         return;
-//     }
-    
-//     // 3. 安全地設置內容
-//     dailyRecordsTitle.textContent = t("DAILY_RECORDS_TITLE", {
-//         dateKey: dateKey
-//     });
-    
-//     dailyRecordsList.innerHTML = '';
-//     dailyRecordsEmpty.style.display = 'none';
-    
-//     if (adjustmentFormContainer) {
-//         adjustmentFormContainer.innerHTML = '';
-//     }
-    
-//     if (recordsLoading) {
-//         recordsLoading.style.display = 'block';
-//     }
-    
-//     // 4. 繼續原有邏輯
-//     const dateObject = new Date(dateKey);
-//     const month = dateObject.getFullYear() + "-" + String(dateObject.getMonth() + 1).padStart(2, "0");
-//     const userId = localStorage.getItem("sessionUserId");
-    
-//     if (monthDataCache[month]) {
-//         renderRecords(monthDataCache[month]);
-//         if (recordsLoading) {
-//             recordsLoading.style.display = 'none';
-//         }
-//     } else {
-//         try {
-//             const res = await callApifetch(`getAttendanceDetails&month=${month}&userId=${userId}`);
-//             if (recordsLoading) {
-//                 recordsLoading.style.display = 'none';
-//             }
-//             if (res.ok) {
-//                 monthDataCache[month] = res.records;
-//                 renderRecords(res.records);
-//             } else {
-//                 console.error("Failed to fetch attendance records:", res.msg);
-//                 showNotification(t("ERROR_FETCH_RECORDS"), "error");
-//             }
-//         } catch (err) {
-//             console.error(err);
-//             if (recordsLoading) {
-//                 recordsLoading.style.display = 'none';
-//             }
-//         }
-//     }
-    
-//     // 5. renderRecords 函數（保持不變）
-//     function renderRecords(records) {
-//         const dailyRecords = records.filter(record => record.date === dateKey);
-        
-//         if (dailyRecords.length > 0) {
-//             dailyRecordsEmpty.style.display = 'none';
-//             dailyRecords.forEach(recordData => {
-//                 const li = document.createElement('li');
-//                 li.className = 'p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
-                
-//                 const recordHtml = recordData.record.map(r => {
-//                     const typeKey = r.type === '上班' ? 'PUNCH_IN' : 'PUNCH_OUT';
-//                     return `
-//                         <p class="font-medium text-gray-800 dark:text-white">${r.time} - ${t(typeKey)}</p>
-//                         <p class="text-sm text-gray-500 dark:text-gray-400">${r.location}</p>
-//                         <p data-i18n="RECORD_NOTE_PREFIX" class="text-sm text-gray-500 dark:text-gray-400">備註：${r.note}</p>
-//                     `;
-//                 }).join("");
-                
-//                 li.innerHTML = `
-//                     ${recordHtml}
-//                     <p class="text-sm text-gray-500 dark:text-gray-400">
-//                         <span data-i18n="RECORD_REASON_PREFIX">系統判斷：</span>
-//                         ${t(recordData.reason)}
-//                     </p>
-//                 `;
-//                 dailyRecordsList.appendChild(li);
-//                 renderTranslations(li);
-//             });
-            
-//             // 檢查是否需要顯示補打卡按鈕
-            
-//         } else {
-//             dailyRecordsEmpty.style.display = 'block';
-//         }
-        
-//         dailyRecordsCard.style.display = 'block';
-//     }
-// }
 
 // ==================== 地點搜尋功能 ====================
 

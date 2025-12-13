@@ -346,5 +346,28 @@
   "BIOMETRIC_PUNCH_IN_BTN": "Punch In",
   "BIOMETRIC_PUNCH_OUT_BTN": "Punch Out",
   "LINE_CHANNEL_TITLE": "Join Employee LINE Channel for Latest Announcements!",
-  "LINE_CHANNEL_ID": "@789cdyeg"
+  "LINE_CHANNEL_ID": "@789cdyeg",
+
+
+  "MONTHLY_STATS_TITLE": "Monthly Attendance Statistics",
+  "STATS_TOTAL_HOURS": "Total Hours",
+  "STATS_WORK_DAYS": "Work Days",
+  "STATS_ABNORMAL_COUNT": "Abnormal Records",
+  "STATS_NORMAL_DAYS": "Normal Punches",
+  "UNIT_HOURS": "hrs",
+  "UNIT_DAYS": "days",
+  "UNIT_RECORDS": "records",
+  
+  "DAILY_ATTENDANCE_TITLE": "Attendance Records",
+  "PUNCH_RECORDS_TITLE": "Punch Records",
+  "OVERTIME_PERIOD": "Overtime Period",
+  "TIME_LABEL": "Time",
+  "REASON_LABEL": "Reason",
+  "SYSTEM_JUDGMENT": "System Note",
+  
+  "LEAVE_INFO_TITLE": "Leave Information",
+  "LEAVE_TYPE": "Leave Type",
+  "LEAVE_DAYS_COUNT": "Days",
+  "LEAVE_REASON_DISPLAY": "Reason",
+  "REVIEW_COMMENT": "Review Comment"
 }
