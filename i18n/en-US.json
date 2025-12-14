@@ -529,6 +529,77 @@
   "SHIFT_EDIT_TITLE": "Edit Shift",
   "BTN_UPDATE_SHIFT": "Update Shift",
   
-  "SHIFT_BATCH_UPLOAD_ERROR": "Batch upload failed"
+  "SHIFT_BATCH_UPLOAD_ERROR": "Batch upload failed",
+
+
+
+
+
+
+
+  "SALARY_PAGE_TITLE": "Salary Management System - Attendance Manager",
+  "SALARY_SYSTEM_TITLE": "Salary Management System",
+  "SALARY_SYSTEM_DESC": "Complete salary management solution (with allowances and deductions)",
+  
+  "SALARY_TAB_EMPLOYEE": "My Salary",
+  "SALARY_TAB_SETTING": "Salary Settings",
+  "SALARY_TAB_MONTHLY": "Monthly Calculation",
+  "SALARY_TAB_HOURLY": "Hourly Calculation",
+  "SALARY_TAB_LIST": "Salary List",
+  
+  "SALARY_QUERY_MONTH": "📅 Query Month:",
+  "BTN_QUERY": "🔍 Query",
+  "SALARY_MY_DETAIL": "My Salary Details",
+  "SALARY_NO_RECORD": "No Salary Record",
+  
+  "SALARY_EARNINGS_TITLE": "Earnings",
+  "SALARY_POSITION_ALLOWANCE": "Position Allowance",
+  "SALARY_MEAL_ALLOWANCE": "Meal Allowance",
+  "SALARY_TRANSPORT_ALLOWANCE": "Transport Allowance",
+  "SALARY_ATTENDANCE_BONUS": "Attendance Bonus",
+  "SALARY_PERFORMANCE_BONUS": "Performance Bonus",
+  "SALARY_RESTDAY_OT": "Rest Day Overtime Pay",
+  
+  "SALARY_DEDUCTIONS_TITLE": "Deductions",
+  "SALARY_OTHER_DEDUCT": "Other Deductions",
+  
+  "SALARY_BANK_INFO_TITLE": "Bank Information",
+  "SALARY_BANK_NAME_LABEL": "Bank:",
+  "SALARY_ACCOUNT_LABEL": "Account:",
+  
+  "SALARY_SETTING_FORM_TITLE": "Employee Salary Settings (Full Version)",
+  "SALARY_BASIC_INFO": "Basic Information",
+  "SALARY_EMPLOYEE_LABEL": "Employee",
+  "SALARY_SELECT_EMPLOYEE": "Select Employee",
+  "SALARY_EMPLOYEE_ID_LABEL": "Employee ID",
+  "SALARY_EMPLOYEE_NAME_LABEL": "Employee Name",
+  "SALARY_ID_NUMBER_LABEL": "ID Number",
+  "SALARY_EMPLOYEE_TYPE_LABEL": "Employee Type",
+  "SALARY_TYPE_LABEL": "Salary Type",
+  "SALARY_BASE_LABEL": "Base Salary",
+  "SALARY_ALLOWANCE_TITLE": "💰 Fixed Allowances",
+  
+  "BTN_SAVE_SALARY_SETTING": "💾 Save Settings",
+  
+  "SALARY_LOGIN_REQUIRED": "Please log in first",
+  "SALARY_INIT_FAILED": "Initialization failed",
+  "SALARY_SELECT_MONTH": "Please select query month",
+  "SALARY_FILL_REQUIRED": "Please fill in required fields",
+  "SALARY_SELECT_TYPE": "Please select employee type and salary type",
+  "SALARY_SAVING": "Saving salary settings...",
+  "SALARY_SAVE_SUCCESS": "Salary settings saved successfully",
+  "SALARY_SAVE_FAILED": "Save failed",
+  "SALARY_SAVE_ERROR": "Save failed, please try again later",
+  "SALARY_INPUT_EMPLOYEE_MONTH": "Please enter employee ID and calculation month",
+  "SALARY_CALCULATING": "Calculating salary...",
+  "SALARY_CALC_SUCCESS": "Calculation completed",
+  "SALARY_CALC_FAILED": "Calculation failed",
+  "SALARY_CALC_ERROR": "Calculation failed, please try again later",
+  "SALARY_SAVING_RECORD": "Saving salary record...",
+  "SALARY_RECORD_SAVED": "Salary record saved successfully",
+  "SALARY_SELECT_YEAR_MONTH": "Please select year and month",
+  "SALARY_HOURLY_MIN_190": "Hourly wage must not be less than 190",
+  "SALARY_INPUT_WORK_HOURS": "Please enter work hours",
+  "SALARY_HOURLY_CALC_SUCCESS": "Hourly calculation completed"
 
 }

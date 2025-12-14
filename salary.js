@@ -1,4 +1,82 @@
 // salary.js - 薪資管理前端邏輯（完整版 v2.0 - 含所有津貼與扣款）
+// ==================== 翻譯系統 ====================
+let translations = {};
+let currentLang = localStorage.getItem("lang") || "zh-TW";
+
+/**
+ * ✅ 翻譯函式
+ */
+function t(code, params = {}) {
+    let text = translations[code] || code;
+    
+    for (const key in params) {
+        let paramValue = params[key];
+        if (paramValue in translations) {
+            paramValue = translations[paramValue];
+        }
+        text = text.replace(`{${key}}`, paramValue);
+    }
+    return text;
+}
+
+/**
+ * ✅ 載入翻譯檔案
+ */
+async function loadTranslations(lang) {
+    try {
+        const res = await fetch(`https://eric693.github.io/check_manager_plus/i18n/${lang}.json`);
+        if (!res.ok) {
+            throw new Error(`HTTP 錯誤: ${res.status}`);
+        }
+        translations = await res.json();
+        currentLang = lang;
+        localStorage.setItem("lang", lang);
+        renderTranslations();
+        console.log(`✅ 語言切換成功: ${lang}`);
+    } catch (err) {
+        console.error("載入語系失敗:", err);
+    }
+}
+
+/**
+ * ✅ 渲染翻譯
+ */
+function renderTranslations(container = document) {
+    // 更新頁面標題
+    if (container === document) {
+        document.title = t("SALARY_PAGE_TITLE");
+    }
+
+    // 翻譯所有帶 data-i18n 的元素
+    const elementsToTranslate = container.querySelectorAll('[data-i18n]');
+    elementsToTranslate.forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translatedText = t(key);
+        
+        if (translatedText !== key) {
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.placeholder = translatedText;
+            } else {
+                element.textContent = translatedText;
+            }
+        }
+    });
+
+    // 翻譯下拉選單選項
+    const selectElements = container.querySelectorAll('select');
+    selectElements.forEach(select => {
+        const options = select.querySelectorAll('option[data-i18n-option]');
+        options.forEach(option => {
+            const key = option.getAttribute('data-i18n-option');
+            if (key) {
+                const translatedText = t(key);
+                if (translatedText !== key) {
+                    option.textContent = translatedText;
+                }
+            }
+        });
+    });
+}
 
 // ==================== 檢查依賴 ====================
 if (typeof callApifetch !== 'function') {
@@ -8,11 +86,14 @@ if (typeof callApifetch !== 'function') {
 // ==================== 初始化薪資頁面 ====================
 
 /**
- * ✅ 初始化薪資頁面（完整版）
+ * ✅ 初始化薪資頁面（完整版 + 多語言）
  */
 async function initSalaryTab() {
     try {
-        console.log('🎯 開始初始化薪資頁面（完整版 v2.0）');
+        console.log('🎯 開始初始化薪資頁面（完整版 v2.0 + 多語言）');
+        
+        // 步驟 0：載入翻譯
+        await loadTranslations(currentLang);
         
         // 步驟 1：驗證 Session
         console.log('📡 正在驗證 Session...');
@@ -20,7 +101,7 @@ async function initSalaryTab() {
         
         if (!session.ok || !session.user) {
             console.error('❌ Session 驗證失敗:', session);
-            showNotification('請先登入', 'error');
+            showNotification(t('SALARY_LOGIN_REQUIRED'), 'error');
             return;
         }
         
@@ -52,15 +133,14 @@ async function initSalaryTab() {
             bindSalaryEvents();
         }
         
-        console.log('✅ 薪資頁面初始化完成（完整版 v2.0）！');
+        console.log('✅ 薪資頁面初始化完成（完整版 v2.0 + 多語言）！');
         
     } catch (error) {
         console.error('❌ 初始化失敗:', error);
         console.error('錯誤堆疊:', error.stack);
-        showNotification('初始化失敗：' + error.message, 'error');
+        showNotification(t('SALARY_INIT_FAILED') + ': ' + error.message, 'error');
     }
 }
-
 // ==================== 員工薪資功能 ====================
 
 /**
@@ -116,7 +196,7 @@ async function loadEmployeeSalaryByMonth() {
     const yearMonth = monthInput ? monthInput.value : '';
     
     if (!yearMonth) {
-        showNotification('請選擇查詢月份', 'error');
+        showNotification(t('SALARY_SELECT_MONTH'), 'error');
         return;
     }
     
@@ -393,17 +473,17 @@ async function handleSalaryConfigSubmit(e) {
     
     // 驗證
     if (!employeeId || !employeeName || !baseSalary || parseFloat(baseSalary) <= 0) {
-        showNotification('❌ 請填寫必填欄位', 'error');
+        showNotification(t('SALARY_FILL_REQUIRED'), 'error');
         return;
     }
     
     if (!employeeType || !salaryType) {
-        showNotification('❌ 請選擇員工類型和薪資類型', 'error');
+        showNotification(t('SALARY_SELECT_TYPE'), 'error');
         return;
     }
     
     try {
-        showNotification('⏳ 正在儲存薪資設定...', 'info');
+        showNotification(t('SALARY_SAVING'), 'info');
         
         // ⭐ 重新排序參數，與後端 Sheet 欄位順序一致
         const queryString = 
@@ -451,7 +531,7 @@ async function handleSalaryConfigSubmit(e) {
         const res = await callApifetch(`setEmployeeSalaryTW&${queryString}`);
         
         if (res.ok) {
-            showNotification('✅ 薪資設定已成功儲存', 'success');
+            showNotification(t('SALARY_SAVE_SUCCESS'), 'success');
             e.target.reset();
             
             // 重置所有輸入欄位為 0
@@ -484,12 +564,13 @@ async function handleSalaryConfigSubmit(e) {
                 setCalculatedValues(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
             }
         } else {
-            showNotification(`❌ 儲存失敗：${res.msg || res.message || '未知錯誤'}`, 'error');
+            showNotification(t('SALARY_SAVE_FAILED') + ': ' + (res.msg || res.message || t('UNKNOWN_ERROR')), 'error');
+
         }
         
     } catch (error) {
         console.error('❌ 設定薪資失敗:', error);
-        showNotification('❌ 設定失敗，請稍後再試', 'error');
+        showNotification(t('SALARY_SAVE_ERROR'), 'error');
     }
 }
 /**
@@ -506,30 +587,31 @@ async function handleSalaryCalculation() {
     const yearMonth = yearMonthEl.value;
     
     if (!employeeId || !yearMonth) {
-        showNotification('❌ 請輸入員工ID和計算月份', 'error');
+        showNotification(t('SALARY_INPUT_EMPLOYEE_MONTH'), 'error');
         return;
     }
     
     try {
-        showNotification('⏳ 正在計算薪資...', 'info');
+        showNotification(t('SALARY_CALCULATING'), 'info');
         
         const res = await callApifetch(`calculateMonthlySalary&employeeId=${encodeURIComponent(employeeId)}&yearMonth=${encodeURIComponent(yearMonth)}`);
         
         if (res.ok && res.data) {
             displaySalaryCalculation(res.data, resultEl);
             resultEl.style.display = 'block';
-            showNotification('✅ 計算完成', 'success');
+            showNotification(t('SALARY_CALC_SUCCESS'), 'success');
             
             if (confirm('是否儲存此薪資單？')) {
                 await saveSalaryRecord(res.data);
             }
         } else {
-            showNotification(`❌ 計算失敗：${res.msg || '未知錯誤'}`, 'error');
+            showNotification(t('SALARY_CALC_FAILED') + ': ' + (res.msg || t('UNKNOWN_ERROR')), 'error');
+
         }
         
     } catch (error) {
         console.error('❌ 計算薪資失敗:', error);
-        showNotification('❌ 計算失敗，請稍後再試', 'error');
+        showNotification(t('SALARY_CALC_ERROR'), 'error');
     }
 }
 
@@ -675,7 +757,7 @@ function displaySalaryCalculation(data, container) {
  */
 async function saveSalaryRecord(data) {
     try {
-        showNotification('⏳ 正在儲存薪資單...', 'info');
+        showNotification(t('SALARY_SAVING_RECORD'), 'info');
         
         const queryString = 
             `employeeId=${encodeURIComponent(data.employeeId)}` +
@@ -708,14 +790,15 @@ async function saveSalaryRecord(data) {
         const res = await callApifetch(`saveMonthlySalary&${queryString}`);
         
         if (res.ok) {
-            showNotification('✅ 薪資單已成功儲存', 'success');
+            showNotification(t('SALARY_RECORD_SAVED'), 'success');
         } else {
-            showNotification(`❌ 儲存失敗：${res.msg || '未知錯誤'}`, 'error');
+            showNotification(t('SALARY_SAVE_FAILED') + ': ' + (res.msg || t('UNKNOWN_ERROR')), 'error');
+
         }
         
     } catch (error) {
         console.error('❌ 儲存薪資單失敗:', error);
-        showNotification('❌ 儲存失敗，請稍後再試', 'error');
+        showNotification(t('SALARY_SAVE_ERROR'), 'error');
     }
 }
 
@@ -732,7 +815,7 @@ async function loadAllEmployeeSalaryFromList() {
     const yearMonth = yearMonthEl.value;
     
     if (!yearMonth) {
-        showNotification('請選擇查詢年月', 'error');
+        showNotification(t('SALARY_SELECT_MONTH'), 'error');
         return;
     }
     

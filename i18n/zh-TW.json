@@ -547,5 +547,78 @@
   "SHIFT_EDIT_TITLE": "編輯排班",
   "BTN_UPDATE_SHIFT": "更新排班",
 
-  "SHIFT_BATCH_UPLOAD_ERROR": "批量上傳失敗"
+  "SHIFT_BATCH_UPLOAD_ERROR": "批量上傳失敗",
+
+
+
+
+
+
+
+
+
+  "SALARY_PAGE_TITLE": "薪資管理系統 - 出勤管家",
+  "SALARY_SYSTEM_TITLE": "薪資管理系統",
+  "SALARY_SYSTEM_DESC": "完整薪資管理解決方案（含津貼與扣款）",
+  
+  "SALARY_TAB_EMPLOYEE": "員工薪酬",
+  "SALARY_TAB_SETTING": "薪資設定",
+  "SALARY_TAB_MONTHLY": "月薪計算",
+  "SALARY_TAB_HOURLY": "時薪計算",
+  "SALARY_TAB_LIST": "薪資列表",
+  
+  "SALARY_QUERY_MONTH": "📅 查詢月份：",
+  "BTN_QUERY": "🔍 查詢",
+  "SALARY_MY_DETAIL": "我的薪資明細",
+  "SALARY_NO_RECORD": "尚無薪資記錄",
+  
+  "SALARY_EARNINGS_TITLE": "應發項目",
+  "SALARY_POSITION_ALLOWANCE": "職務加給",
+  "SALARY_MEAL_ALLOWANCE": "伙食費",
+  "SALARY_TRANSPORT_ALLOWANCE": "交通補助",
+  "SALARY_ATTENDANCE_BONUS": "全勤獎金",
+  "SALARY_PERFORMANCE_BONUS": "績效獎金",
+  "SALARY_RESTDAY_OT": "休息日加班費",
+  
+  "SALARY_DEDUCTIONS_TITLE": "扣款項目",
+  "SALARY_OTHER_DEDUCT": "其他扣款",
+  
+  "SALARY_BANK_INFO_TITLE": "銀行資訊",
+  "SALARY_BANK_NAME_LABEL": "銀行：",
+  "SALARY_ACCOUNT_LABEL": "帳號：",
+  
+  "SALARY_SETTING_FORM_TITLE": "員工薪資設定（完整版）",
+  "SALARY_BASIC_INFO": "基本資訊",
+  "SALARY_EMPLOYEE_LABEL": "員工",
+  "SALARY_SELECT_EMPLOYEE": "請選擇員工",
+  "SALARY_EMPLOYEE_ID_LABEL": "員工ID",
+  "SALARY_EMPLOYEE_NAME_LABEL": "員工姓名",
+  "SALARY_ID_NUMBER_LABEL": "身分證字號",
+  "SALARY_EMPLOYEE_TYPE_LABEL": "員工類型",
+  "SALARY_TYPE_LABEL": "薪資類型",
+  "SALARY_BASE_LABEL": "基本薪資",
+  "SALARY_ALLOWANCE_TITLE": "💰 固定津貼與補助",
+  
+  "BTN_SAVE_SALARY_SETTING": "💾 儲存薪資設定",
+  
+  "SALARY_LOGIN_REQUIRED": "請先登入",
+  "SALARY_INIT_FAILED": "初始化失敗",
+  "SALARY_SELECT_MONTH": "請選擇查詢月份",
+  "SALARY_FILL_REQUIRED": "請填寫必填欄位",
+  "SALARY_SELECT_TYPE": "請選擇員工類型和薪資類型",
+  "SALARY_SAVING": "正在儲存薪資設定...",
+  "SALARY_SAVE_SUCCESS": "薪資設定已成功儲存",
+  "SALARY_SAVE_FAILED": "儲存失敗",
+  "SALARY_SAVE_ERROR": "設定失敗，請稍後再試",
+  "SALARY_INPUT_EMPLOYEE_MONTH": "請輸入員工ID和計算月份",
+  "SALARY_CALCULATING": "正在計算薪資...",
+  "SALARY_CALC_SUCCESS": "計算完成",
+  "SALARY_CALC_FAILED": "計算失敗",
+  "SALARY_CALC_ERROR": "計算失敗，請稍後再試",
+  "SALARY_SAVING_RECORD": "正在儲存薪資單...",
+  "SALARY_RECORD_SAVED": "薪資單已成功儲存",
+  "SALARY_SELECT_YEAR_MONTH": "請選擇查詢年月",
+  "SALARY_HOURLY_MIN_190": "時薪不得低於190元",
+  "SALARY_INPUT_WORK_HOURS": "請輸入工作時數",
+  "SALARY_HOURLY_CALC_SUCCESS": "時薪計算完成"
 }

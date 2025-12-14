@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>薪資管理系統 - 出勤管家</title>
+    <title data-i18n="SALARY_PAGE_TITLE">薪資管理系統 - 出勤管家</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -562,11 +562,11 @@
                     </svg>
                 </div>
                 <div class="header-title">
-                    <h1>薪資管理系統</h1>
-                    <p>完整薪資管理解決方案（含津貼與扣款）</p>
+                    <h1 data-i18n="SALARY_SYSTEM_TITLE">薪資管理系統</h1>
+                    <p data-i18n="SALARY_SYSTEM_DESC">完整薪資管理解決方案（含津貼與扣款）</p>
                 </div>
             </div>
-            <button class="back-btn" onclick="goBack()">← 返回</button>
+            <button class="back-btn" onclick="goBack()" data-i18n="BTN_BACK">← 返回</button>
         </div>
 
         <!-- 權限提示 -->
@@ -579,11 +579,11 @@
 
         <!-- Tab 導航 -->
         <div class="tab-nav" id="tab-navigation">
-            <button class="tab-btn active" onclick="showTab('employee-salary')" data-role="all">員工薪酬</button>
-            <button class="tab-btn" onclick="showTab('salary-setting')" data-role="admin">薪資設定</button>
-            <button class="tab-btn" onclick="showTab('monthly-calc')" data-role="admin">月薪計算</button>
-            <button class="tab-btn" onclick="showTab('hourly-calc')" data-role="admin">時薪計算</button>
-            <button class="tab-btn" onclick="showTab('salary-list')" data-role="admin">薪資列表</button>
+            <button class="tab-btn active" onclick="showTab('employee-salary')" data-role="all" data-i18n="SALARY_TAB_EMPLOYEE">員工薪酬</button>
+            <button class="tab-btn" onclick="showTab('salary-setting')" data-role="admin" data-i18n="SALARY_TAB_SETTING">薪資設定</button>
+            <button class="tab-btn" onclick="showTab('monthly-calc')" data-role="admin" data-i18n="SALARY_TAB_MONTHLY">月薪計算</button>
+            <button class="tab-btn" onclick="showTab('hourly-calc')" data-role="admin" data-i18n="SALARY_TAB_HOURLY">時薪計算</button>
+            <button class="tab-btn" onclick="showTab('salary-list')" data-role="admin" data-i18n="SALARY_TAB_LIST">薪資列表</button>
         </div>
 
         <!-- Tab 1: 員工薪酬 -->
@@ -591,22 +591,22 @@
             <div id="employee-salary-section">
                 <!-- 月份選擇器 -->
                 <div class="month-selector">
-                    <label>📅 查詢月份：</label>
+                    <label data-i18n="SALARY_QUERY_MONTH">📅 查詢月份：</label>
                     <input type="month" id="employee-salary-month" class="form-input">
-                    <button onclick="loadEmployeeSalaryByMonth()">🔍 查詢</button>
+                    <button onclick="loadEmployeeSalaryByMonth()" data-i18n="BTN_QUERY">🔍 查詢</button>
                 </div>
 
                 <div class="feature-box">
-                    <div class="feature-title">我的薪資明細</div>
+                    <div class="feature-title" data-i18n="SALARY_MY_DETAIL">我的薪資明細</div>
                     
                     <div id="current-salary-loading" class="loading" style="display: none;">
                         <div class="loading-spinner"></div>
-                        <p>載入中...</p>
+                        <p data-i18n="LOADING">載入中...</p>
                     </div>
                     
                     <div id="current-salary-empty" class="empty-state" style="display: none;">
                         <div class="empty-state-icon">📄</div>
-                        <div class="empty-state-title">尚無薪資記錄</div>
+                        <div class="empty-state-title" data-i18n="SALARY_NO_RECORD">尚無薪資記錄</div>
                         <div class="empty-state-text">
                             <p>此月份還沒有薪資資料</p>
                             <p style="margin-top: 0.5rem; font-size: 0.875rem;">
@@ -619,91 +619,91 @@
                     <div id="current-salary-content" style="display: none;">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div class="info-card" style="background: rgba(34, 197, 94, 0.1);">
-                                <div class="info-label">應發總額</div>
+                                <div class="info-label" data-i18n="SALARY_GROSS">應發總額</div>
                                 <div id="gross-salary" class="info-value" style="color: #22c55e;">$0</div>
                             </div>
                             <div class="info-card" style="background: rgba(239, 68, 68, 0.1);">
-                                <div class="info-label">扣款總額</div>
+                                <div class="info-label" data-i18n="SALARY_DEDUCTIONS">扣款總額</div>
                                 <div id="total-deductions" class="info-value" style="color: #ef4444;">$0</div>
                             </div>
                             <div class="info-card" style="background: rgba(168, 85, 247, 0.1);">
-                                <div class="info-label">實發金額</div>
+                                <div class="info-label" data-i18n="SALARY_NET">實發金額</div>
                                 <div id="net-salary" class="info-value" style="color: #a855f7;">$0</div>
                             </div>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                             <div class="feature-box">
-                                <h4 class="font-semibold mb-3 text-green-400">應發項目</h4>
+                                <h4 class="font-semibold mb-3 text-green-400" data-i18n="SALARY_EARNINGS_TITLE">應發項目</h4>
                                 <div class="space-y-2 text-sm">
                                     <div class="flex justify-between">
-                                        <span>基本薪資</span>
+                                        <span data-i18n="SALARY_BASE">基本薪資</span>
                                         <span id="detail-base-salary" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>職務加給</span>
+                                        <span data-i18n="SALARY_POSITION_ALLOWANCE">職務加給</span>
                                         <span id="detail-position-allowance" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>伙食費</span>
+                                        <span data-i18n="SALARY_MEAL_ALLOWANCE">伙食費</span>
                                         <span id="detail-meal-allowance" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>交通補助</span>
+                                        <span data-i18n="SALARY_TRANSPORT_ALLOWANCE">交通補助</span>
                                         <span id="detail-transport-allowance" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>全勤獎金</span>
+                                        <span data-i18n="SALARY_ATTENDANCE_BONUS">全勤獎金</span>
                                         <span id="detail-attendance-bonus" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>績效獎金</span>
+                                        <span data-i18n="SALARY_PERFORMANCE_BONUS">績效獎金</span>
                                         <span id="detail-performance-bonus" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>平日加班費</span>
+                                        <span data-i18n="SALARY_WEEKDAY_OT">平日加班費</span>
                                         <span id="detail-weekday-overtime" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>休息日加班費</span>
+                                        <span data-i18n="SALARY_RESTDAY_OT">休息日加班費</span>
                                         <span id="detail-restday-overtime" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>國定假日加班費</span>
+                                        <span data-i18n="SALARY_HOLIDAY_OT">國定假日加班費</span>
                                         <span id="detail-holiday-overtime" class="font-mono">$0</span>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="feature-box">
-                                <h4 class="font-semibold mb-3 text-red-400">扣款項目</h4>
+                                <h4 class="font-semibold mb-3 text-red-400" data-i18n="SALARY_DEDUCTIONS_TITLE">扣款項目</h4>
                                 <div class="space-y-2 text-sm">
                                     <div class="flex justify-between">
-                                        <span>勞保費</span>
+                                        <span data-i18n="SALARY_LABOR_INS">勞保費</span>
                                         <span id="detail-labor-fee" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>健保費</span>
+                                        <span data-i18n="SALARY_HEALTH_INS">健保費</span>
                                         <span id="detail-health-fee" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>就業保險費</span>
+                                        <span data-i18n="SALARY_EMPLOYMENT_INS">就業保險費</span>
                                         <span id="detail-employment-fee" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>勞退自提</span>
+                                        <span data-i18n="SALARY_PENSION">勞退自提</span>
                                         <span id="detail-pension-self" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>所得稅</span>
+                                        <span data-i18n="SALARY_TAX">所得稅</span>
                                         <span id="detail-income-tax" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>請假扣款</span>
+                                        <span data-i18n="SALARY_LEAVE_DEDUCT">請假扣款</span>
                                         <span id="detail-leave-deduction" class="font-mono">$0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>其他扣款</span>
+                                        <span data-i18n="SALARY_OTHER_DEDUCT">其他扣款</span>
                                         <span id="detail-other-deductions" class="font-mono">$0</span>
                                     </div>
                                 </div>
@@ -711,11 +711,11 @@
                         </div>
                         
                         <div class="mt-4 pt-4 border-t border-gray-700">
-                            <h4 class="font-semibold mb-2">銀行資訊</h4>
+                            <h4 class="font-semibold mb-2" data-i18n="SALARY_BANK_INFO_TITLE">銀行資訊</h4>
                             <div class="text-sm">
-                                <span>銀行：</span>
+                                <span data-i18n="SALARY_BANK_NAME_LABEL">銀行：</span>
                                 <span id="detail-bank-name" class="font-mono">--</span>
-                                <span class="ml-4">帳號：</span>
+                                <span data-i18n="SALARY_ACCOUNT_LABEL">帳號：</span>
                                 <span id="detail-bank-account" class="font-mono">--</span>
                             </div>
                         </div>
@@ -723,7 +723,7 @@
                 </div>
                 
                 <div class="feature-box">
-                    <div class="feature-title">薪資歷史記錄</div>
+                    <div class="feature-title" data-i18n="SALARY_HISTORY_TITLE">薪資歷史記錄</div>
                     
                     <div id="salary-history-loading" class="loading" style="display: none;">
                         <div class="loading-spinner"></div>
@@ -732,7 +732,7 @@
                     
                     <div id="salary-history-empty" class="empty-state" style="display: none;">
                         <div class="empty-state-icon">📋</div>
-                        <div class="empty-state-title">尚無歷史記錄</div>
+                        <div class="empty-state-title" data-i18n="SALARY_NO_HISTORY">尚無歷史記錄</div>
                     </div>
                     
                     <div id="salary-history-list" class="space-y-3"></div>
@@ -743,7 +743,7 @@
         <!-- Tab 2: 薪資設定 -->
         <div id="salary-setting" class="tab-content">
             <div class="form-section">
-                <div class="feature-title">員工薪資設定（完整版）</div>
+                <div class="feature-title" data-i18n="SALARY_SETTING_FORM_TITLE">員工薪資設定（完整版）</div>
                 <p style="color: #94a3b8; margin-bottom: 2rem;">
                     設定基本薪資與所有津貼、扣款項目
                 </p>
@@ -751,30 +751,30 @@
                 <form id="salary-config-form">
                     <!-- 基本資訊 -->
                     <div class="feature-box">
-                        <h3 class="text-lg font-semibold mb-4">基本資訊</h3>
+                        <h3 class="text-lg font-semibold mb-4" data-i18n="SALARY_BASIC_INFO">基本資訊</h3>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label class="form-label required">員工</label>
+                                <label class="form-label required" data-i18n="SALARY_EMPLOYEE_LABEL">員工</label>
                                 <select id="config-employee-select" class="form-select" required onchange="onEmployeeSelect()">
-                                    <option value="">請選擇員工</option>
+                                    <option value="" data-i18n-option="SALARY_SELECT_EMPLOYEE">請選擇員工</option>
                                     <!-- 動態載入員工列表 -->
                                 </select>
                                 <span class="form-hint">選擇員工後會自動填入ID和姓名</span>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">員工ID</label>
+                                <label class="form-label" data-i18n="SALARY_EMPLOYEE_ID_LABEL">員工ID</label>
                                 <input type="text" id="config-employee-id" class="form-input" placeholder="自動填入" readonly>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">員工姓名</label>
+                                <label class="form-label" data-i18n="SALARY_EMPLOYEE_NAME_LABEL">員工姓名</label>
                                 <input type="text" id="config-employee-name" class="form-input" placeholder="自動填入" readonly>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">身分證字號</label>
+                                <label class="form-label" data-i18n="SALARY_ID_NUMBER_LABEL">身分證字號</label>
                                 <input type="text" id="config-id-number" class="form-input" placeholder="選填" maxlength="10">
                             </div>
                             <div class="form-group">
-                                <label class="form-label required">員工類型</label>
+                                <label class="form-label required" data-i18n="SALARY_EMPLOYEE_TYPE_LABEL">員工類型</label>
                                 <select id="config-employee-type" class="form-select" required>
                                     <option value="">請選擇</option>
                                     <option value="正職">正職</option>
@@ -783,7 +783,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label required">薪資類型</label>
+                                <label class="form-label required" data-i18n="SALARY_TYPE_LABEL">薪資類型</label>
                                 <select id="config-salary-type" class="form-select" required>
                                     <option value="">請選擇</option>
                                     <option value="月薪">月薪</option>
@@ -791,7 +791,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label required">基本薪資</label>
+                                <label class="form-label required" data-i18n="SALARY_BASE_LABEL">基本薪資</label>
                                 <input type="number" id="config-base-salary" class="form-input" 
                                        placeholder="27,470" min="0" step="1" required>
                                 <span class="form-hint warning">⚠️ <strong>2025年基本工資</strong>: 月薪 28,590 元 | 時薪 190 元</span>
@@ -803,9 +803,8 @@
 
                     <!-- ⭐ 固定津貼項目 -->
                     <div class="feature-box">
-                        <h3 class="text-lg font-semibold mb-2 text-green-400">
-                            💰 固定津貼與補助
-                        </h3>
+                        <h3 class="text-lg font-semibold mb-2 text-green-400" data-i18n="SALARY_ALLOWANCE_TITLE">💰 固定津貼與補助</h3>
+
                         <p class="text-sm text-gray-400 mb-4">
                             每月固定發放的津貼項目（會計入應發總額）
                         </p>
@@ -1064,9 +1063,7 @@
                                   placeholder="選填，可記錄特殊說明事項"></textarea>
                     </div>
 
-                    <button type="submit" class="submit-btn">
-                        💾 儲存薪資設定
-                    </button>
+                    <button type="submit" class="submit-btn" data-i18n="BTN_SAVE_SALARY_SETTING">💾 儲存薪資設定</button>
                 </form>
             </div>
         </div>
@@ -1536,12 +1533,12 @@
             }
             
             if (hourlyRate < 190) {
-                showNotification('❌ 時薪不得低於190元', 'error');
+                showNotification(t('SALARY_HOURLY_MIN_190'), 'error');
                 return;
             }
             
             if (workHours <= 0) {
-                showNotification('❌ 請輸入工作時數', 'error');
+                showNotification(t('SALARY_INPUT_WORK_HOURS'), 'error');
                 return;
             }
             
@@ -1665,7 +1662,7 @@
             `;
             
             resultEl.style.display = 'block';
-            showNotification('✅ 時薪計算完成', 'success');
+            showNotification(t('SALARY_HOURLY_CALC_SUCCESS'), 'success');
         }
 
         // ⭐ 補充：薪資列表功能
@@ -1682,7 +1679,7 @@
             const yearMonth = yearMonthEl.value;
             
             if (!yearMonth) {
-                showNotification('請選擇查詢年月', 'error');
+                showNotification(t('SALARY_SELECT_YEAR_MONTH'), 'error');
                 return;
             }
             
