@@ -710,5 +710,6 @@
   "FILTER_YEAR_MONTH_LABEL": "查詢年月",
   "BTN_LOAD_SALARY_LIST": "📋 載入薪資列表",
   
-  "SALARY_SELECT_QUERY_MONTH": "請選擇查詢月份"
+  "SALARY_SELECT_QUERY_MONTH": "請選擇查詢月份",
+  "FOOTER_CREDITS": "由 {name} 製作"
 }
