@@ -600,6 +600,12 @@
   "SALARY_SELECT_YEAR_MONTH": "Please select year and month",
   "SALARY_HOURLY_MIN_190": "Hourly wage must not be less than 190",
   "SALARY_INPUT_WORK_HOURS": "Please enter work hours",
-  "SALARY_HOURLY_CALC_SUCCESS": "Hourly calculation completed"
+  "SALARY_HOURLY_CALC_SUCCESS": "Hourly calculation completed",
 
+  "SALARY_SETTING_DESC": "Set base salary and all allowance/deduction items",
+  "PLEASE_SELECT": "Please select",
+  "FULL_TIME": "Full-time",
+  "PART_TIME": "Part-time",
+  "CONTRACT": "Contract",
+  "HINT_AUTO_FILL": "Employee ID and name will be auto-filled after selection"
 }

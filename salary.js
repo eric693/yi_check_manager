@@ -1,82 +1,82 @@
 // salary.js - 薪資管理前端邏輯（完整版 v2.0 - 含所有津貼與扣款）
 // ==================== 翻譯系統 ====================
-let translations = {};
-let currentLang = localStorage.getItem("lang") || "zh-TW";
+// let translations = {};
+// let currentLang = localStorage.getItem("lang") || "zh-TW";
 
-/**
- * ✅ 翻譯函式
- */
-function t(code, params = {}) {
-    let text = translations[code] || code;
+// /**
+//  * ✅ 翻譯函式
+//  */
+// function t(code, params = {}) {
+//     let text = translations[code] || code;
     
-    for (const key in params) {
-        let paramValue = params[key];
-        if (paramValue in translations) {
-            paramValue = translations[paramValue];
-        }
-        text = text.replace(`{${key}}`, paramValue);
-    }
-    return text;
-}
+//     for (const key in params) {
+//         let paramValue = params[key];
+//         if (paramValue in translations) {
+//             paramValue = translations[paramValue];
+//         }
+//         text = text.replace(`{${key}}`, paramValue);
+//     }
+//     return text;
+// }
 
-/**
- * ✅ 載入翻譯檔案
- */
-async function loadTranslations(lang) {
-    try {
-        const res = await fetch(`https://eric693.github.io/check_manager_plus/i18n/${lang}.json`);
-        if (!res.ok) {
-            throw new Error(`HTTP 錯誤: ${res.status}`);
-        }
-        translations = await res.json();
-        currentLang = lang;
-        localStorage.setItem("lang", lang);
-        renderTranslations();
-        console.log(`✅ 語言切換成功: ${lang}`);
-    } catch (err) {
-        console.error("載入語系失敗:", err);
-    }
-}
+// /**
+//  * ✅ 載入翻譯檔案
+//  */
+// async function loadTranslations(lang) {
+//     try {
+//         const res = await fetch(`https://eric693.github.io/check_manager_plus/i18n/${lang}.json`);
+//         if (!res.ok) {
+//             throw new Error(`HTTP 錯誤: ${res.status}`);
+//         }
+//         translations = await res.json();
+//         currentLang = lang;
+//         localStorage.setItem("lang", lang);
+//         renderTranslations();
+//         console.log(`✅ 語言切換成功: ${lang}`);
+//     } catch (err) {
+//         console.error("載入語系失敗:", err);
+//     }
+// }
 
-/**
- * ✅ 渲染翻譯
- */
-function renderTranslations(container = document) {
-    // 更新頁面標題
-    if (container === document) {
-        document.title = t("SALARY_PAGE_TITLE");
-    }
+// /**
+//  * ✅ 渲染翻譯
+//  */
+// function renderTranslations(container = document) {
+//     // 更新頁面標題
+//     if (container === document) {
+//         document.title = t("SALARY_PAGE_TITLE");
+//     }
 
-    // 翻譯所有帶 data-i18n 的元素
-    const elementsToTranslate = container.querySelectorAll('[data-i18n]');
-    elementsToTranslate.forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        const translatedText = t(key);
+//     // 翻譯所有帶 data-i18n 的元素
+//     const elementsToTranslate = container.querySelectorAll('[data-i18n]');
+//     elementsToTranslate.forEach(element => {
+//         const key = element.getAttribute('data-i18n');
+//         const translatedText = t(key);
         
-        if (translatedText !== key) {
-            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                element.placeholder = translatedText;
-            } else {
-                element.textContent = translatedText;
-            }
-        }
-    });
+//         if (translatedText !== key) {
+//             if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+//                 element.placeholder = translatedText;
+//             } else {
+//                 element.textContent = translatedText;
+//             }
+//         }
+//     });
 
-    // 翻譯下拉選單選項
-    const selectElements = container.querySelectorAll('select');
-    selectElements.forEach(select => {
-        const options = select.querySelectorAll('option[data-i18n-option]');
-        options.forEach(option => {
-            const key = option.getAttribute('data-i18n-option');
-            if (key) {
-                const translatedText = t(key);
-                if (translatedText !== key) {
-                    option.textContent = translatedText;
-                }
-            }
-        });
-    });
-}
+//     // 翻譯下拉選單選項
+//     const selectElements = container.querySelectorAll('select');
+//     selectElements.forEach(select => {
+//         const options = select.querySelectorAll('option[data-i18n-option]');
+//         options.forEach(option => {
+//             const key = option.getAttribute('data-i18n-option');
+//             if (key) {
+//                 const translatedText = t(key);
+//                 if (translatedText !== key) {
+//                     option.textContent = translatedText;
+//                 }
+//             }
+//         });
+//     });
+// }
 
 // ==================== 檢查依賴 ====================
 if (typeof callApifetch !== 'function') {
