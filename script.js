@@ -2240,7 +2240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
                     </div>
                     
-                    <!-- 👇 新增：補打卡理由 -->
+                    <!-- 補打卡理由 -->
                     <div class="form-group mb-3">
                         <label for="adjustReason" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                             <span data-i18n="ADJUST_REASON_LABEL">補打卡理由</span>
@@ -2274,6 +2274,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             const adjustDateTimeInput = document.getElementById("adjustDateTime");
             const defaultTime = type === '上班' ? '09:00' : '18:00';
             adjustDateTimeInput.value = `${date}T${defaultTime}`;
+            
+            // 👇 新增：平滑滾動到補打卡表單
+            setTimeout(() => {
+                adjustmentFormContainer.scrollIntoView({ 
+                    behavior: 'smooth',  // 平滑滾動
+                    block: 'start'       // 滾動到元素頂部
+                });
+                
+                // 可選：讓理由輸入框自動聚焦
+                const reasonInput = document.getElementById('adjustReason');
+                if (reasonInput) {
+                    reasonInput.focus();
+                }
+            }, 100); // 稍微延遲，確保表單已渲染
             
             // 綁定取消按鈕
             document.getElementById('cancel-adjust-btn').addEventListener('click', () => {
