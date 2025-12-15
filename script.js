@@ -2322,7 +2322,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const loadingText = t('LOADING') || '處理中...';
             
             const datetime = document.getElementById("adjustDateTime").value;
-            const reason = document.getElementById("adjustReason")?.value.trim(); // 👈 新增
+            const reason = document.getElementById("adjustReason")?.value.trim();
             const type = button.dataset.type;
             const date = button.dataset.date;
             
@@ -2331,9 +2331,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             
-            // 👇 新增：驗證理由
-            if (!reason || reason.length < 5) {
-                showNotification(t('ADJUST_REASON_REQUIRED') || "請填寫補打卡理由（至少 5 個字）", "error");
+            // 👇 修改：改為至少 2 個字
+            if (!reason || reason.length < 2) {
+                showNotification(t('ADJUST_REASON_REQUIRED') || "請填寫補打卡理由（至少 2 個字）", "error");
                 return;
             }
             
@@ -2351,14 +2351,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
                 
-                // 👇 修改：將理由加入 note 參數
                 const params = new URLSearchParams({
                     token: sessionToken,
                     type: type,
                     lat: lat,
                     lng: lng,
                     datetime: datetime,
-                    note: reason  // ⭐ 改為使用者填寫的理由
+                    note: reason
                 });
                 
                 const res = await callApifetch(`adjustPunch&${params.toString()}`);
