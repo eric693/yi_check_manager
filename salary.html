@@ -1356,6 +1356,8 @@
                 (parseFloat(data['其他扣款']) || 0);
             
             safeSet('total-deductions', formatCurrency(deductions));
+            
+            // 應發項目
             safeSet('detail-base-salary', formatCurrency(data['基本薪資']));
             safeSet('detail-position-allowance', formatCurrency(data['職務加給'] || 0));
             safeSet('detail-meal-allowance', formatCurrency(data['伙食費'] || 0));
@@ -1365,9 +1367,16 @@
             safeSet('detail-weekday-overtime', formatCurrency(data['平日加班費']));
             safeSet('detail-restday-overtime', formatCurrency(data['休息日加班費']));
             safeSet('detail-holiday-overtime', formatCurrency(data['國定假日加班費']));
+            
+            // 扣款項目
             safeSet('detail-labor-fee', formatCurrency(data['勞保費']));
             safeSet('detail-health-fee', formatCurrency(data['健保費']));
             safeSet('detail-employment-fee', formatCurrency(data['就業保險費']));
+            
+            // ⭐ 勞退自提率：從後端資料取得
+            const pensionRate = parseFloat(data['勞退自提率']) || 0;
+            safeSet('detail-pension-rate', `${pensionRate}%`);
+            
             safeSet('detail-pension-self', formatCurrency(data['勞退自提']));
             safeSet('detail-income-tax', formatCurrency(data['所得稅']));
             safeSet('detail-leave-deduction', formatCurrency(data['請假扣款']));
@@ -1379,8 +1388,12 @@
                 (parseFloat(data['其他扣款']) || 0);
             safeSet('detail-other-deductions', formatCurrency(otherDeductions));
             
-            safeSet('detail-bank-name', getBankName(data['銀行代碼']));
-            safeSet('detail-bank-account', data['銀行帳號'] || '--');
+            // 銀行資訊
+            const bankCode = data['銀行代碼'];
+            const bankAccount = data['銀行帳號'];
+            
+            safeSet('detail-bank-name', getBankName(bankCode));
+            safeSet('detail-bank-account', bankAccount || '--');
         }
 
         function showTab(tabId) {
