@@ -1557,7 +1557,7 @@
             }
         }
 
-        async function handleHourlyCalculation() {
+        <!-- async function handleHourlyCalculation() {
             const employeeId = document.getElementById('hourly-employee-id').value;
             const hourlyRate = parseFloat(document.getElementById('hourly-rate').value) || 0;
             const workHours = parseFloat(document.getElementById('work-hours').value) || 0;
@@ -1612,6 +1612,48 @@
                 totalDeductions,
                 netSalary
             });
+        } -->
+
+        async function handleHourlyCalculation() {
+            const employeeIdEl = document.getElementById('hourly-employee-id');
+            const yearMonthEl = document.getElementById('hourly-year-month');
+            const resultEl = document.getElementById('hourly-calculation-result');
+            
+            if (!employeeIdEl || !yearMonthEl || !resultEl) {
+                console.error('找不到必要的元素');
+                return;
+            }
+            
+            const employeeId = employeeIdEl.value.trim();
+            const yearMonth = yearMonthEl.value;
+            
+            if (!employeeId || !yearMonth) {
+                showNotification('❌ 請選擇員工和計算年月', 'error');
+                return;
+            }
+            
+            try {
+                showNotification('🔄 正在計算薪資...', 'info');
+                
+                // ⭐ 改用跟月薪計算相同的 API
+                const res = await callApifetch(`calculateMonthlySalary&employeeId=${encodeURIComponent(employeeId)}&yearMonth=${encodeURIComponent(yearMonth)}`);
+                
+                if (res.ok && res.data) {
+                    displaySalaryCalculation(res.data, resultEl);
+                    resultEl.style.display = 'block';
+                    showNotification('✅ 薪資計算完成', 'success');
+                    
+                    if (confirm('是否儲存此薪資單？')) {
+                        await saveSalaryRecord(res.data);
+                    }
+                } else {
+                    showNotification('❌ 計算失敗: ' + (res.msg || '未知錯誤'), 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ 計算薪資失敗:', error);
+                showNotification('❌ 計算失敗', 'error');
+            }
         }
 
         function displayHourlyCalculation(data) {
