@@ -820,37 +820,51 @@
                         </p>
                         
                         <div class="form-grid">
+                            <!-- 職務加給 -->
                             <div class="form-group">
                                 <label class="form-label" data-i18n="SALARY_POSITION_ALLOWANCE_LABEL">職務加給</label>
                                 <input type="number" id="config-position-allowance" class="form-input" 
-                                       value="0" min="0" step="1" placeholder="0">
+                                    value="0" min="0" step="1" placeholder="0">
                                 <span class="form-hint" data-i18n="HINT_POSITION_ALLOWANCE">依職務等級固定發放</span>
                             </div>
                             
+                            <!-- 伙食費 -->
                             <div class="form-group">
                                 <label class="form-label" data-i18n="SALARY_MEAL_ALLOWANCE_LABEL">伙食費</label>
+                                <input type="number" id="config-meal-allowance" class="form-input" 
+                                    value="0" min="0" step="1" placeholder="0">
                                 <span class="form-hint" data-i18n="HINT_MEAL_ALLOWANCE">每月伙食補助（常見: 2,400元）</span>
                             </div>
                             
+                            <!-- 交通補助 -->
                             <div class="form-group">
                                 <label class="form-label" data-i18n="SALARY_TRANSPORT_ALLOWANCE_LABEL">交通補助</label>
+                                <input type="number" id="config-transport-allowance" class="form-input" 
+                                    value="0" min="0" step="1" placeholder="0">
                                 <span class="form-hint" data-i18n="HINT_TRANSPORT_ALLOWANCE">每月交通津貼或油錢補助</span>
                             </div>
                             
+                            <!-- 全勤獎金 -->
                             <div class="form-group">
                                 <label class="form-label" data-i18n="SALARY_ATTENDANCE_BONUS_LABEL">全勤獎金</label>
+                                <input type="number" id="config-attendance-bonus" class="form-input" 
+                                    value="0" min="0" step="1" placeholder="0">
                                 <span class="form-hint" data-i18n="HINT_ATTENDANCE_BONUS">未請假可領取（系統自動判斷）</span>
                             </div>
                             
+                            <!-- 績效獎金 -->
                             <div class="form-group">
                                 <label class="form-label" data-i18n="SALARY_PERFORMANCE_BONUS_LABEL">績效獎金</label>
+                                <input type="number" id="config-performance-bonus" class="form-input" 
+                                    value="0" min="0" step="1" placeholder="0">
                                 <span class="form-hint" data-i18n="HINT_PERFORMANCE_BONUS">依績效考核發放</span>
                             </div>
                             
+                            <!-- 其他津貼 -->
                             <div class="form-group">
                                 <label class="form-label" data-i18n="SALARY_OTHER_ALLOWANCES_LABEL">其他津貼</label>
                                 <input type="number" id="config-other-allowances" class="form-input" 
-                                       value="0" min="0" step="1" placeholder="0">
+                                    value="0" min="0" step="1" placeholder="0">
                                 <span class="form-hint" data-i18n="HINT_OTHER_ALLOWANCES">其他固定津貼項目</span>
                             </div>
                         </div>
@@ -869,49 +883,68 @@
                         </p>
                         
                         <div class="form-grid">
+                            <!-- 勞保費（自動計算） -->
                             <div class="form-group">
                                 <label class="form-label">
                                     <span data-i18n="SALARY_LABOR_INS_LABEL">勞保費</span> 
                                     <span class="auto-badge" data-i18n="AUTO">自動</span>
                                 </label>
+                                <input type="number" id="config-labor-fee" class="form-input" 
+                                       value="0" readonly style="background: rgba(255,255,255,0.05); cursor: not-allowed;">
                                 <span class="form-hint" data-i18n="HINT_LABOR_INS">個人負擔20%</span>
                             </div>
                             
+                            <!-- 健保費（自動計算） -->
                             <div class="form-group">
                                 <label class="form-label">
                                     <span data-i18n="SALARY_HEALTH_INS_LABEL">健保費</span> 
                                     <span class="auto-badge" data-i18n="AUTO">自動</span>
                                 </label>
+                                <input type="number" id="config-health-fee" class="form-input" 
+                                       value="0" readonly style="background: rgba(255,255,255,0.05); cursor: not-allowed;">
                                 <span class="form-hint" data-i18n="HINT_HEALTH_INS">個人負擔30%</span>
                             </div>
                             
+                            <!-- 就業保險費（自動計算） -->
                             <div class="form-group">
                                 <label class="form-label">
                                     <span data-i18n="SALARY_EMPLOYMENT_INS_LABEL">就業保險費</span> 
                                     <span class="auto-badge" data-i18n="AUTO">自動</span>
                                 </label>
+                                <input type="number" id="config-employment-fee" class="form-input" 
+                                       value="0" readonly style="background: rgba(255,255,255,0.05); cursor: not-allowed;">
                                 <span class="form-hint" data-i18n="HINT_EMPLOYMENT_INS">費率1%</span>
                             </div>
                             
+                            <!-- 勞退自提率（可輸入） -->
                             <div class="form-group">
                                 <label class="form-label" data-i18n="SALARY_PENSION_RATE_LABEL">勞退自提率 (%)</label>
+                                <input type="number" id="config-pension-rate" class="form-input" 
+                                       value="0" min="0" max="6" step="1" placeholder="0">
                                 <span class="form-hint" data-i18n="HINT_PENSION_RATE">可選擇 0% ~ 6%</span>
                             </div>
                             
+                            <!-- 勞退自提金額（自動計算） -->
                             <div class="form-group">
                                 <label class="form-label">
                                     <span data-i18n="SALARY_PENSION_SELF_LABEL">勞退自提金額</span> 
                                     <span class="auto-badge" data-i18n="AUTO">自動</span>
                                 </label>
+                                <input type="number" id="config-pension-self" class="form-input" 
+                                       value="0" readonly style="background: rgba(255,255,255,0.05); cursor: not-allowed;">
                             </div>
                             
+                            <!-- 所得稅（自動計算） -->
                             <div class="form-group">
                                 <label class="form-label">
                                     <span data-i18n="SALARY_TAX_LABEL">所得稅</span> 
                                     <span class="auto-badge" data-i18n="AUTO">自動</span>
                                 </label>
+                                <input type="number" id="config-income-tax" class="form-input" 
+                                       value="0" readonly style="background: rgba(255,255,255,0.05); cursor: not-allowed;">
                             </div>
                         </div>
+                    
 
                         <hr class="section-divider">
 
