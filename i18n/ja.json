@@ -52,7 +52,7 @@
   "API_TEST_TITLE": "APIテストエリア",
   "API_TEST_DESCRIPTION": "下のボタンをクリックして、新しいAPI機能をテストしてください。",
   "API_TEST_BTN": "APIをテスト",
-  "FOOTER_VERSION": "勤怠管理システム v4.2.4",
+  "FOOTER_VERSION": "勤怠管理システム v4.2.5",
   "FOOTER_CREDITS_PREFIX": "制作：",
   "FOOTER_CREDITS_SUFFIX": "",
   "FOOTER_SPONSOR": "このプロジェクトを支援する",

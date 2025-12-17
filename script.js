@@ -2265,14 +2265,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const res = await callApifetch(`getProfile&otoken=${otoken}`);
             if (res.ok && res.sToken) {
+                // 儲存 Session Token
                 localStorage.setItem("sessionToken", res.sToken);
+                
+                // ⭐ 新增：儲存使用者快取
+                localStorage.setItem("cachedUser", JSON.stringify(res.user));
+                localStorage.setItem("cacheTime", Date.now().toString());
+                localStorage.setItem("sessionUserId", res.user.userId);
+                
+                // 清除 URL 參數
                 history.replaceState({}, '', window.location.pathname);
-                ensureLogin();
+                
+                // ⭐⭐⭐ 關鍵：不需要再呼叫 ensureLogin 或 initApp
+                // 直接顯示介面
+                
+                if (res.user.dept === "管理員") {
+                  document.getElementById('tab-admin-btn').style.display = 'block';
+                }
+                
+                document.getElementById("user-name").textContent = res.user.name;
+                document.getElementById("profile-img").src = res.user.picture;
+                
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('user-header').style.display = 'flex';
+                document.getElementById('main-app').style.display = 'block';
+                
+                // ⭐ 直接渲染異常記錄（資料已經在 res 裡）
+                if (res.abnormalRecords) {
+                  renderAbnormalRecords(res.abnormalRecords);
+                }
+                
+                showNotification(t("LOGIN_SUCCESS"), "success");
+                
+                // 初始化生物辨識（背景執行）
                 initBiometricPunch();
+                
             } else {
                 showNotification(t("ERROR_LOGIN_FAILED", { msg: res.msg || t("UNKNOWN_ERROR") }), "error");
                 loginBtn.style.display = 'block';
             }
+            // if (res.ok && res.sToken) {
+            //     localStorage.setItem("sessionToken", res.sToken);
+            //     history.replaceState({}, '', window.location.pathname);
+            //     ensureLogin();
+            //     initBiometricPunch();
+            // } else {
+            //     showNotification(t("ERROR_LOGIN_FAILED", { msg: res.msg || t("UNKNOWN_ERROR") }), "error");
+            //     loginBtn.style.display = 'block';
+            // }
         } catch (err) {
             console.error(err);
             loginBtn.style.display = 'block';
