@@ -265,6 +265,17 @@ async function loadLeaveRecords() {
     }
 }
 
+function formatDateTimeLocal(isoString) {
+    const date = new Date(isoString);
+    
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  }
 /**
  * 渲染請假紀錄（支援時數顯示）
  */
@@ -289,8 +300,8 @@ function renderLeaveRecords(records) {
         // 格式化時間顯示
         let timeDisplay = '';
         if (record.startDateTime && record.endDateTime) {
-            // 新格式：顯示完整時間
-            timeDisplay = `${record.startDateTime} ~ ${record.endDateTime}`;
+            // 新格式：顯示完整時間（使用 formatDateTimeLocal 格式化）
+            timeDisplay = `${formatDateTimeLocal(record.startDateTime)} ~ ${formatDateTimeLocal(record.endDateTime)}`;
         } else if (record.startDate && record.endDate) {
             // 舊格式：只有日期
             timeDisplay = `${formatLeaveDate(record.startDate)} ~ ${formatLeaveDate(record.endDate)}`;
@@ -488,7 +499,7 @@ function renderPendingLeaveRequests(requests) {
         // 格式化時間顯示
         let timeDisplay = '';
         if (req.startDateTime && req.endDateTime) {
-            timeDisplay = `${req.startDateTime} ~ ${req.endDateTime}`;
+            timeDisplay = `${formatDateTimeLocal(req.startDateTime)} ~ ${formatDateTimeLocal(req.endDateTime)}`;
         } else if (req.startDate && req.endDate) {
             timeDisplay = `${formatLeaveDate(req.startDate)} ~ ${formatLeaveDate(req.endDate)}`;
         }
