@@ -42,7 +42,6 @@ function bindLeaveEventListeners() {
     // 提交請假申請
     const submitBtn = document.getElementById('submit-leave-btn');
     if (submitBtn) {
-        // 移除舊的監聽器，避免重複綁定
         submitBtn.replaceWith(submitBtn.cloneNode(true));
         document.getElementById('submit-leave-btn').addEventListener('click', handleSubmitLeave);
     }
@@ -54,16 +53,98 @@ function bindLeaveEventListeners() {
         leaveTypeSelect.addEventListener('change', handleLeaveTypeChange);
     }
     
-    // 開始日期/結束日期改變時自動計算天數
-    const startDateInput = document.getElementById('leave-start-date');
-    const endDateInput = document.getElementById('leave-end-date');
+    // 👇 修改：改為 datetime-local 輸入框
+    const startDateTimeInput = document.getElementById('leave-start-datetime');
+    const endDateTimeInput = document.getElementById('leave-end-datetime');
     
-    if (startDateInput && endDateInput) {
-        startDateInput.removeEventListener('change', calculateLeaveDays);
-        endDateInput.removeEventListener('change', calculateLeaveDays);
-        startDateInput.addEventListener('change', calculateLeaveDays);
-        endDateInput.addEventListener('change', calculateLeaveDays);
+    if (startDateTimeInput && endDateTimeInput) {
+        startDateTimeInput.removeEventListener('change', calculateLeaveHours);
+        endDateTimeInput.removeEventListener('change', calculateLeaveHours);
+        startDateTimeInput.addEventListener('change', calculateLeaveHours);
+        endDateTimeInput.addEventListener('change', calculateLeaveHours);
     }
+}
+
+/**
+ * 計算請假時數（扣除午休）
+ */
+function calculateLeaveHours() {
+    const startDateTime = document.getElementById('leave-start-datetime').value;
+    const endDateTime = document.getElementById('leave-end-datetime').value;
+    const hoursEl = document.getElementById('calculated-hours');
+    const daysEl = document.getElementById('calculated-days');
+    
+    if (!startDateTime || !endDateTime) {
+        if (hoursEl) hoursEl.textContent = '0';
+        if (daysEl) daysEl.textContent = '0';
+        return;
+    }
+    
+    const start = new Date(startDateTime);
+    const end = new Date(endDateTime);
+    
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        if (hoursEl) hoursEl.textContent = '0';
+        if (daysEl) daysEl.textContent = '0';
+        return;
+    }
+    
+    if (end <= start) {
+        showNotification('結束時間必須晚於開始時間', 'error');
+        if (hoursEl) hoursEl.textContent = '0';
+        if (daysEl) daysEl.textContent = '0';
+        return;
+    }
+    
+    // 計算總毫秒差
+    const diffMs = end - start;
+    let totalHours = diffMs / (1000 * 60 * 60);
+    
+    // 計算需要扣除的午休時數
+    let lunchDeduction = 0;
+    
+    // 如果是同一天的請假
+    if (start.toDateString() === end.toDateString()) {
+        const startHour = start.getHours() + start.getMinutes() / 60;
+        const endHour = end.getHours() + end.getMinutes() / 60;
+        
+        // 如果請假時段包含 12:00-13:00，扣除1小時
+        if (startHour < 13 && endHour > 12) {
+            lunchDeduction = 1;
+        }
+    } else {
+        // 跨天請假，計算每個完整天數的午休時數
+        const startOfDay = new Date(start);
+        startOfDay.setHours(0, 0, 0, 0);
+        
+        const endOfDay = new Date(end);
+        endOfDay.setHours(0, 0, 0, 0);
+        
+        const daysDiff = Math.floor((endOfDay - startOfDay) / (1000 * 60 * 60 * 24));
+        
+        // 計算第一天的午休扣除
+        const firstDayStart = start.getHours() + start.getMinutes() / 60;
+        if (firstDayStart < 13) {
+            lunchDeduction += 1;
+        }
+        
+        // 計算中間完整天數的午休（每天1小時）
+        if (daysDiff > 1) {
+            lunchDeduction += (daysDiff - 1);
+        }
+        
+        // 計算最後一天的午休扣除
+        const lastDayEnd = end.getHours() + end.getMinutes() / 60;
+        if (lastDayEnd > 12) {
+            lunchDeduction += 1;
+        }
+    }
+    
+    const workHours = Math.max(0, totalHours - lunchDeduction);
+    const days = (workHours / 8).toFixed(2);
+    
+    if (hoursEl) hoursEl.textContent = workHours.toFixed(2);
+    if (daysEl) daysEl.textContent = days;
 }
 
 /**
@@ -185,7 +266,7 @@ async function loadLeaveRecords() {
 }
 
 /**
- * 渲染請假紀錄（修正版）
+ * 渲染請假紀錄（支援時數顯示）
  */
 function renderLeaveRecords(records) {
     const listEl = document.getElementById('leave-records-list');
@@ -205,9 +286,23 @@ function renderLeaveRecords(records) {
             statusClass = 'text-red-600 dark:text-red-400';
         }
         
-        // 🔧 修正：格式化日期
-        const startDate = formatLeaveDate(record.startDate);
-        const endDate = formatLeaveDate(record.endDate);
+        // 格式化時間顯示
+        let timeDisplay = '';
+        if (record.startDateTime && record.endDateTime) {
+            // 新格式：顯示完整時間
+            timeDisplay = `${record.startDateTime} ~ ${record.endDateTime}`;
+        } else if (record.startDate && record.endDate) {
+            // 舊格式：只有日期
+            timeDisplay = `${formatLeaveDate(record.startDate)} ~ ${formatLeaveDate(record.endDate)}`;
+        }
+        
+        // 顯示時數或天數
+        let durationDisplay = '';
+        if (record.workHours !== undefined) {
+            durationDisplay = `${record.workHours} 小時 (${record.days} 天)`;
+        } else if (record.days !== undefined) {
+            durationDisplay = `${record.days} 天`;
+        }
         
         li.innerHTML = `
             <div class="flex justify-between items-start mb-2">
@@ -216,9 +311,13 @@ function renderLeaveRecords(records) {
                         <span data-i18n-key="${record.leaveType}">${t(record.leaveType)}</span>
                     </p>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        ${startDate} ~ ${endDate}
-                        <span class="ml-2">(${record.days} ${t('DAYS')})</span>
+                        ${timeDisplay}
                     </p>
+                    ${durationDisplay ? `
+                        <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                            ${durationDisplay}
+                        </p>
+                    ` : ''}
                 </div>
                 <span class="${statusClass} font-semibold text-sm" data-i18n-key="${record.status}">
                     ${t(record.status)}
@@ -292,7 +391,7 @@ function calculateLeaveDays() {
 }
 
 /**
- * 提交請假申請（修正版）
+ * 提交請假申請（小時制修正版）
  */
 async function handleSubmitLeave() {
     const button = document.getElementById('submit-leave-btn');
@@ -300,25 +399,33 @@ async function handleSubmitLeave() {
     
     // 取得表單資料
     const leaveType = document.getElementById('leave-type').value;
-    const startDate = document.getElementById('leave-start-date').value;
-    const endDate = document.getElementById('leave-end-date').value;
-    const days = document.getElementById('leave-days').value;
+    const startDateTime = document.getElementById('leave-start-datetime').value;
+    const endDateTime = document.getElementById('leave-end-datetime').value;
     const reason = document.getElementById('leave-reason').value;
     
     // 驗證
-    if (!leaveType || !startDate || !endDate || !days) {
-        showNotification(t('ERR_MISSING_FIELDS'), 'error');
+    if (!leaveType) {
+        showNotification('請選擇請假類型', 'error');
         return;
     }
     
-    if (parseFloat(days) <= 0) {
-        showNotification(t('ERR_INVALID_DAYS'), 'error');
+    if (!startDateTime || !endDateTime) {
+        showNotification('請選擇開始和結束時間', 'error');
         return;
     }
     
-    // 🔧 修正：確保日期格式為 YYYY-MM-DD
-    const formattedStartDate = formatLeaveDate(startDate);
-    const formattedEndDate = formatLeaveDate(endDate);
+    const start = new Date(startDateTime);
+    const end = new Date(endDateTime);
+    
+    if (end <= start) {
+        showNotification('結束時間必須晚於開始時間', 'error');
+        return;
+    }
+    
+    if (!reason || reason.length < 2) {
+        showNotification('請填寫請假原因（至少2個字）', 'error');
+        return;
+    }
     
     // 進入處理中狀態
     generalButtonState(button, 'processing', loadingText);
@@ -326,21 +433,24 @@ async function handleSubmitLeave() {
     try {
         const res = await callApifetch(
             `submitLeave&leaveType=${encodeURIComponent(leaveType)}` +
-            `&startDate=${encodeURIComponent(formattedStartDate)}` +
-            `&endDate=${encodeURIComponent(formattedEndDate)}` +
-            `&days=${encodeURIComponent(days)}` +
+            `&startDateTime=${encodeURIComponent(startDateTime)}` +
+            `&endDateTime=${encodeURIComponent(endDateTime)}` +
             `&reason=${encodeURIComponent(reason)}`
         );
         
         if (res.ok) {
-            showNotification(t(res.code || 'LEAVE_SUBMIT_SUCCESS'), 'success');
+            showNotification(
+                `請假申請成功！時數：${res.hours || 0}小時 (${res.days || 0}天)`,
+                'success'
+            );
             
             // 清空表單
             document.getElementById('leave-type').value = '';
-            document.getElementById('leave-start-date').value = '';
-            document.getElementById('leave-end-date').value = '';
-            document.getElementById('leave-days').value = '';
+            document.getElementById('leave-start-datetime').value = '';
+            document.getElementById('leave-end-datetime').value = '';
             document.getElementById('leave-reason').value = '';
+            document.getElementById('calculated-hours').textContent = '0';
+            document.getElementById('calculated-days').textContent = '0';
             
             // 重新載入資料
             await loadLeaveBalance();
@@ -350,7 +460,7 @@ async function handleSubmitLeave() {
         }
     } catch (err) {
         console.error('提交請假失敗:', err);
-        showNotification(t('NETWORK_ERROR'), 'error');
+        showNotification('提交失敗，請稍後再試', 'error');
     } finally {
         generalButtonState(button, 'idle');
     }
@@ -389,7 +499,7 @@ async function loadPendingLeaveRequests() {
 }
 
 /**
- * 渲染待審核請假列表（修正版）
+ * 渲染待審核請假列表（支援時數顯示）
  */
 function renderPendingLeaveRequests(requests) {
     const listEl = document.getElementById('pending-leave-list');
@@ -401,9 +511,21 @@ function renderPendingLeaveRequests(requests) {
         const li = document.createElement('li');
         li.className = 'p-4 bg-gray-50 dark:bg-gray-700 rounded-lg';
         
-        // 🔧 修正：格式化日期
-        const startDate = formatLeaveDate(req.startDate);
-        const endDate = formatLeaveDate(req.endDate);
+        // 格式化時間顯示
+        let timeDisplay = '';
+        if (req.startDateTime && req.endDateTime) {
+            timeDisplay = `${req.startDateTime} ~ ${req.endDateTime}`;
+        } else if (req.startDate && req.endDate) {
+            timeDisplay = `${formatLeaveDate(req.startDate)} ~ ${formatLeaveDate(req.endDate)}`;
+        }
+        
+        // 顯示時數或天數
+        let durationDisplay = '';
+        if (req.workHours !== undefined) {
+            durationDisplay = `${req.workHours} 小時 (${req.days} 天)`;
+        } else if (req.days !== undefined) {
+            durationDisplay = `${req.days} 天`;
+        }
         
         li.innerHTML = `
             <div class="flex flex-col space-y-2">
@@ -413,8 +535,13 @@ function renderPendingLeaveRequests(requests) {
                             ${req.employeeName} - <span data-i18n-key="${req.leaveType}">${t(req.leaveType)}</span>
                         </p>
                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                            ${startDate} ~ ${endDate} (${req.days} ${t('DAYS')})
+                            ${timeDisplay}
                         </p>
+                        ${durationDisplay ? `
+                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                ${durationDisplay}
+                            </p>
+                        ` : ''}
                         ${req.reason ? `
                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 <span data-i18n="LEAVE_REASON_LABEL">原因：</span>${req.reason}
