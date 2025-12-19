@@ -10,7 +10,8 @@ const ADMIN_LIST = [
   "U1558097f933b72938d3098c201c28955",
   "Ueb6337faee9c9f0afd381e039571fe37",
   "Ueea1089924b92d3de5218f10331e685d",
-  "U0443d2af11a744a8d64c8914f300e72a"
+  "U0443d2af11a744a8d64c8914f300e72a",
+  "Ua5e653690ff1cc19f16bc67f159a48e5"
 ];
 
 function writeEmployee_(profile) {

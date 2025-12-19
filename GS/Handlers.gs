@@ -447,11 +447,21 @@ function handleGetLeaveBalance(params) {
   return getLeaveBalance(params.token);
 }
 
+// function handleSubmitLeave(params) {
+//   const { token, leaveType, startDate, endDate, days, reason } = params;
+//   return submitLeaveRequest(token, leaveType, startDate, endDate, parseFloat(days), reason);
+// }
 function handleSubmitLeave(params) {
-  const { token, leaveType, startDate, endDate, days, reason } = params;
-  return submitLeaveRequest(token, leaveType, startDate, endDate, parseFloat(days), reason);
+  const { token, leaveType, startDateTime, endDateTime, reason } = params;
+  
+  return submitLeaveRequest(
+    token,
+    leaveType,
+    startDateTime,  // 現在是完整的日期時間
+    endDateTime,    // 現在是完整的日期時間
+    reason
+  );
 }
-
 function handleGetEmployeeLeaveRecords(params) {
   return getEmployeeLeaveRecords(params.token);
 }
