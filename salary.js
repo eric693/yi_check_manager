@@ -552,12 +552,11 @@ async function handleSalaryCalculation() {
 }
 
 /**
- * ✅ 顯示薪資計算結果（完整版）
+ * ✅ 顯示薪資計算結果（包含加班費明細）
  */
 function displaySalaryCalculation(data, container) {
     if (!container) return;
     
-    // ⭐ 計算扣款總額（包含所有扣款）
     const totalDeductions = 
         (parseFloat(data.laborFee) || 0) + 
         (parseFloat(data.healthFee) || 0) + 
@@ -573,7 +572,7 @@ function displaySalaryCalculation(data, container) {
     container.innerHTML = `
         <div class="calculation-card">
             <h3 class="text-xl font-bold mb-4">
-                ${data.employeeName || '--'} - ${data.yearMonth || '--'} 薪資計算結果（完整版）
+                ${data.employeeName || '--'} - ${data.yearMonth || '--'} 薪資計算結果
             </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -590,6 +589,37 @@ function displaySalaryCalculation(data, container) {
                     <div class="info-value" style="color: #a855f7;">${formatCurrency(data.netSalary)}</div>
                 </div>
             </div>
+            
+            <!-- ⭐ 加班時數統計卡片 -->
+            ${data.totalOvertimeHours > 0 ? `
+                <div class="bg-orange-50 dark:bg-orange-900/20 border-2 border-orange-200 dark:border-orange-700 rounded-lg p-4 mb-6">
+                    <h4 class="font-semibold text-orange-800 dark:text-orange-300 mb-3">
+                        ⏰ 本月加班統計
+                    </h4>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p class="text-sm text-orange-600 dark:text-orange-400">總加班時數</p>
+                            <p class="text-2xl font-bold text-orange-800 dark:text-orange-200">
+                                ${data.totalOvertimeHours.toFixed(1)}h
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-orange-600 dark:text-orange-400">前2小時加班費</p>
+                            <p class="text-xl font-bold text-orange-800 dark:text-orange-200">
+                                ${formatCurrency(data.weekdayOvertimePay)}
+                            </p>
+                            <p class="text-xs text-orange-500">(× 1.34)</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-orange-600 dark:text-orange-400">後2小時加班費</p>
+                            <p class="text-xl font-bold text-orange-800 dark:text-orange-200">
+                                ${formatCurrency(data.extendedOvertimePay)}
+                            </p>
+                            <p class="text-xs text-orange-500">(× 1.67)</p>
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="calculation-detail">
@@ -618,17 +648,15 @@ function displaySalaryCalculation(data, container) {
                         <span>績效獎金</span>
                         <span class="font-mono">${formatCurrency(data.performanceBonus || 0)}</span>
                     </div>
+                    <!-- ⭐ 修改：顯示前2小時加班費 -->
                     <div class="calculation-row">
-                        <span>平日加班費</span>
-                        <span class="font-mono">${formatCurrency(data.weekdayOvertimePay)}</span>
+                        <span>前2小時加班費 (×1.34)</span>
+                        <span class="font-mono">${formatCurrency(data.weekdayOvertimePay || 0)}</span>
                     </div>
+                    <!-- ⭐ 修改：顯示後2小時加班費 -->
                     <div class="calculation-row">
-                        <span>休息日加班費</span>
-                        <span class="font-mono">${formatCurrency(data.restdayOvertimePay)}</span>
-                    </div>
-                    <div class="calculation-row">
-                        <span>國定假日加班費</span>
-                        <span class="font-mono">${formatCurrency(data.holidayOvertimePay)}</span>
+                        <span>後2小時加班費 (×1.67)</span>
+                        <span class="font-mono">${formatCurrency(data.extendedOvertimePay || 0)}</span>
                     </div>
                     <div class="calculation-row total">
                         <span>應發總額</span>
@@ -651,16 +679,12 @@ function displaySalaryCalculation(data, container) {
                         <span class="font-mono">${formatCurrency(data.employmentFee)}</span>
                     </div>
                     <div class="calculation-row">
-                        <span>勞退自提</span>
+                        <span>勞退自提 (${data.pensionSelfRate || 0}%)</span>
                         <span class="font-mono">${formatCurrency(data.pensionSelf)}</span>
                     </div>
                     <div class="calculation-row">
                         <span>所得稅</span>
                         <span class="font-mono">${formatCurrency(data.incomeTax)}</span>
-                    </div>
-                    <div class="calculation-row">
-                        <span>請假扣款</span>
-                        <span class="font-mono">${formatCurrency(data.leaveDeduction || 0)}</span>
                     </div>
                     <div class="calculation-row">
                         <span>福利金</span>
