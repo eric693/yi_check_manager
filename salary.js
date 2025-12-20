@@ -1271,9 +1271,7 @@ function getBankName(code) {
     return banks[code] || "未知銀行";
 }
 
-/**
- * ✅ 載入出勤明細（打卡 + 加班）- 修正版
- */
+// ✅ 新方法：直接用 calculateMonthlySalary（跟時薪計算一樣）
 async function loadAttendanceDetails(yearMonth) {
     try {
         console.log(`📋 載入 ${yearMonth} 出勤明細`);
@@ -1281,19 +1279,26 @@ async function loadAttendanceDetails(yearMonth) {
         const detailsSection = document.getElementById('attendance-details-section');
         if (!detailsSection) return;
         
-        // ⭐ 先檢查是否為時薪員工
-        const res = await callApifetch(`getMySalary&yearMonth=${yearMonth}`);
+        // ⭐⭐⭐ 改用跟時薪計算一樣的 API
+        // 先取得當前使用者的 session
+        const session = await callApifetch('checkSession');
+        if (!session.ok || !session.user) {
+            detailsSection.style.display = 'none';
+            return;
+        }
+        
+        const employeeId = session.user.userId;
+        
+        // ⭐ 呼叫 calculateMonthlySalary（跟時薪計算完全一樣）
+        const res = await callApifetch(`calculateMonthlySalary&employeeId=${encodeURIComponent(employeeId)}&yearMonth=${encodeURIComponent(yearMonth)}`);
         
         if (!res.ok || !res.data) {
             detailsSection.style.display = 'none';
             return;
         }
-        console.log('📊 完整薪資資料:', res.data);
-        console.log('📊 所有欄位名稱:', Object.keys(res.data));
-        console.log('📊 薪資類型欄位值:', res.data['薪資類型']);
-
-        // ⭐⭐⭐ 關鍵：從後端回傳的資料判斷是否為時薪
-        const salaryType = res.data['薪資類型'] || '月薪';
+        
+        const data = res.data;
+        const salaryType = data.salaryType || '月薪';
         const isHourly = salaryType === '時薪';
         
         console.log(`💼 薪資類型: ${salaryType}, 是否為時薪: ${isHourly}`);
@@ -1301,17 +1306,119 @@ async function loadAttendanceDetails(yearMonth) {
         // 顯示出勤明細區塊
         detailsSection.style.display = 'block';
         
-        // ⭐ 如果是時薪，顯示工作時數卡片
+        // ⭐ 如果是時薪，顯示工作時數卡片（直接用 API 回傳的資料）
         if (isHourly) {
-            await loadWorkHoursCard(yearMonth, res.data);
+            displayWorkHoursFromCalculation(data);
         }
         
-        // 載入加班記錄（月薪和時薪都需要）
-        await loadOvertimeRecordsCard(yearMonth, res.data);
+        // 顯示加班記錄（直接用 API 回傳的資料）
+        if (data.totalOvertimeHours > 0) {
+            displayOvertimeFromCalculation(data);
+        }
         
     } catch (error) {
         console.error('❌ 載入出勤明細失敗:', error);
     }
+}
+
+/**
+ * ✅ 從薪資計算結果顯示工作時數
+ */
+function displayWorkHoursFromCalculation(data) {
+    const detailsSection = document.getElementById('attendance-details-section');
+    if (!detailsSection) return;
+    
+    // 移除舊的工時卡片
+    const oldCard = document.getElementById('work-hours-card');
+    if (oldCard) oldCard.remove();
+    
+    // 建立新的工時卡片
+    const workHoursCard = document.createElement('div');
+    workHoursCard.id = 'work-hours-card';
+    workHoursCard.className = 'feature-box bg-purple-900/20 border-purple-700 mb-4';
+    
+    const totalWorkHours = Math.floor(data.totalWorkHours || 0);
+    const hourlyRate = data.hourlyRate || 0;
+    const baseSalary = data.baseSalary || 0;
+    
+    workHoursCard.innerHTML = `
+        <h4 class="font-semibold mb-3 text-purple-400">本月工作時數統計</h4>
+        
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="text-center p-3 bg-purple-800/20 rounded-lg">
+                <p class="text-sm text-purple-300 mb-1">時薪</p>
+                <p class="text-2xl font-bold text-purple-200">$${hourlyRate}</p>
+            </div>
+            <div class="text-center p-3 bg-purple-800/20 rounded-lg">
+                <p class="text-sm text-purple-300 mb-1">總工作時數</p>
+                <p class="text-2xl font-bold text-purple-200">${totalWorkHours}h</p>
+            </div>
+            <div class="text-center p-3 bg-purple-800/20 rounded-lg">
+                <p class="text-sm text-purple-300 mb-1">基本薪資</p>
+                <p class="text-2xl font-bold text-purple-200">${formatCurrency(baseSalary)}</p>
+                <p class="text-xs text-purple-400 mt-1">(時薪 × 工時)</p>
+            </div>
+        </div>
+        
+        <div class="p-3 bg-purple-800/10 rounded-lg text-sm text-purple-300">
+            💡 工作時數已包含在薪資計算中
+        </div>
+    `;
+    
+    detailsSection.insertBefore(workHoursCard, detailsSection.firstChild);
+}
+
+
+/**
+ * ✅ 從薪資計算結果顯示加班統計
+ */
+function displayOvertimeFromCalculation(data) {
+    const detailsSection = document.getElementById('attendance-details-section');
+    if (!detailsSection) return;
+    
+    // 移除舊的加班卡片
+    const oldCard = document.getElementById('overtime-card');
+    if (oldCard) oldCard.remove();
+    
+    // 建立新的加班卡片
+    const overtimeCard = document.createElement('div');
+    overtimeCard.id = 'overtime-card';
+    overtimeCard.className = 'feature-box bg-orange-900/20 border-orange-700 mt-4';
+    
+    const totalOvertimeHours = Math.floor(data.totalOvertimeHours || 0);
+    const weekdayOvertimePay = data.weekdayOvertimePay || 0;
+    const extendedOvertimePay = data.holidayOvertimePay || 0;
+    const totalOvertimePay = weekdayOvertimePay + extendedOvertimePay;
+    
+    overtimeCard.innerHTML = `
+        <h4 class="font-semibold mb-3 text-orange-400">本月加班統計</h4>
+        
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="text-center p-3 bg-orange-800/20 rounded-lg">
+                <p class="text-sm text-orange-300 mb-1">總加班時數</p>
+                <p class="text-2xl font-bold text-orange-200">${totalOvertimeHours}h</p>
+            </div>
+            <div class="text-center p-3 bg-orange-800/20 rounded-lg">
+                <p class="text-sm text-orange-300 mb-1">前2小時加班費</p>
+                <p class="text-xl font-bold text-orange-200">${formatCurrency(weekdayOvertimePay)}</p>
+                <p class="text-xs text-orange-400 mt-1">(× 1.34)</p>
+            </div>
+            <div class="text-center p-3 bg-orange-800/20 rounded-lg">
+                <p class="text-sm text-orange-300 mb-1">後2小時加班費</p>
+                <p class="text-xl font-bold text-orange-200">${formatCurrency(extendedOvertimePay)}</p>
+                <p class="text-xs text-orange-400 mt-1">(× 1.67)</p>
+            </div>
+        </div>
+        
+        <div class="p-3 bg-orange-800/20 rounded-lg">
+            <div class="flex justify-between items-center">
+                <span class="font-semibold text-orange-200">加班費合計</span>
+                <span class="text-2xl font-bold text-orange-300">${formatCurrency(totalOvertimePay)}</span>
+            </div>
+        </div>
+    `;
+    
+    detailsSection.appendChild(overtimeCard);
 }
 
 /**
