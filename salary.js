@@ -92,7 +92,7 @@ async function loadCurrentEmployeeSalary() {
             console.log('✅ 成功載入薪資資料');
             displayEmployeeSalary(result.data);
             if (contentEl) contentEl.style.display = 'block';
-            await loadAttendanceDetails(currentMonth);
+            // await loadAttendanceDetails(currentMonth);
         } else {
             console.log(`⚠️ 沒有 ${currentMonth} 的薪資記錄`);
             if (emptyEl) {
