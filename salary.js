@@ -383,7 +383,7 @@ async function loadWorkHoursCard(yearMonth, salaryData) {
 }
 
 /**
- * ✅ 顯示薪資明細（完整版 - 支援時薪顯示）
+ * ✅ 顯示薪資明細（完整版 - 支援時薪顯示 + 工時統計）
  */
 function displayEmployeeSalary(data) {
     console.log('顯示薪資明細（完整版）:', data);
@@ -413,7 +413,7 @@ function displayEmployeeSalary(data) {
         (parseFloat(data['勞退自提']) || 0) + 
         (parseFloat(data['所得稅']) || 0) +
         (parseFloat(data['請假扣款']) || 0) +
-        (parseFloat(data['福利金']) || 0) +
+        (parseFloat(data['福利金扣款']) || 0) +
         (parseFloat(data['宿舍費用']) || 0) +
         (parseFloat(data['團保費用']) || 0) +
         (parseFloat(data['其他扣款']) || 0);
@@ -459,6 +459,61 @@ function displayEmployeeSalary(data) {
             if (hourlyInfo) {
                 hourlyInfo.remove();
             }
+            
+            // 恢復原本的標籤文字
+            const baseSalaryLabel = document.querySelector('[for="detail-base-salary"]') || 
+                                    baseSalaryEl.previousElementSibling;
+            if (baseSalaryLabel) {
+                baseSalaryLabel.textContent = '基本薪資';
+            }
+        }
+    }
+    
+    // ⭐⭐⭐ 在加班費上方加入工時統計資訊
+    const totalWorkHours = parseFloat(data['工作時數']) || 0;
+    const totalOvertimeHours = parseFloat(data['總加班時數']) || 0;
+    
+    // 找到平日加班費的元素
+    const weekdayOvertimeEl = document.getElementById('detail-weekday-overtime');
+    if (weekdayOvertimeEl && weekdayOvertimeEl.parentElement) {
+        // 移除舊的工時資訊（如果存在）
+        const oldWorkHoursInfo = weekdayOvertimeEl.parentElement.querySelector('.work-hours-summary');
+        if (oldWorkHoursInfo) {
+            oldWorkHoursInfo.remove();
+        }
+        
+        // 只有在有工時或加班時數時才顯示
+        if (totalWorkHours > 0 || totalOvertimeHours > 0) {
+            const workHoursSummary = document.createElement('div');
+            workHoursSummary.className = 'work-hours-summary mb-3 p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg';
+            
+            let summaryHTML = '<div class="text-sm font-semibold text-blue-300 mb-2">📊 本月工時統計</div>';
+            
+            if (isHourly && totalWorkHours > 0) {
+                summaryHTML += `
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-blue-200">打卡工作時數：</span>
+                        <span class="font-mono text-blue-100">${totalWorkHours.toFixed(1)}h</span>
+                    </div>
+                `;
+            }
+            
+            if (totalOvertimeHours > 0) {
+                summaryHTML += `
+                    <div class="flex justify-between text-sm">
+                        <span class="text-orange-200">加班時數：</span>
+                        <span class="font-mono text-orange-100">${totalOvertimeHours.toFixed(1)}h</span>
+                    </div>
+                `;
+            }
+            
+            workHoursSummary.innerHTML = summaryHTML;
+            
+            // 插入到平日加班費之前
+            weekdayOvertimeEl.parentElement.parentElement.insertBefore(
+                workHoursSummary,
+                weekdayOvertimeEl.parentElement
+            );
         }
     }
     
@@ -485,7 +540,7 @@ function displayEmployeeSalary(data) {
     safeSet('detail-leave-deduction', formatCurrency(data['請假扣款']));
     
     const otherDeductions = 
-        (parseFloat(data['福利金']) || 0) +
+        (parseFloat(data['福利金扣款']) || 0) +
         (parseFloat(data['宿舍費用']) || 0) +
         (parseFloat(data['團保費用']) || 0) +
         (parseFloat(data['其他扣款']) || 0);
@@ -502,8 +557,9 @@ function displayEmployeeSalary(data) {
     safeSet('detail-bank-name', getBankName(bankCode));
     safeSet('detail-bank-account', bankAccount || '--');
     
-    console.log('✅ 薪資明細顯示完成（完整版 - 支援時薪）');
+    console.log('✅ 薪資明細顯示完成（完整版 - 支援時薪 + 工時統計）');
 }
+
 /**
  * ✅ 載入薪資歷史
  */
@@ -863,7 +919,7 @@ function displaySalaryCalculation(data, container) {
                 <!-- ⭐ 時薪統計卡片 -->
                 <div class="bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-lg p-4 mb-6">
                     <h4 class="font-semibold text-purple-800 dark:text-purple-300 mb-3">
-                        ⏰ 時薪工時統計
+                        時薪工時統計
                     </h4>
                     <div class="grid grid-cols-3 gap-4 text-center">
                         <div>
@@ -893,7 +949,7 @@ function displaySalaryCalculation(data, container) {
             ${data.totalOvertimeHours > 0 ? `
                 <div class="bg-orange-50 dark:bg-orange-900/20 border-2 border-orange-200 dark:border-orange-700 rounded-lg p-4 mb-6">
                     <h4 class="font-semibold text-orange-800 dark:text-orange-300 mb-3">
-                        ⏰ 本月加班統計
+                        本月加班統計
                     </h4>
                     <div class="grid grid-cols-3 gap-4 text-center">
                         <div>
@@ -1233,7 +1289,7 @@ async function loadAttendanceDetails(yearMonth) {
         console.log('📊 完整薪資資料:', res.data);
         console.log('📊 所有欄位名稱:', Object.keys(res.data));
         console.log('📊 薪資類型欄位值:', res.data['薪資類型']);
-        
+
         // ⭐⭐⭐ 關鍵：從後端回傳的資料判斷是否為時薪
         const salaryType = res.data['薪資類型'] || '月薪';
         const isHourly = salaryType === '時薪';
