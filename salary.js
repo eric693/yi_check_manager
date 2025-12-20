@@ -338,7 +338,7 @@ async function loadWorkHoursCard(yearMonth, salaryData) {
     const totalWorkHours = parseFloat(salaryData['工作時數']) || 0;
     const hourlyRate = parseFloat(salaryData['時薪']) || 0;
     const baseSalary = parseFloat(salaryData['基本薪資']) || 0;
-    
+    const totalWorkHoursInt = Math.floor(totalWorkHours);
     console.log(`⏱️ 總工時: ${totalWorkHours}h, 時薪: $${hourlyRate}, 基本薪資: $${baseSalary}`);
     
     // 建立工時卡片
@@ -425,7 +425,7 @@ function displayEmployeeSalary(data) {
         // 時薪顯示方式
         const hourlyRate = parseFloat(data['時薪']) || 0;
         const totalWorkHours = parseFloat(data['工作時數']) || 0;
-        
+        const totalWorkHoursInt = Math.floor(totalWorkHours);
         // 修改基本薪資的顯示文字
         const baseSalaryLabel = document.querySelector('[for="detail-base-salary"]') || 
                                 document.querySelector('#detail-base-salary')?.previousElementSibling;
@@ -472,7 +472,9 @@ function displayEmployeeSalary(data) {
     // ⭐⭐⭐ 在加班費上方加入工時統計資訊
     const totalWorkHours = parseFloat(data['工作時數']) || 0;
     const totalOvertimeHours = parseFloat(data['總加班時數']) || 0;
-    
+    // ✅ 強制取整數
+    const totalWorkHoursInt = Math.floor(totalWorkHours);
+    const totalOvertimeHoursInt = Math.floor(totalOvertimeHours);
     // 找到平日加班費的元素
     const weekdayOvertimeEl = document.getElementById('detail-weekday-overtime');
     if (weekdayOvertimeEl && weekdayOvertimeEl.parentElement) {
