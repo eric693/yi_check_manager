@@ -364,7 +364,7 @@ async function loadWorkHoursCard(yearMonth, salaryData) {
             </div>
             <div class="text-center p-3 bg-purple-800/20 rounded-lg">
                 <p class="text-sm text-purple-300 mb-1">總工作時數</p>
-                <p class="text-2xl font-bold text-purple-200">${totalWorkHours.toFixed(1)}h</p>
+                <p class="text-2xl font-bold text-purple-200">${Math.floor(totalWorkHours)}h</p>
             </div>
             <div class="text-center p-3 bg-purple-800/20 rounded-lg">
                 <p class="text-sm text-purple-300 mb-1">基本薪資</p>
@@ -446,7 +446,7 @@ function displayEmployeeSalary(data) {
                 hourlyInfo.className = 'hourly-info text-xs text-purple-400 mt-1';
                 baseSalaryEl.parentElement.appendChild(hourlyInfo);
             }
-            hourlyInfo.textContent = `時薪 $${hourlyRate} × ${totalWorkHours.toFixed(1)}h`;
+            hourlyInfo.textContent = `時薪 $${hourlyRate} × ${Math.floor(totalWorkHours)}h`;
         }
     } else {
         // 月薪顯示方式（原本的邏輯）
@@ -493,7 +493,7 @@ function displayEmployeeSalary(data) {
                 summaryHTML += `
                     <div class="flex justify-between text-sm mb-1">
                         <span class="text-blue-200">打卡工作時數：</span>
-                        <span class="font-mono text-blue-100">${totalWorkHours.toFixed(1)}h</span>
+                        <span class="font-mono text-blue-100">${Math.floor(totalWorkHours)}h</span>
                     </div>
                 `;
             }
@@ -931,7 +931,7 @@ function displaySalaryCalculation(data, container) {
                         <div>
                             <p class="text-sm text-purple-600 dark:text-purple-400">工作時數</p>
                             <p class="text-2xl font-bold text-purple-800 dark:text-purple-200">
-                                ${(data.totalWorkHours || 0).toFixed(1)}h
+                                ${Math.floor(data.totalWorkHours || 0)}h
                             </p>
                         </div>
                         <div>
