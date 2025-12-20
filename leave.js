@@ -1,25 +1,54 @@
 // leave.js - 請假系統前端邏輯（完全修正版）
 
+// ⭐ 添加全域標記
+let leaveTabInitialized = false;
+let leaveEventsBound = false;
+
 /**
- * 初始化請假頁籤
+ * 初始化請假頁籤（防重複版）
  */
 async function initLeaveTab() {
-    console.log('📋 初始化請假系統...');
+    console.log('📋 initLeaveTab 被調用');
     
-    // 載入假期餘額
-    await loadLeaveBalance();
+    // ⭐ 檢查是否已初始化
+    if (leaveTabInitialized) {
+        console.log('⏭️ 請假系統已初始化，跳過');
+        return;
+    }
     
-    // 載入請假紀錄
-    await loadLeaveRecords();
+    console.log('🔄 開始初始化請假系統...');
     
-    // 綁定事件監聽器
-    bindLeaveEventListeners();
+    // 標記為正在初始化（防止並發調用）
+    leaveTabInitialized = true;
+    
+    try {
+        // 載入假期餘額
+        await loadLeaveBalance();
+        
+        // 載入請假紀錄
+        await loadLeaveRecords();
+        
+        // 綁定事件監聽器
+        bindLeaveEventListeners();
+        
+        console.log('✅ 請假系統初始化完成');
+    } catch (error) {
+        console.error('❌ 請假系統初始化失敗:', error);
+        // 如果初始化失敗，重置標記以便重試
+        leaveTabInitialized = false;
+    }
 }
 
 /**
- * 綁定請假相關事件
+ * 綁定請假相關事件（防重複版）
  */
 function bindLeaveEventListeners() {
+    // ⭐ 檢查是否已綁定
+    if (leaveEventsBound) {
+        console.log('⏭️ 事件監聽器已綁定，跳過');
+        return;
+    }
+    
     console.log('🔗 綁定事件監聽器...');
     
     // 請假類型改變
@@ -35,16 +64,33 @@ function bindLeaveEventListeners() {
     if (startInput) {
         startInput.addEventListener('change', updateWorkHoursPreview);
         console.log('✅ 已綁定開始時間事件');
-    } else {
-        console.error('❌ 找不到 leave-start-datetime 元素');
     }
     
     if (endInput) {
         endInput.addEventListener('change', updateWorkHoursPreview);
         console.log('✅ 已綁定結束時間事件');
-    } else {
-        console.error('❌ 找不到 leave-end-datetime 元素');
     }
+    
+    // ⭐ 標記為已綁定
+    leaveEventsBound = true;
+}
+
+/**
+ * 重置初始化狀態（用於手動刷新）
+ */
+function resetLeaveTab() {
+    console.log('🔄 重置請假系統狀態');
+    leaveTabInitialized = false;
+    leaveEventsBound = false;
+}
+
+/**
+ * 手動刷新請假數據（不重新綁定事件）
+ */
+async function refreshLeaveData() {
+    console.log('🔄 手動刷新請假數據...');
+    await loadLeaveBalance();
+    await loadLeaveRecords();
 }
 
 /**
