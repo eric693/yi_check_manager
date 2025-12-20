@@ -725,6 +725,57 @@
                                 <span id="detail-bank-account" class="font-mono">--</span>
                             </div>
                         </div>
+
+                        <!-- ⭐⭐⭐ 新增：出勤明細區塊 -->
+                        <div class="mt-6" id="attendance-details-section" style="display: none;">
+                            <hr class="section-divider">
+                            
+                            <!-- 打卡記錄明細 -->
+                            <div class="feature-box bg-blue-900/20 border-blue-700">
+                                <h4 class="font-semibold mb-3 text-blue-400">本月打卡記錄</h4>
+                                
+                                <div id="punch-records-loading" class="loading" style="display: none;">
+                                    <div class="loading-spinner"></div>
+                                    <p>載入中...</p>
+                                </div>
+                                
+                                <div id="punch-records-empty" class="empty-state" style="display: none;">
+                                    <p class="text-gray-400">本月無打卡記錄</p>
+                                </div>
+                                
+                                <div id="punch-records-list" class="space-y-2"></div>
+                                
+                                <div class="mt-4 p-3 bg-blue-800/20 rounded-lg">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-semibold">總工作時數：</span>
+                                        <span id="total-work-hours" class="text-2xl font-bold text-blue-400">0.0 小時</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 加班記錄明細 -->
+                            <div class="feature-box bg-orange-900/20 border-orange-700 mt-4">
+                                <h4 class="font-semibold mb-3 text-orange-400">本月加班記錄</h4>
+                                
+                                <div id="overtime-records-loading" class="loading" style="display: none;">
+                                    <div class="loading-spinner"></div>
+                                    <p>載入中...</p>
+                                </div>
+                                
+                                <div id="overtime-records-empty" class="empty-state" style="display: none;">
+                                    <p class="text-gray-400">本月無加班記錄</p>
+                                </div>
+                                
+                                <div id="overtime-records-list" class="space-y-2"></div>
+                                
+                                <div class="mt-4 p-3 bg-orange-800/20 rounded-lg">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-semibold">總加班時數：</span>
+                                        <span id="total-overtime-hours" class="text-2xl font-bold text-orange-400">0.0 小時</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
