@@ -2170,3 +2170,62 @@ function handleGetEmployeeMonthlyPunchData(params) {
     return { ok: false, msg: error.message };
   }
 }
+
+
+/**
+ * ✅ 取得員工本月打卡記錄（前端專用）
+ */
+function handleGetEmployeeMonthlyAttendance(params) {
+  try {
+    const employee = checkSession_(params.token);
+    const user = employee.user;
+    if (!user) return { ok: false, code: "ERR_SESSION_INVALID" };
+    
+    const yearMonth = params.yearMonth;
+    if (!yearMonth) {
+      return { ok: false, message: "缺少年月參數" };
+    }
+    
+    Logger.log(`📋 員工 ${user.name} 查詢 ${yearMonth} 打卡記錄`);
+    
+    const records = getEmployeeMonthlyAttendance(user.userId, yearMonth);
+    
+    return {
+      ok: true,
+      records: records
+    };
+    
+  } catch (error) {
+    Logger.log("❌ 取得打卡記錄失敗: " + error);
+    return { ok: false, message: error.toString() };
+  }
+}
+
+/**
+ * ✅ 取得員工本月加班記錄（前端專用）
+ */
+function handleGetEmployeeMonthlyOvertime(params) {
+  try {
+    const employee = checkSession_(params.token);
+    const user = employee.user;
+    if (!user) return { ok: false, code: "ERR_SESSION_INVALID" };
+    
+    const yearMonth = params.yearMonth;
+    if (!yearMonth) {
+      return { ok: false, message: "缺少年月參數" };
+    }
+    
+    Logger.log(`📋 員工 ${user.name} 查詢 ${yearMonth} 加班記錄`);
+    
+    const records = getEmployeeMonthlyOvertime(user.userId, yearMonth);
+    
+    return {
+      ok: true,
+      records: records
+    };
+    
+  } catch (error) {
+    Logger.log("❌ 取得加班記錄失敗: " + error);
+    return { ok: false, message: error.toString() };
+  }
+}
