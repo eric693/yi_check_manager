@@ -373,10 +373,113 @@ function handleGetLocations() {
 }
 
 // ==================== 員工管理相關 ====================
-
-function handleGetAllUsers() {
-  return getAllUsers();
+/**
+ * 處理取得所有用戶
+ */
+function handleGetAllUsers(params) {
+  try {
+    Logger.log('📋 處理取得所有用戶請求');
+    
+    // 驗證 Session
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    // 驗證管理員權限
+    const session = checkSession_(params.token);
+    if (!session.ok || !session.user || session.user.dept !== '管理員') {
+      return { ok: false, msg: '需要管理員權限' };
+    }
+    
+    const result = getAllUsers();
+    return result;
+    
+  } catch (error) {
+    Logger.log('❌ handleGetAllUsers 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
 }
+
+/**
+ * 處理更新用戶角色
+ */
+function handleUpdateUserRole(params) {
+  try {
+    Logger.log('📝 處理更新用戶角色請求');
+    
+    // 驗證 Session
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    // 驗證管理員權限
+    const session = checkSession_(params.token);
+    if (!session.ok || !session.user || session.user.dept !== '管理員') {
+      return { ok: false, msg: '需要管理員權限' };
+    }
+    
+    const userId = params.userId;
+    const role = params.role;  // 'admin' 或 'employee'
+    
+    if (!userId || !role) {
+      return { ok: false, msg: '缺少必要參數' };
+    }
+    
+    // 不能改自己
+    if (userId === session.user.userId) {
+      return { ok: false, msg: '不能修改自己的角色' };
+    }
+    
+    const result = updateUserRole(userId, role);
+    return result;
+    
+  } catch (error) {
+    Logger.log('❌ handleUpdateUserRole 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+/**
+ * 處理刪除用戶
+ */
+function handleDeleteUser(params) {
+  try {
+    Logger.log('🗑️ 處理刪除用戶請求');
+    
+    // 驗證 Session
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    // 驗證管理員權限
+    const session = checkSession_(params.token);
+    if (!session.ok || !session.user || session.user.dept !== '管理員') {
+      return { ok: false, msg: '需要管理員權限' };
+    }
+    
+    const userId = params.userId;
+    
+    if (!userId) {
+      return { ok: false, msg: '缺少用戶 ID' };
+    }
+    
+    // 不能刪除自己
+    if (userId === session.user.userId) {
+      return { ok: false, msg: '不能刪除自己' };
+    }
+    
+    const result = deleteUser(userId);
+    return result;
+    
+  } catch (error) {
+    Logger.log('❌ handleDeleteUser 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+// function handleGetAllUsers() {
+//   return getAllUsers();
+// }
 
 // ==================== 審核功能相關 ====================
 

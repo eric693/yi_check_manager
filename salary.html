@@ -1562,65 +1562,6 @@
             }
         }
 
-        /*
-        async function handleHourlyCalculation() {
-            const employeeId = document.getElementById('hourly-employee-id').value;
-            const hourlyRate = parseFloat(document.getElementById('hourly-rate').value) || 0;
-            const workHours = parseFloat(document.getElementById('work-hours').value) || 0;
-            const overtimeHours = parseFloat(document.getElementById('overtime-hours').value) || 0;
-            const yearMonth = document.getElementById('hourly-year-month').value;
-            
-            if (!employeeId || !yearMonth) {
-                showNotification('❌ 請選擇員工和計算年月', 'error');
-                return;
-            }
-            
-            if (hourlyRate < 190) {
-                showNotification(t('SALARY_HOURLY_MIN_190'), 'error');
-                return;
-            }
-            
-            if (workHours <= 0) {
-                showNotification(t('SALARY_INPUT_WORK_HOURS'), 'error');
-                return;
-            }
-            
-            const basePay = hourlyRate * workHours;
-            const overtimePay = hourlyRate * overtimeHours * 1.34;
-            const grossSalary = basePay + overtimePay;
-            
-            let laborFee = 0;
-            let healthFee = 0;
-            let employmentFee = 0;
-            
-            if (grossSalary >= 27470) {
-                const insuredSalary = getInsuredSalary(grossSalary);
-                laborFee = Math.round(insuredSalary * 0.115 * 0.2);
-                healthFee = Math.round(insuredSalary * 0.0517 * 0.3);
-                employmentFee = Math.round(insuredSalary * 0.01 * 0.2);
-            }
-            
-            const totalDeductions = laborFee + healthFee + employmentFee;
-            const netSalary = grossSalary - totalDeductions;
-            
-            displayHourlyCalculation({
-                employeeId,
-                yearMonth,
-                hourlyRate,
-                workHours,
-                overtimeHours,
-                basePay,
-                overtimePay,
-                grossSalary,
-                laborFee,
-                healthFee,
-                employmentFee,
-                totalDeductions,
-                netSalary
-            });
-        }
-        */
-
         async function handleHourlyCalculation() {
             const employeeIdEl = document.getElementById('hourly-employee-id');
             const yearMonthEl = document.getElementById('hourly-year-month');

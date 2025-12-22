@@ -11,7 +11,8 @@ const ADMIN_LIST = [
   "Ueb6337faee9c9f0afd381e039571fe37",
   "Ueea1089924b92d3de5218f10331e685d",
   "U0443d2af11a744a8d64c8914f300e72a",
-  "Ua5e653690ff1cc19f16bc67f159a48e5"
+  "Ua5e653690ff1cc19f16bc67f159a48e5",
+  "U8e096120c5ec8cc25ef063f021369976"
 ];
 
 function writeEmployee_(profile) {
@@ -1807,6 +1808,135 @@ function updateReviewStatus(rowNumber, status, note) {
     Logger.log('❌ updateReviewStatus 錯誤: ' + err.message);
     Logger.log('   錯誤堆疊: ' + err.stack);
     return { ok: false, msg: `審核失敗：${err.message}` };
+  }
+}
+
+
+// ==================== 用戶角色管理 ====================
+
+/**
+ * ✅ 更新用戶角色
+ */
+function updateUserRole(userId, newRole) {
+  try {
+    Logger.log('📝 開始更新用戶角色');
+    Logger.log('   userId: ' + userId);
+    Logger.log('   newRole: ' + newRole);
+    
+    const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_EMPLOYEES);
+    
+    if (!sheet) {
+      return {
+        ok: false,
+        msg: '找不到員工工作表'
+      };
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    
+    // 檢查是否為最後一個管理員
+    if (newRole === 'employee') {
+      const adminCount = data.filter((row, index) => 
+        index > 0 && row[5] === '管理員'  // F 欄: 部門
+      ).length;
+      
+      if (adminCount <= 1) {
+        return {
+          ok: false,
+          msg: '至少需要保留一位管理員'
+        };
+      }
+    }
+    
+    // 尋找用戶並更新
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === userId) {  // A 欄: userId
+        const newDept = newRole === 'admin' ? '管理員' : '員工';
+        sheet.getRange(i + 1, 6).setValue(newDept);  // F 欄: 部門
+        
+        Logger.log('✅ 已更新角色為: ' + newDept);
+        
+        return {
+          ok: true,
+          msg: '角色已更新'
+        };
+      }
+    }
+    
+    return {
+      ok: false,
+      msg: '找不到該用戶'
+    };
+    
+  } catch (error) {
+    Logger.log('❌ updateUserRole 錯誤: ' + error);
+    return {
+      ok: false,
+      msg: error.message
+    };
+  }
+}
+
+/**
+ * ✅ 刪除用戶
+ */
+function deleteUser(userId) {
+  try {
+    Logger.log('🗑️ 開始刪除用戶');
+    Logger.log('   userId: ' + userId);
+    
+    const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_EMPLOYEES);
+    
+    if (!sheet) {
+      return {
+        ok: false,
+        msg: '找不到員工工作表'
+      };
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    
+    // 檢查是否為最後一個管理員
+    const targetUser = data.find((row, index) => index > 0 && row[0] === userId);
+    
+    if (targetUser && targetUser[5] === '管理員') {  // F 欄: 部門
+      const adminCount = data.filter((row, index) => 
+        index > 0 && row[5] === '管理員'
+      ).length;
+      
+      if (adminCount <= 1) {
+        return {
+          ok: false,
+          msg: '不能刪除最後一位管理員'
+        };
+      }
+    }
+    
+    // 尋找並刪除用戶
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === userId) {  // A 欄: userId
+        sheet.deleteRow(i + 1);
+        
+        Logger.log('✅ 用戶已刪除');
+        
+        return {
+          ok: true,
+          msg: '用戶已刪除'
+        };
+      }
+    }
+    
+    return {
+      ok: false,
+      msg: '找不到該用戶'
+    };
+    
+  } catch (error) {
+    Logger.log('❌ deleteUser 錯誤: ' + error);
+    return {
+      ok: false,
+      msg: error.message
+    };
   }
 }
 // function updateReviewStatus(rowNumber, status, note) {

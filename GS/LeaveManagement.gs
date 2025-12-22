@@ -394,9 +394,9 @@ function getLeaveBalance(sessionToken) {
         // hospitalizationLeave: values[i][8] || 0,           // I
         // menstrualLeave: values[i][9] || 0,                 // J
         // familyCareLeave: values[i][10] || 0,               // K
-        // officialLeave: values[i][11] || 999,               // L
-        // workInjuryLeave: values[i][12] || 999,             // M
-        // naturalDisasterLeave: values[i][13] || 999,        // N
+        // officialLeave: values[i][11] || 0,               // L
+        // workInjuryLeave: values[i][12] || 0,             // M
+        // naturalDisasterLeave: values[i][13] || 0,        // N
         // compTimeOff: values[i][14] || 0,                   // O
         // absenceWithoutLeave: values[i][15] || 0            // P
       // };
@@ -539,9 +539,9 @@ function initializeEmployeeLeave(sessionToken) {
       30,                 // I: 住院病假（天/年）
       12,                 // J: 生理假（天/年）- 每月1天
       7,                  // K: 家庭照顧假（天/年）
-      999,                // L: 公假（含兵役假）（無上限）
-      999,                // M: 公傷假（無上限）
-      999,                // N: 天然災害停班（無上限）
+      0,                // L: 公假（含兵役假）（無上限）
+      0,                // M: 公傷假（無上限）
+      0,                // N: 天然災害停班（無上限）
       0,                  // O: 加班補休假（初始0）
       0,                  // P: 曠工（初始0）
       new Date()          // Q: 更新時間
@@ -866,9 +866,9 @@ function migrateLeaveBalanceSheet() {
       30,                   // I: 住院病假（新增，預設 30 天）
       12,                   // J: 生理假（新增，預設 12 天）
       7,                    // K: 家庭照顧假（新增，預設 7 天）
-      999,                  // L: 公假（新增，無上限）
-      999,                  // M: 公傷假（新增，無上限）
-      999,                  // N: 天然災害停班（新增，無上限）
+      0,                  // L: 公假（新增，無上限）
+      0,                  // M: 公傷假（新增，無上限）
+      0,                  // N: 天然災害停班（新增，無上限）
       0,                    // O: 加班補休假（新增，初始 0）
       0,                    // P: 曠工（新增，初始 0）
       new Date()            // Q: 更新時間（更新為當前時間）
@@ -947,10 +947,10 @@ function testLeaveBalanceComplete() {
     Logger.log('   產檢假: ' + balance.prenatalCheckupLeave + ' 天');
     Logger.log('   生理假: ' + balance.menstrualLeave + ' 天');
     Logger.log('   家庭照顧假: ' + balance.familyCareLeave + ' 天');
-    Logger.log('   公假: ' + (balance.officialLeave === 999 ? '無上限' : balance.officialLeave + ' 天'));
-    Logger.log('   公傷病假: ' + (balance.occupationalInjuryLeave === 999 ? '無上限' : balance.occupationalInjuryLeave + ' 天'));
-    Logger.log('   疫苗接種假: ' + (balance.vaccinationLeave === 999 ? '無上限' : balance.vaccinationLeave + ' 天'));
-    Logger.log('   防疫照顧假: ' + (balance.epidemicCareLeave === 999 ? '無上限' : balance.epidemicCareLeave + ' 天'));
+    Logger.log('   公假: ' + (balance.officialLeave === 0 ? '無上限' : balance.officialLeave + ' 天'));
+    Logger.log('   公傷病假: ' + (balance.occupationalInjuryLeave === 0 ? '無上限' : balance.occupationalInjuryLeave + ' 天'));
+    Logger.log('   疫苗接種假: ' + (balance.vaccinationLeave === 0 ? '無上限' : balance.vaccinationLeave + ' 天'));
+    Logger.log('   防疫照顧假: ' + (balance.epidemicCareLeave === 0 ? '無上限' : balance.epidemicCareLeave + ' 天'));
   } else {
     Logger.log('❌ 測試失敗');
   }
@@ -1381,15 +1381,6 @@ function deductLeaveBalance(userId, leaveType, days) {
         const currentBalance = values[i][columnIndex - 1]; // 因為陣列從 0 開始
         
         Logger.log(`   目前餘額: ${currentBalance} 天`);
-        
-        // 特殊處理：無上限的假別（999）
-        if (currentBalance === 999) {
-          Logger.log('   ℹ️ 此假別無上限，無需扣除');
-          return {
-            ok: true,
-            remaining: 999
-          };
-        }
         
         // 檢查餘額是否足夠
         if (currentBalance < days) {

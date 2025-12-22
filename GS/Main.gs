@@ -50,6 +50,11 @@ function doGet(e) {
       // ==================== 員工管理 ====================
       case "getAllUsers":
         return respond1(handleGetAllUsers(e.parameter));
+      
+      case "updateUserRole":
+        return respond1(handleUpdateUserRole(e.parameter));
+      case "deleteUser":
+        return respond1(handleDeleteUser(e.parameter));
       // ==================== 補打卡審核 ====================
       case "getReviewRequest":
         return respond1(handleGetReviewRequest());
