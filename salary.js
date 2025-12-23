@@ -1543,5 +1543,104 @@ async function loadOvertimeRecords(yearMonth) {
     }
 }
 
+// ==================== 薪資匯出功能（管理員專用） ====================
+
+/**
+ * ✅ 匯出所有員工的薪資總表（Excel格式）- 管理員專用
+ */
+async function exportAllSalaryExcel() {
+    try {
+        // 1. 檢查管理員權限
+        if (currentUserRole !== 'admin') {
+            showNotification('❌ 此功能僅限管理員使用', 'error');
+            return;
+        }
+        
+        // 2. 取得選擇的月份
+        const yearMonthEl = document.getElementById('filter-year-month-list');
+        const yearMonth = yearMonthEl ? yearMonthEl.value : '';
+        
+        if (!yearMonth) {
+            showNotification('❌ 請先選擇要匯出的月份', 'error');
+            return;
+        }
+        
+        // 3. 確認是否要匯出
+        if (!confirm(`確定要匯出 ${yearMonth} 的薪資總表嗎？\n\n將包含所有員工的薪資明細。`)) {
+            return;
+        }
+        
+        // 4. 顯示進度提示
+        showExportProgress('正在生成薪資總表 Excel...');
+        
+        // 5. 呼叫後端 API
+        const res = await callApifetch(`exportAllSalaryExcel&yearMonth=${encodeURIComponent(yearMonth)}`);
+        
+        // 6. 隱藏進度提示
+        hideExportProgress();
+        
+        // 7. 處理結果
+        if (res.ok && res.fileUrl) {
+            // 開啟新視窗下載 Excel
+            window.open(res.fileUrl, '_blank');
+            
+            showNotification(`✅ 薪資總表已生成！\n共 ${res.recordCount} 筆記錄\n\n請檢查下載或前往 Google Drive 查看`, 'success');
+            
+            console.log('✅ 匯出成功:', {
+                檔案名稱: res.fileName,
+                記錄數: res.recordCount,
+                檔案連結: res.fileUrl
+            });
+        } else {
+            showNotification('❌ 匯出失敗: ' + (res.msg || res.message || '未知錯誤'), 'error');
+        }
+        
+    } catch (error) {
+        hideExportProgress();
+        console.error('❌ 匯出 Excel 失敗:', error);
+        showNotification('❌ 匯出失敗：' + error.message, 'error');
+    }
+}
+
+/**
+ * ✅ 顯示匯出進度
+ */
+function showExportProgress(message) {
+    // 移除舊的進度提示（如果存在）
+    const oldProgress = document.getElementById('export-progress-overlay');
+    if (oldProgress) {
+        oldProgress.remove();
+    }
+    
+    // 建立新的進度提示
+    const overlay = document.createElement('div');
+    overlay.id = 'export-progress-overlay';
+    overlay.className = 'export-progress-overlay';
+    
+    overlay.innerHTML = `
+        <div class="export-progress">
+            <div class="export-progress-spinner"></div>
+            <div class="export-progress-text">${message}</div>
+            <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 1rem;">
+                請稍候，這可能需要幾秒鐘...
+            </p>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+}
+
+/**
+ * ✅ 隱藏匯出進度
+ */
+function hideExportProgress() {
+    const overlay = document.getElementById('export-progress-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+console.log('✅ 薪資匯出功能已載入（管理員專用）');
+
 console.log('✅ 薪資管理系統（完整版 v2.0）JS 已載入');
 console.log('📋 包含：基本薪資 + 6項津貼 + 10項扣款');

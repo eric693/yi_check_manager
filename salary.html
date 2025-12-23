@@ -1180,10 +1180,22 @@
             </div>
         </div>
 
-        <!-- Tab 5: 薪資列表 -->
+        <!-- 在 Tab 5: 薪資列表 的 feature-title 下方添加 -->
         <div id="salary-list" class="tab-content">
             <div class="form-section">
                 <div class="feature-title" data-i18n="SALARY_LIST_TITLE">薪資列表</div>
+                
+                <!-- ⭐ 新增：匯出工具列（只有管理員可見） -->
+                <div id="admin-export-toolbar" class="export-toolbar" style="display: none; margin-bottom: 2rem; padding: 1rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px;">
+                    <div style="flex: 1;">
+                        <h4 style="color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">管理員功能</h4>
+                        <p style="color: #94a3b8; font-size: 0.875rem;">匯出當月所有員工的薪資總表（Excel格式）</p>
+                    </div>
+                    <button class="export-btn" onclick="exportAllSalaryExcel()">
+                        匯出薪資總表
+                    </button>
+                </div>
+                
                 <p style="color: #94a3b8; margin-bottom: 2rem;" data-i18n="SALARY_LIST_DESC">
                     瀏覽所有員工的薪資記錄
                 </p>
@@ -1205,6 +1217,91 @@
                 <div id="all-salary-list-content" class="space-y-3" style="margin-top: 2rem;"></div>
             </div>
         </div>
+
+        <style>
+        .export-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+        }
+
+        .export-btn {
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .export-btn:active {
+            transform: translateY(0);
+        }
+
+        .export-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 匯出進度提示 */
+        .export-progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .export-progress {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 2.5rem 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .export-progress-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(16, 185, 129, 0.2);
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        .export-progress-text {
+            color: #fff;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        </style>
     </div>
 
     <div id="notification" class="notification">
@@ -1266,12 +1363,19 @@
                             : `👤 員工模式 - ${res.user.name || res.user.userId}`;
                     }
                     
+                    // 隱藏管理員專用的 Tab
                     const tabs = document.querySelectorAll('[data-role="admin"]');
                     tabs.forEach(tab => {
                         if (!isAdmin) {
                             tab.style.display = 'none';
                         }
                     });
+                    
+                    // ⭐ 顯示/隱藏匯出工具列
+                    const exportToolbar = document.getElementById('admin-export-toolbar');
+                    if (exportToolbar) {
+                        exportToolbar.style.display = isAdmin ? 'flex' : 'none';
+                    }
                     
                     console.log(`✅ 使用者角色: ${currentUserRole}`);
                 }
