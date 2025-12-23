@@ -1550,55 +1550,56 @@ async function loadOvertimeRecords(yearMonth) {
  */
 async function exportAllSalaryExcel() {
     try {
-        // 1. 檢查管理員權限
+        console.log('🔍 ========== DEBUG 开始 ==========');
+        
+        // 检查权限
+        console.log('👤 currentUserRole:', currentUserRole);
+        
         if (currentUserRole !== 'admin') {
-            showNotification('❌ 此功能僅限管理員使用', 'error');
+            showNotification('❌ 此功能仅限管理员使用', 'error');
             return;
         }
         
-        // 2. 取得選擇的月份
+        // 取得月份
         const yearMonthEl = document.getElementById('filter-year-month-list');
         const yearMonth = yearMonthEl ? yearMonthEl.value : '';
+        console.log('📅 yearMonth:', yearMonth);
         
         if (!yearMonth) {
-            showNotification('❌ 請先選擇要匯出的月份', 'error');
+            showNotification('❌ 请先选择要汇出的月份', 'error');
             return;
         }
         
-        // 3. 確認是否要匯出
-        if (!confirm(`確定要匯出 ${yearMonth} 的薪資總表嗎？\n\n將包含所有員工的薪資明細。`)) {
-            return;
-        }
+        // 建构 API URL
+        const apiUrl = `action=exportAllSalaryExcel&yearMonth=${encodeURIComponent(yearMonth)}`;
+        console.log('🔗 API URL:', apiUrl);
         
-        // 4. 顯示進度提示
-        showExportProgress('正在生成薪資總表 Excel...');
+        // 显示进度
+        showExportProgress('正在生成薪资总表 Excel...');
         
-        // 5. 呼叫後端 API
-        const res = await callApifetch(`action=exportAllSalaryExcel&yearMonth=${encodeURIComponent(yearMonth)}`);
+        // ⭐⭐⭐ 关键：记录完整请求
+        console.log('📤 准备发送请求...');
+        console.log('   URL:', apiUrl);
         
-        // 6. 隱藏進度提示
+        const res = await callApifetch(apiUrl);
+        
+        console.log('📥 收到回应:', res);
+        console.log('🔍 ========== DEBUG 结束 ==========');
+        
         hideExportProgress();
         
-        // 7. 處理結果
+        // 处理结果
         if (res.ok && res.fileUrl) {
-            // 開啟新視窗下載 Excel
             window.open(res.fileUrl, '_blank');
-            
-            showNotification(`✅ 薪資總表已生成！\n共 ${res.recordCount} 筆記錄\n\n請檢查下載或前往 Google Drive 查看`, 'success');
-            
-            console.log('✅ 匯出成功:', {
-                檔案名稱: res.fileName,
-                記錄數: res.recordCount,
-                檔案連結: res.fileUrl
-            });
+            showNotification(`✅ 薪资总表已生成！\n共 ${res.recordCount} 笔记录`, 'success');
         } else {
-            showNotification('❌ 匯出失敗: ' + (res.msg || res.message || '未知錯誤'), 'error');
+            showNotification('❌ 汇出失败: ' + (res.msg || res.message || '未知错误'), 'error');
         }
         
     } catch (error) {
         hideExportProgress();
-        console.error('❌ 匯出 Excel 失敗:', error);
-        showNotification('❌ 匯出失敗：' + error.message, 'error');
+        console.error('❌ 汇出 Excel 失败:', error);
+        showNotification('❌ 汇出失败：' + error.message, 'error');
     }
 }
 
