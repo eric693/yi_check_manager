@@ -1547,74 +1547,52 @@ async function loadOvertimeRecords(yearMonth) {
 
 async function exportAllSalaryExcel() {
     try {
-        console.log('🔍 ========== DEBUG 開始 ==========');
-        
-        // 檢查權限
-        console.log('👤 currentUserRole:', currentUserRole);
-        
-        if (currentUserRole !== 'admin') {
-            showNotification('❌ 此功能僅限管理員使用', 'error');
-            return;
-        }
+        console.log('🔍 開始匯出薪資總表');
         
         // 取得月份
         const yearMonthEl = document.getElementById('filter-year-month-list');
         const yearMonth = yearMonthEl ? yearMonthEl.value : '';
-        console.log('📅 yearMonth:', yearMonth);
         
         if (!yearMonth) {
             showNotification('❌ 請先選擇要匯出的月份', 'error');
             return;
         }
         
-        // ⭐⭐⭐ 修改：手動取得 token 並構建完整 URL
         const token = localStorage.getItem('sessionToken');
-        console.log('🔑 Token:', token ? '存在' : '不存在');
-        
         if (!token) {
             showNotification('❌ 請先登入', 'error');
             return;
         }
         
-        // ✅ 修正：使用 API_CONFIG.apiUrl
+        // 構建 API URL
         const apiUrl = `${API_CONFIG.apiUrl}?action=exportAllSalaryExcel&yearMonth=${encodeURIComponent(yearMonth)}&token=${encodeURIComponent(token)}`;
-        console.log('🔗 完整 API URL:', apiUrl);
         
         // 顯示進度
         showExportProgress('正在生成薪資總表 Excel...');
         
-        console.log('📤 準備發送請求...');
-        
-        // ⭐⭐⭐ 使用 fetch 直接發送請求
+        // 呼叫 API
         const response = await fetch(apiUrl);
         const res = await response.json();
         
         console.log('📥 收到回應:', res);
-        console.log('🔍 ========== DEBUG 結束 ==========');
         
         hideExportProgress();
         
-        // 處理結果
-        if (res.ok && res.fileUrl) {
-            // ✅ 改用 <a> 標籤模擬點擊
+        if (res.ok && res.data && res.data.fileUrl) {
+            // ⭐⭐⭐ 直接下載檔案
             const link = document.createElement('a');
-            link.href = res.fileUrl;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
+            link.href = res.data.fileUrl;
+            link.download = res.data.fileName + '.xlsx';  // ⭐ 強制下載
+            link.style.display = 'none';
             
-            // 觸發點擊
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            showNotification(`✅ 薪資總表已生成！\n共 ${res.recordCount} 筆記錄\n\n點擊通知可開啟檔案`, 'success');
+            showNotification(`✅ 薪資總表開始下載！\n檔案名稱：${res.data.fileName}.xlsx\n共 ${res.data.recordCount} 筆記錄`, 'success');
             
-            try {
-                await navigator.clipboard.writeText(res.fileUrl);
-                console.log('✅ 檔案連結已複製到剪貼簿');
-            } catch (e) {
-                console.log('⚠️ 無法複製連結:', e);
-            }
+            // 📋 同時顯示結果區塊（備用）
+            displayExportResult(res.data);
             
         } else {
             showNotification('❌ 匯出失敗: ' + (res.msg || res.message || '未知錯誤'), 'error');
@@ -1622,9 +1600,50 @@ async function exportAllSalaryExcel() {
         
     } catch (error) {
         hideExportProgress();
-        console.error('❌ 匯出 Excel 失敗:', error);
+        console.error('❌ 匯出失敗:', error);
         showNotification('❌ 匯出失敗：' + error.message, 'error');
     }
+}
+
+/**
+ * ✅ 顯示匯出結果（備用方案）
+ */
+function displayExportResult(data) {
+    // 建立結果提示區塊
+    let resultDiv = document.getElementById('export-result-box');
+    
+    if (!resultDiv) {
+        resultDiv = document.createElement('div');
+        resultDiv.id = 'export-result-box';
+        resultDiv.className = 'mt-4 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded-lg';
+        
+        const exportSection = document.querySelector('#admin-view .feature-box');
+        if (exportSection) {
+            exportSection.appendChild(resultDiv);
+        }
+    }
+    
+    resultDiv.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="font-semibold text-green-800 dark:text-green-300">
+                    ✅ 薪資總表已生成！
+                </p>
+                <p class="text-sm text-green-700 dark:text-green-400">
+                    檔案名稱：${data.fileName}.xlsx<br>
+                    共 ${data.recordCount} 筆記錄
+                </p>
+            </div>
+            <a href="${data.fileUrl}" 
+               download="${data.fileName}.xlsx"
+               class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors">
+                📥 重新下載
+            </a>
+        </div>
+    `;
+    
+    resultDiv.style.display = 'block';
+    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 /**
