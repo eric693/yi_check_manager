@@ -1545,9 +1545,6 @@ async function loadOvertimeRecords(yearMonth) {
 
 // ==================== 薪資匯出功能（管理員專用） ====================
 
-/**
- * ✅ 匯出所有員工的薪資總表（Excel格式）- 管理員專用
- */
 async function exportAllSalaryExcel() {
     try {
         console.log('🔍 ========== DEBUG 開始 ==========');
@@ -1570,18 +1567,27 @@ async function exportAllSalaryExcel() {
             return;
         }
         
-        // 建構 API URL
-        const apiUrl = `action=exportAllSalaryExcel&yearMonth=${encodeURIComponent(yearMonth)}`;
-        console.log('🔗 API URL:', apiUrl);
+        // ⭐⭐⭐ 修改：手動取得 token 並構建完整 URL
+        const token = localStorage.getItem('sessionToken');
+        console.log('🔑 Token:', token ? '存在' : '不存在');
+        
+        if (!token) {
+            showNotification('❌ 請先登入', 'error');
+            return;
+        }
+        
+        // ⭐⭐⭐ 修改：直接使用 fetch，不用 callApifetch
+        const apiUrl = `${API_URL}?action=exportAllSalaryExcel&yearMonth=${encodeURIComponent(yearMonth)}&token=${encodeURIComponent(token)}`;
+        console.log('🔗 完整 API URL:', apiUrl);
         
         // 顯示進度
         showExportProgress('正在生成薪資總表 Excel...');
         
-        // ⭐⭐⭐ 關鍵：記錄完整請求
         console.log('📤 準備發送請求...');
-        console.log('   URL:', apiUrl);
         
-        const res = await callApifetch(apiUrl);
+        // ⭐⭐⭐ 使用 fetch 直接發送請求
+        const response = await fetch(apiUrl);
+        const res = await response.json();
         
         console.log('📥 收到回應:', res);
         console.log('🔍 ========== DEBUG 結束 ==========');
