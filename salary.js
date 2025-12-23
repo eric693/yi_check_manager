@@ -1574,9 +1574,7 @@ async function exportAllSalaryExcel() {
         showExportProgress('正在生成薪資總表 Excel...');
         
         // 5. 呼叫後端 API
-        const res = await callApifetch(`exportAllSalaryExcel`, {
-            yearMonth: yearMonth
-        });
+        const res = await callApifetch(`action=exportAllSalaryExcel&yearMonth=${encodeURIComponent(yearMonth)}`);
         
         // 6. 隱藏進度提示
         hideExportProgress();
