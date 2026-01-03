@@ -6,15 +6,15 @@
  * 修正：僅 admin_list 內的 userId 才是管理員，其餘為員工
  */
 const ADMIN_LIST = [
-  "U68e0ca9d516e63ed15bf9387fad174ac",
-  "U1558097f933b72938d3098c201c28955",
-  "Ueb6337faee9c9f0afd381e039571fe37",
-  "Ueea1089924b92d3de5218f10331e685d",
-  "U0443d2af11a744a8d64c8914f300e72a",
-  "Ua5e653690ff1cc19f16bc67f159a48e5",
-  "U8e096120c5ec8cc25ef063f021369976"
+  "Ud3b574f260f5a777337158ccd4ff0ba2",
+  "U1558097f933b72938d3098c201c28955"
 ];
 
+// DbOperations.gs - 修正後的 writeEmployee_ 函數
+
+/**
+ * ✅ 修正版：登入時不覆蓋手動設定的姓名
+ */
 function writeEmployee_(profile) {
   const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_EMPLOYEES);
   const values = sheet.getDataRange().getValues();
@@ -23,11 +23,26 @@ function writeEmployee_(profile) {
   // 檢查是否已存在
   for (let i = 1; i < values.length; i++) {
     if (values[i][0] === employeeId) {
+      
+      // ⭐⭐⭐ 關鍵修正：檢查是否有手動設定的姓名
+      const currentName = values[i][2];           // C 欄：displayName（目前顯示的姓名）
+      const nameOverride = values[i][8] || "";    // I 欄：nameOverride（手動設定的姓名）
+      
+      // 只在沒有手動設定姓名時才更新
+      if (!nameOverride) {
+        Logger.log(`✅ 更新員工 ${profile.displayName} 的 LINE 姓名`);
+        sheet.getRange(i + 1, 3).setValue(profile.displayName);  // C 欄
+      } else {
+        Logger.log(`🔒 保留員工 ${currentName} 的手動設定姓名（忽略 LINE 姓名：${profile.displayName}）`);
+        // 不更新姓名，保持原有的手動設定
+      }
+      
+      // 更新其他資訊（email, 頭像等）
       sheet.getRange(i + 1, 2).setValue(profile.email || "");
-      sheet.getRange(i + 1, 3).setValue(profile.displayName);
       sheet.getRange(i + 1, 4).setValue(profile.pictureUrl);
       sheet.getRange(i + 1, 8).setValue("啟用");
-      Logger.log(`✅ 更新員工 ${profile.displayName}（保留原有權限：${values[i][5]}）`);
+      
+      Logger.log(`✅ 更新員工資料完成（保留原有權限：${values[i][5]}）`);
       return values[i];
     }
   }
@@ -37,23 +52,25 @@ function writeEmployee_(profile) {
 
   // 新增資料
   const row = [
-    employeeId,
-    profile.email || "",
-    profile.displayName,
-    profile.pictureUrl,
-    new Date(),
-    role,   // 根據 admin_list 指定權限
-    "",
-    "啟用"
+    employeeId,              // A: userId
+    profile.email || "",     // B: email
+    profile.displayName,     // C: displayName
+    profile.pictureUrl,      // D: pictureUrl
+    new Date(),              // E: 建立時間
+    role,                    // F: 部門（權限）
+    "",                      // G: 到職日期
+    "啟用",                  // H: 狀態
+    ""                       // I: nameOverride（手動設定的姓名，新用戶為空）
   ];
 
   sheet.appendRow(row);
   Logger.log(`✅ 新增員工 ${profile.displayName}（權限：${role}）`);
   return row;
 }
+// DbOperations.gs - 修正後的 findEmployeeByLineUserId_ 函數
 
 /**
- * ✅ 修正：根據 LINE User ID 查詢員工資料
+ * ✅ 修正版：優先使用手動設定的姓名
  */
 function findEmployeeByLineUserId_(userId) {
   const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_EMPLOYEES);
@@ -61,12 +78,24 @@ function findEmployeeByLineUserId_(userId) {
 
   for (let i = 1; i < values.length; i++) {
     if (String(values[i][0]).trim() === userId) {
+      
+      // ⭐⭐⭐ 關鍵修正：優先使用 nameOverride
+      const displayName = values[i][2];        // C 欄：displayName
+      const nameOverride = values[i][8] || ""; // I 欄：nameOverride
+      
+      const finalName = nameOverride || displayName; // 優先使用手動設定的姓名
+      
+      Logger.log(`📋 查詢員工: ${userId}`);
+      Logger.log(`   displayName: ${displayName}`);
+      Logger.log(`   nameOverride: ${nameOverride}`);
+      Logger.log(`   最終姓名: ${finalName}`);
+      
       return {
         ok: true,
         userId: values[i][0],        // ✅ LINE userId
         employeeId: values[i][0],    // ✅ 員工ID = LINE userId
         email: values[i][1] || "",
-        name: values[i][2],
+        name: finalName,             // ⭐ 使用最終姓名
         picture: values[i][3],
         dept: values[i][5] || "管理員",
         status: values[i][7] || "啟用"
@@ -77,6 +106,68 @@ function findEmployeeByLineUserId_(userId) {
   return { ok: false, code: "ERR_NO_DATA" };
 }
 
+// DbOperations.gs - 新增：解除姓名鎖定功能
+
+/**
+ * 🔓 解除姓名鎖定，恢復使用 LINE 姓名
+ */
+function unlockEmployeeName(userId) {
+  try {
+    Logger.log('🔓 解除員工姓名鎖定');
+    Logger.log('   userId: ' + userId);
+    
+    const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_EMPLOYEES);
+    
+    if (!sheet) {
+      return { ok: false, msg: '找不到員工工作表' };
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    
+    // 尋找用戶並解除鎖定
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === userId) {
+        const currentName = data[i][2];  // C 欄: displayName
+        
+        // ⭐ 清除 nameOverride，下次登入時將使用 LINE 姓名
+        sheet.getRange(i + 1, 9).setValue("");  // I 欄：nameOverride
+        
+        Logger.log('✅ 已解除姓名鎖定');
+        Logger.log('   當前姓名: ' + currentName);
+        Logger.log('   下次登入將使用 LINE 姓名');
+        
+        return {
+          ok: true,
+          msg: '已解除姓名鎖定，下次登入將使用 LINE 姓名',
+          currentName: currentName
+        };
+      }
+    }
+    
+    return { ok: false, msg: '找不到該員工' };
+    
+  } catch (error) {
+    Logger.log('❌ unlockEmployeeName 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+/**
+ * 🧪 測試解除鎖定功能
+ */
+function testUnlockEmployeeName() {
+  Logger.log('🧪 測試解除姓名鎖定');
+  Logger.log('');
+  
+  // ⚠️ 替換成實際的 userId
+  const testUserId = 'Ud3b574f260f5a777337158ccd4ff0ba2';
+  
+  const result = unlockEmployeeName(testUserId);
+  
+  Logger.log('');
+  Logger.log('📤 結果:');
+  Logger.log(JSON.stringify(result, null, 2));
+}
 
 /**
  * ✅ 取得所有員工列表（根據實際資料表結構）
@@ -2629,4 +2720,218 @@ function getEmployeeMonthlyPunchData(employeeId, yearMonth) {
       message: error.message
     };
   }
+}
+
+// DbOperations.gs - 修正後的 updateEmployeeName 函數
+
+/**
+ * ✅ 修正版：更新員工姓名並設定鎖定標記
+ */
+function updateEmployeeName(userId, newName) {
+  try {
+    Logger.log('═══════════════════════════════════════');
+    Logger.log('✏️ 開始更新員工姓名');
+    Logger.log('   userId: ' + userId);
+    Logger.log('   newName: ' + newName);
+    
+    // 驗證輸入
+    if (!userId || !newName) {
+      return {
+        ok: false,
+        msg: '缺少必要參數'
+      };
+    }
+    
+    const trimmedName = String(newName).trim();
+    
+    if (trimmedName.length < 2) {
+      return {
+        ok: false,
+        msg: '姓名至少需要 2 個字'
+      };
+    }
+    
+    if (trimmedName.length > 50) {
+      return {
+        ok: false,
+        msg: '姓名不能超過 50 個字'
+      };
+    }
+    
+    const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_EMPLOYEES);
+    
+    if (!sheet) {
+      return {
+        ok: false,
+        msg: '找不到員工工作表'
+      };
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    
+    // 尋找用戶並更新
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === userId) {  // A 欄: userId
+        const oldName = data[i][2];  // C 欄: displayName
+        
+        // ⭐⭐⭐ 關鍵修正：同時更新姓名和 nameOverride
+        sheet.getRange(i + 1, 3).setValue(trimmedName);   // C 欄：displayName
+        sheet.getRange(i + 1, 9).setValue(trimmedName);   // I 欄：nameOverride（設定鎖定）
+        
+        Logger.log('✅ 已更新姓名並設定鎖定');
+        Logger.log('   舊姓名: ' + oldName);
+        Logger.log('   新姓名: ' + trimmedName);
+        Logger.log('   nameOverride: ' + trimmedName + ' 🔒');
+        Logger.log('═══════════════════════════════════════');
+        
+        return {
+          ok: true,
+          msg: '姓名已更新並鎖定',
+          oldName: oldName,
+          newName: trimmedName
+        };
+      }
+    }
+    
+    return {
+      ok: false,
+      msg: '找不到該員工'
+    };
+    
+  } catch (error) {
+    Logger.log('❌ updateEmployeeName 錯誤: ' + error);
+    Logger.log('═══════════════════════════════════════');
+    return {
+      ok: false,
+      msg: error.message
+    };
+  }
+}
+/**
+ * 🧪 測試更新姓名
+ */
+function testUpdateEmployeeName() {
+  Logger.log('🧪 測試更新員工姓名');
+  Logger.log('');
+  
+  // ⚠️ 替換成實際的 userId
+  const testUserId = 'Ud3b574f260f5a777337158ccd4ff0ba2';
+  const newName = '王小明';
+  
+  const result = updateEmployeeName(testUserId, newName);
+  
+  Logger.log('📤 結果:');
+  Logger.log(JSON.stringify(result, null, 2));
+}
+
+/**
+ * 根據 token 取得使用者資料
+ */
+function getUserByToken(token) {
+  try {
+    const session = checkSession_(token);
+    if (session.ok && session.user) {
+      return session.user;
+    }
+    return null;
+  } catch (error) {
+    Logger.log('❌ getUserByToken 錯誤: ' + error);
+    return null;
+  }
+}
+
+
+/**
+ * 🧪 測試公告系統（改良版）
+ */
+function testAnnouncementSystemImproved() {
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('🧪 測試公告系統（改良版）');
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('');
+  
+  const testToken = 'f8eeb016-b89a-4cb5-8737-8c904ca680ab';  // ⚠️ 替換成你的 token
+  
+  // ✅ 測試 1：新增公告
+  Logger.log('📝 測試 1：新增公告');
+  const addResult = handleAddAnnouncement({
+    token: testToken,
+    title: '測試公告 - ' + new Date().getTime(),
+    content: '這是一個測試公告',
+    priority: 'normal'
+  });
+  
+  Logger.log('   ok: ' + addResult.ok);
+  
+  if (!addResult.ok) {
+    Logger.log('❌ 新增失敗: ' + addResult.msg);
+    Logger.log('═══════════════════════════════════════');
+    return;
+  }
+  
+  const announcementId = addResult.announcement.id;
+  Logger.log('   ✅ 新增成功');
+  Logger.log('   ID: ' + announcementId);
+  Logger.log('   ID 型別: ' + typeof announcementId);
+  Logger.log('');
+  
+  // ✅ 測試 2：取得公告
+  Logger.log('📋 測試 2：取得公告');
+  const getResult = handleGetAnnouncements({});
+  
+  Logger.log('   ok: ' + getResult.ok);
+  Logger.log('   公告數: ' + (getResult.announcements ? getResult.announcements.length : 0));
+  
+  if (getResult.ok && getResult.announcements.length > 0) {
+    const latest = getResult.announcements[0];
+    Logger.log('   最新公告:');
+    Logger.log('     - ID: ' + latest.id + ' (' + typeof latest.id + ')');
+    Logger.log('     - 標題: ' + latest.title);
+  }
+  Logger.log('');
+  
+  // ⏸️ 等待 2 秒（確保資料已寫入）
+  Logger.log('⏸️ 等待 2 秒...');
+  Utilities.sleep(2000);
+  Logger.log('');
+  
+  // ✅ 測試 3：刪除公告
+  Logger.log('🗑️ 測試 3：刪除公告');
+  Logger.log('   準備刪除的 ID: ' + announcementId + ' (' + typeof announcementId + ')');
+  
+  const deleteResult = handleDeleteAnnouncement({
+    token: testToken,
+    id: announcementId
+  });
+  
+  Logger.log('');
+  Logger.log('   ok: ' + deleteResult.ok);
+  Logger.log('   msg: ' + deleteResult.msg);
+  Logger.log('');
+  
+  if (deleteResult.ok) {
+    Logger.log('✅✅✅ 刪除成功！');
+    
+    // ✅ 測試 4：確認刪除
+    Logger.log('');
+    Logger.log('🔍 測試 4：確認刪除');
+    const finalCheck = handleGetAnnouncements({});
+    
+    if (finalCheck.ok) {
+      const stillExists = finalCheck.announcements.some(a => String(a.id) === String(announcementId));
+      
+      if (stillExists) {
+        Logger.log('   ❌ 公告仍存在（刪除失敗）');
+      } else {
+        Logger.log('   ✅ 公告已不存在（刪除成功）');
+      }
+    }
+  } else {
+    Logger.log('❌ 刪除失敗: ' + deleteResult.msg);
+  }
+  
+  Logger.log('');
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('🎉 測試完成！');
+  Logger.log('═══════════════════════════════════════');
 }

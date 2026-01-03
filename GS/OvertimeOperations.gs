@@ -6,7 +6,7 @@ const SHEET_OVERTIME = "加班申請";
 // ==================== 資料庫操作 ====================
 
 /**
- * 初始化加班申請工作表（如果不存在則建立）
+ * 初始化加班申請工作表（修改版 - 加入補休時數欄位）
  */
 function initOvertimeSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -14,12 +14,12 @@ function initOvertimeSheet() {
   
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_OVERTIME);
-    // 設定表頭
+    // ✅ 加入「補休時數」欄位
     const headers = [
       "申請ID", "員工ID", "員工姓名", "加班日期", 
       "開始時間", "結束時間", "加班時數", "申請原因",
       "申請時間", "審核狀態", "審核人ID", "審核人姓名",
-      "審核時間", "審核意見"
+      "審核時間", "審核意見", "補休時數"
     ];
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
@@ -30,9 +30,9 @@ function initOvertimeSheet() {
 }
 
 /**
- * 提交加班申請
+ * 提交加班申請（修改版 - 加入補休時數）
  */
-function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, hours, reason) {
+function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, hours, reason, compensatoryHours) {
   const employee = checkSession_(sessionToken);
   const user = employee.user;
   if (!user) return { ok: false, code: "ERR_SESSION_INVALID" };
@@ -44,7 +44,10 @@ function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, h
   const startDateTime = new Date(`${overtimeDate}T${startTime}:00`);
   const endDateTime = new Date(`${overtimeDate}T${endTime}:00`);
   
-  Logger.log(`📝 提交加班: ${user.name}, 日期=${overtimeDate}, 時數=${hours}`);
+  // ✅ 處理補休時數（預設為 0）
+  const compHours = parseFloat(compensatoryHours) || 0;
+  
+  Logger.log(`📝 提交加班: ${user.name}, 日期=${overtimeDate}, 時數=${hours}, 補休=${compHours}`);
   
   const row = [
     requestId,
@@ -57,7 +60,8 @@ function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, h
     reason,
     new Date(),
     "pending",
-    "", "", "", ""
+    "", "", "", "",
+    compHours  // ✅ 補休時數
   ];
   
   sheet.appendRow(row);
@@ -67,6 +71,26 @@ function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, h
     code: "OVERTIME_SUBMIT_SUCCESS",
     requestId: requestId
   };
+}
+
+
+/**
+ * Handler - 接收補休時數參數
+ */
+function handleSubmitOvertime(params) {
+  const { token, overtimeDate, startTime, endTime, hours, reason, compensatoryHours } = params;
+  
+  Logger.log(`📥 收到加班申請: 日期=${overtimeDate}, 時數=${hours}, 補休=${compensatoryHours || 0}`);
+  
+  return submitOvertimeRequest(
+    token, 
+    overtimeDate, 
+    startTime, 
+    endTime, 
+    parseFloat(hours), 
+    reason,
+    parseFloat(compensatoryHours) || 0  // ✅ 補休時數，預設 0
+  );
 }
 
 /**
@@ -104,7 +128,8 @@ function getEmployeeOvertimeRequests(sessionToken) {
       applyDate: formatDate(row[8]),
       status: String(row[9]).trim().toLowerCase(),
       reviewerName: row[11] || "",
-      reviewComment: row[13] || ""
+      reviewComment: row[13] || "",
+      compensatoryHours: parseFloat(row[14]) || 0  // ✅ 加入這行
     };
   });
   
@@ -145,17 +170,18 @@ function getPendingOvertimeRequests(sessionToken) {
     
     if (status === "pending") {
       requests.push({
-        rowNumber: i + 1,
-        requestId: row[0],
-        employeeId: row[1],
-        employeeName: row[2],
-        overtimeDate: formatDate(row[3]),
-        startTime: formatTime(row[4]),
-        endTime: formatTime(row[5]),
-        hours: parseFloat(row[6]) || 0,
-        reason: row[7],
-        applyDate: formatDate(row[8])
-      });
+      rowNumber: i + 1,
+      requestId: row[0],
+      employeeId: row[1],
+      employeeName: row[2],
+      overtimeDate: formatDate(row[3]),
+      startTime: formatTime(row[4]),
+      endTime: formatTime(row[5]),
+      hours: parseFloat(row[6]) || 0,
+      reason: row[7],
+      applyDate: formatDate(row[8]),
+      compensatoryHours: parseFloat(row[14]) || 0  // ✅ 加入這行
+    });
     }
   }
   
@@ -271,20 +297,45 @@ function formatDate(date) {
   return Utilities.formatDate(date, "Asia/Taipei", "yyyy-MM-dd");
 }
 
-// ==================== Handlers ====================
-
-function handleSubmitOvertime(params) {
-  const { token, overtimeDate, startTime, endTime, hours, reason } = params;
-  Logger.log(`📥 收到加班申請: 日期=${overtimeDate}, 開始=${startTime}, 結束=${endTime}, 時數=${hours}`);
-  return submitOvertimeRequest(
-    token, 
-    overtimeDate, 
-    startTime, 
-    endTime, 
-    parseFloat(hours), 
-    reason
-  );
+/**
+ * 🔧 升級工具：為現有工作表新增補休時數欄位
+ * 只需執行一次
+ */
+function upgradeOvertimeSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_OVERTIME);
+  
+  if (!sheet) {
+    Logger.log("⚠️ 工作表不存在，將建立新表");
+    initOvertimeSheet();
+    return;
+  }
+  
+  // 檢查是否已有第 15 欄
+  const lastCol = sheet.getLastColumn();
+  
+  if (lastCol >= 15) {
+    const header15 = sheet.getRange(1, 15).getValue();
+    if (header15 === "補休時數") {
+      Logger.log("✅ 已存在補休時數欄位，無需升級");
+      return;
+    }
+  }
+  
+  // 新增第 15 欄標題
+  sheet.getRange(1, 15).setValue("補休時數").setFontWeight("bold");
+  sheet.setColumnWidth(15, 80);
+  
+  // 為所有現有記錄填入預設值 0
+  const lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    const defaultValues = Array(lastRow - 1).fill([0]);
+    sheet.getRange(2, 15, lastRow - 1, 1).setValues(defaultValues);
+  }
+  
+  Logger.log(`✅ 升級完成！已為 ${lastRow - 1} 筆記錄新增補休時數欄位`);
 }
+// ==================== Handlers ====================
 
 function handleGetEmployeeOvertime(params) {
   Logger.log(`📥 查詢員工加班記錄`);

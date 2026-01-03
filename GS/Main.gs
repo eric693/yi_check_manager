@@ -55,6 +55,21 @@ function doGet(e) {
         return respond1(handleUpdateUserRole(e.parameter));
       case "deleteUser":
         return respond1(handleDeleteUser(e.parameter));
+      
+      case "updateEmployeeName":
+        if (!validateSession(e.parameter.token)) {
+          return respond1({ ok: false, code: "ERR_SESSION_INVALID" });
+        }
+        
+        const targetUserId = e.parameter.userId;
+        const newName = e.parameter.newName;
+        
+        if (!targetUserId || !newName) {
+          return respond1({ ok: false, msg: "缺少必要參數" });
+        }
+        
+        const updateNameResult = updateEmployeeName(targetUserId, newName);
+        return respond1(updateNameResult);
       // ==================== 補打卡審核 ====================
       case "getReviewRequest":
         return respond1(handleGetReviewRequest());
@@ -118,8 +133,10 @@ function doGet(e) {
         return respond1(handleGetMySalaryHistory(e.parameter));
       case "calculateMonthlySalary":
         return respond1(handleCalculateMonthlySalary(e.parameter));
-      case "saveMonthlySalary":
-        return respond1(handleSaveMonthlySalary(e.parameter));
+      case "getEmployeeWorkHours":
+        return respond1(handleGetEmployeeWorkHours(e.parameter));
+      // case "saveMonthlySalary":
+      //   return respond1(handleSaveMonthlySalary(e.parameter));
       case "getAllMonthlySalary":
         return respond1(handleGetAllMonthlySalary(e.parameter));
        // ==================== 日薪系統 ====================
@@ -136,9 +153,129 @@ function doGet(e) {
       case "getDailySalaryRecords":
         return respond1(handleGetDailySalaryRecords(e.parameter));
 
+      case "saveMonthlySalary":
+        return saveMonthlySalaryAPI();
+
+      case 'exportAllSalaryExcel':
+        try {
+          Logger.log('📊 收到 exportAllSalaryExcel 请求');
+          Logger.log('   action: ' + action);
+          Logger.log('   token: ' + (e.parameter.token ? '有' : '无'));
+          Logger.log('   yearMonth: ' + e.parameter.yearMonth);
+          
+          // ⭐ 验证 session
+          if (!e.parameter.token) {
+            Logger.log('❌ 缺少 token');
+            return respond1({ 
+              ok: false, 
+              msg: '缺少 token',
+              code: 'MISSING_TOKEN' 
+            });
+          }
+          
+          if (!validateSession(e.parameter.token)) {
+            Logger.log('❌ token 验证失败');
+            return respond1({ 
+              ok: false, 
+              msg: '未授權或 session 已過期',
+              code: 'SESSION_INVALID' 
+            });
+          }
+          
+          Logger.log('✅ token 验证成功');
+          
+          const sessionResult = handleCheckSession(e.parameter.token);
+          
+          if (!sessionResult.ok || !sessionResult.user) {
+            Logger.log('❌ 无法取得使用者资讯');
+            return respond1({ 
+              ok: false, 
+              msg: 'Session 資料無效',
+              code: 'SESSION_DATA_INVALID' 
+            });
+          }
+          
+          const user = sessionResult.user;
+          Logger.log('👤 使用者: ' + user.name);
+          Logger.log('🔐 權限: ' + user.dept);
+          
+          if (user.dept !== '管理員') {
+            Logger.log('❌ 权限不足');
+            return respond1({ 
+              ok: false, 
+              msg: '此功能僅限管理員使用',
+              code: 'PERMISSION_DENIED' 
+            });
+          }
+          
+          const yearMonth = e.parameter.yearMonth;
+          if (!yearMonth) {
+            Logger.log('❌ 缺少 yearMonth');
+            return respond1({ 
+              ok: false, 
+              msg: '缺少年月參數',
+              code: 'MISSING_YEAR_MONTH' 
+            });
+          }
+          
+          Logger.log(`📊 管理員 ${user.name} 請求匯出 ${yearMonth} 薪資總表`);
+          
+          // ⭐⭐⭐ 關鍵修正：設定 globalThis.currentRequest
+          globalThis.currentRequest = e;
+          
+          // ⭐⭐⭐ 呼叫匯出函数（不傳參數）
+          const result = exportAllSalaryExcel();
+          
+          Logger.log('📤 exportAllSalaryExcel 回传类型: ' + typeof result);
+          
+          // ⭐⭐⭐ 修正：result 是 ContentService 物件，需要解析
+          try {
+            const resultContent = result.getContent();
+            const resultJson = JSON.parse(resultContent);
+            
+            Logger.log('📤 解析後的結果: ' + JSON.stringify(resultJson));
+            
+            if (resultJson.ok) {
+              return respond1({ 
+                ok: true, 
+                fileUrl: resultJson.data.fileUrl,
+                fileName: resultJson.data.fileName,
+                recordCount: resultJson.data.recordCount,
+                msg: '匯出成功'
+              });
+            } else {
+              return respond1({ 
+                ok: false, 
+                msg: resultJson.message || resultJson.msg || '匯出失敗'
+              });
+            }
+          } catch (parseError) {
+            Logger.log('❌ 解析結果失敗: ' + parseError);
+            return respond1({ 
+              ok: false, 
+              msg: '結果解析失敗: ' + parseError.message 
+            });
+          }
+          
+        } catch (error) {
+          Logger.log('❌ exportAllSalaryExcel 錯誤: ' + error);
+          Logger.log('❌ 錯誤堆疊: ' + error.stack);
+          return respond1({ 
+            ok: false, 
+            msg: '系統錯誤: ' + error.message 
+          });
+        }
+        break;
       // 在 doGet(e) 的 switch 區塊中新增：
       case "getEmployeeMonthlyPunchData":
         return respond1(handleGetEmployeeMonthlyPunchData(e.parameter));
+      
+      case "getAnnouncements":
+        return respond1(handleGetAnnouncements(e.parameter));
+      case "addAnnouncement":
+        return respond1(handleAddAnnouncement(e.parameter));
+      case "deleteAnnouncement":
+        return respond1(handleDeleteAnnouncement(e.parameter));
       // ==================== 測試端點 ====================
       case "initApp":
         return respond1(handleInitApp(e.parameter));
@@ -552,7 +689,7 @@ function handleSetEmployeeSalaryTW(params) {
       mealAllowance: parseFloat(params.mealAllowance) || 0,              // H: 伙食費
       transportAllowance: parseFloat(params.transportAllowance) || 0,    // I: 交通補助
       attendanceBonus: parseFloat(params.attendanceBonus) || 0,          // J: 全勤獎金
-      performanceBonus: parseFloat(params.performanceBonus) || 0,        // K: 績效獎金
+      performanceBonus: parseFloat(params.performanceBonus) || 0,        // K: 業績獎金
       otherAllowances: parseFloat(params.otherAllowances) || 0,          // L: 其他津貼
       
       // ========== 銀行資訊 (4 個參數: M-P) ==========
@@ -585,7 +722,7 @@ function handleSetEmployeeSalaryTW(params) {
     Logger.log('   - 伙食費: ' + salaryData.mealAllowance);
     Logger.log('   - 交通補助: ' + salaryData.transportAllowance);
     Logger.log('   - 全勤獎金: ' + salaryData.attendanceBonus);
-    Logger.log('   - 績效獎金: ' + salaryData.performanceBonus);
+    Logger.log('   - 業績獎金: ' + salaryData.performanceBonus);
     Logger.log('   - 其他津貼: ' + salaryData.otherAllowances);
     Logger.log('   - 福利金: ' + salaryData.welfareFee);
     Logger.log('   - 宿舍費用: ' + salaryData.dormitoryFee);
