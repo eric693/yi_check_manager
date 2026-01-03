@@ -11,7 +11,7 @@ let weekShiftCache = null;  // 快取本週排班
 // 載入語系檔
 async function loadTranslations(lang) {
     try {
-        const res = await fetch(`https://eric693.github.io/check_manager_plus/i18n/${lang}.json`);
+        const res = await fetch(`https://eric693.github.io/Allianz_check_manager/i18n/${lang}.json`);
         if (!res.ok) {
             throw new Error(`HTTP 錯誤: ${res.status}`);
         }
@@ -923,51 +923,20 @@ async function renderCalendar(date) {
 }
 
 /**
- * ✅ 更新本月出勤統計（改用後端計算 - 統一數據源）
+ * ✅ 更新本月出勤統計（已移除總工時）
  */
 async function updateMonthlyStats(records) {
-    const totalHoursEl = document.getElementById('stats-total-hours-value');
     const workDaysEl = document.getElementById('stats-work-days-value');
     const abnormalCountEl = document.getElementById('stats-abnormal-count-value');
     const normalDaysEl = document.getElementById('stats-normal-days-value');
     const overtimeHoursEl = document.getElementById('stats-overtime-hours-value');
     
-    if (!totalHoursEl || !workDaysEl || !abnormalCountEl || !normalDaysEl) {
+    if (!workDaysEl || !abnormalCountEl || !normalDaysEl) {
         console.warn('找不到統計元素');
         return;
     }
     
-    // ⭐⭐⭐ 關鍵修改：調用後端 API 獲取總工時
-    const userId = localStorage.getItem('sessionUserId');
-    const year = currentMonthDate.getFullYear();
-    const month = String(currentMonthDate.getMonth() + 1).padStart(2, '0');
-    const yearMonth = `${year}-${month}`;
-    
-    try {
-        // 調用後端薪資計算 API（與薪資頁面一致）
-        const res = await callApifetch(
-            `calculateMonthlySalary&employeeId=${userId}&yearMonth=${yearMonth}`
-        );
-        
-        if (res.ok && res.data) {
-            // ✅ 使用後端計算的總工時（已扣除請假、午休等）
-            const totalWorkHours = parseFloat(res.data.totalWorkHours) || 0;
-            totalHoursEl.textContent = totalWorkHours.toFixed(1);
-            
-            console.log('✅ 使用後端計算工時:', totalWorkHours.toFixed(1), '小時');
-        } else {
-            console.warn('⚠️ 後端 API 失敗，使用前端計算');
-            // 降級方案：如果 API 失敗，使用前端計算
-            calculateFrontendWorkHours(records, totalHoursEl);
-        }
-        
-    } catch (error) {
-        console.error('❌ 調用後端 API 失敗:', error);
-        // 降級方案：使用前端計算
-        calculateFrontendWorkHours(records, totalHoursEl);
-    }
-    
-    // ⭐ 其他統計數據仍然使用前端計算（因為後端 API 可能沒有提供）
+    // ⭐ 統計數據全部使用前端計算
     let workDays = 0;
     let abnormalCount = 0;
     let normalDays = 0;
@@ -1044,38 +1013,6 @@ async function updateMonthlyStats(records) {
     if (overtimeHoursEl) {
         overtimeHoursEl.textContent = totalOvertimeHours > 0 ? totalOvertimeHours.toFixed(1) : '0';
     }
-}
-
-/**
- * 降級方案：前端計算工時（當後端 API 失敗時使用）
- */
-function calculateFrontendWorkHours(records, totalHoursEl) {
-    let totalHours = 0;
-    
-    records.forEach(record => {
-        const punchIn = record.record ? record.record.find(r => r.type === '上班') : null;
-        const punchOut = record.record ? record.record.find(r => r.type === '下班') : null;
-        
-        if (punchIn && punchOut) {
-            try {
-                const inTime = new Date(`${record.date} ${punchIn.time}`);
-                const outTime = new Date(`${record.date} ${punchOut.time}`);
-                const diffMs = outTime - inTime;
-                const totalHoursRaw = diffMs / (1000 * 60 * 60);
-                
-                if (totalHoursRaw > 0) {
-                    const lunchBreak = 1;
-                    const netHours = totalHoursRaw - lunchBreak;
-                    totalHours += netHours;
-                }
-            } catch (e) {
-                console.error('計算工時失敗:', e);
-            }
-        }
-    });
-    
-    totalHoursEl.textContent = totalHours > 0 ? totalHours.toFixed(1) : '0';
-    console.log('⚠️ 使用前端降級計算:', totalHours.toFixed(1), '小時');
 }
 
 async function submitAdjustPunch(date, type, note) {
@@ -2324,7 +2261,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     logoutBtn.onclick = () => {
         localStorage.removeItem("sessionToken");
-        window.location.href = "/check_manager_plus"
+        window.location.href = "/Allianz_check_manager"
     };
     
     /* ===== 打卡功能 ===== */
@@ -2701,10 +2638,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 👇 加入公告事件綁定
+    // 在 DOMContentLoaded 中修改
     const submitAnnouncementBtn = document.getElementById('submit-announcement-btn');
     if (submitAnnouncementBtn) {
-        submitAnnouncementBtn.addEventListener('click', () => {
+        submitAnnouncementBtn.addEventListener('click', async () => {
             const title = document.getElementById('announcement-title').value.trim();
             const content = document.getElementById('announcement-content').value.trim();
             const priority = document.getElementById('announcement-priority').value;
@@ -2714,26 +2651,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             
-            const announcements = loadAnnouncements();
-            const newAnnouncement = {
-                id: Date.now().toString(),
-                title: title,
-                content: content,
-                priority: priority,
-                createdAt: new Date().toISOString()
-            };
-            
-            announcements.unshift(newAnnouncement);
-            saveAnnouncements(announcements);
-            
-            document.getElementById('announcement-title').value = '';
-            document.getElementById('announcement-content').value = '';
-            document.getElementById('announcement-priority').value = 'normal';
-            
-            displayAdminAnnouncements();
-            displayAnnouncements();
-            
-            showNotification('公告發布成功！', 'success');
+            try {
+                const res = await callApifetch(
+                    `addAnnouncement&title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}&priority=${priority}`
+                );
+                
+                if (res.ok) {
+                    document.getElementById('announcement-title').value = '';
+                    document.getElementById('announcement-content').value = '';
+                    document.getElementById('announcement-priority').value = 'normal';
+                    
+                    showNotification('公告發布成功！', 'success');
+                    
+                    // 重新載入公告列表
+                    await displayAdminAnnouncements();
+                    await displayAnnouncements();
+                } else {
+                    showNotification(res.msg || '發布失敗', 'error');
+                }
+                
+            } catch (error) {
+                console.error('發布公告失敗:', error);
+                showNotification('發布失敗', 'error');
+            }
         });
     }
     displayAnnouncements();
@@ -2957,16 +2897,6 @@ function clearShiftCache() {
 }
 
 // ==================== 📢 佈告欄功能 ====================
-
-function  loadAnnouncements() {
-    const data = localStorage.getItem('announcements');
-    return data ? JSON.parse(data) : [];
-}
-
-function saveAnnouncements(announcements) {
-    localStorage.setItem('announcements', JSON.stringify(announcements));
-}
-
 function displayAnnouncements() {
     const list = document.getElementById('announcements-list');
     const empty = document.getElementById('announcements-empty');
@@ -3886,6 +3816,12 @@ function renderUsersList(users) {
                 <!-- 操作按鈕 -->
                 ${!isCurrentUser ? `
                     <div class="flex flex-wrap gap-2">
+                        <!-- 新增：編輯姓名按鈕 -->
+                        <button onclick="openEditNameDialog('${user.userId}', '${user.name}')"
+                                class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-md transition-colors">
+                            ✏️ 編輯姓名
+                        </button>
+                        
                         ${isAdmin ? `
                             <button onclick="changeUserRole('${user.userId}', '${user.name}', 'employee')"
                                     class="flex-1 min-w-[120px] px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-md transition-colors">
@@ -3906,6 +3842,7 @@ function renderUsersList(users) {
                 ` : `
                     <span class="text-xs text-gray-500 dark:text-gray-400">無法操作自己</span>
                 `}
+
             </div>
         </div>
         `;
@@ -4025,5 +3962,259 @@ async function deleteUser(userId, userName) {
     } catch (error) {
         console.error('刪除用戶失敗:', error);
         showNotification('刪除失敗，請稍後再試', 'error');
+    }
+}
+
+// ==================== 編輯員工姓名功能 ====================
+
+/**
+ * 打開編輯姓名對話框
+ */
+function openEditNameDialog(userId, currentName) {
+    const dialog = document.createElement('div');
+    dialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    dialog.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">
+                ✏️ 編輯員工姓名
+            </h3>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    目前姓名
+                </label>
+                <input type="text" 
+                       value="${currentName}" 
+                       disabled
+                       class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600 text-gray-500 dark:text-gray-400">
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    新姓名 <span class="text-red-500">*</span>
+                </label>
+                <input type="text" 
+                       id="new-name-input"
+                       placeholder="請輸入新姓名（至少 2 個字）"
+                       maxlength="50"
+                       class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    ℹ️ 修改後將立即生效
+                </p>
+            </div>
+            
+            <div class="flex space-x-3">
+                <button onclick="closeEditNameDialog()"
+                        class="flex-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg font-semibold transition-colors">
+                    取消
+                </button>
+                <button onclick="saveNewName('${userId}')"
+                        class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
+                    確認修改
+                </button>
+            </div>
+        </div>
+    `;
+    
+    dialog.id = 'edit-name-dialog';
+    document.body.appendChild(dialog);
+    
+    // 自動聚焦輸入框
+    setTimeout(() => {
+        document.getElementById('new-name-input').focus();
+    }, 100);
+    
+    // 按 Enter 提交
+    document.getElementById('new-name-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            saveNewName(userId);
+        }
+    });
+    
+    // 點擊背景關閉
+    dialog.addEventListener('click', (e) => {
+        if (e.target === dialog) {
+            closeEditNameDialog();
+        }
+    });
+}
+
+/**
+ * 關閉編輯姓名對話框
+ */
+function closeEditNameDialog() {
+    const dialog = document.getElementById('edit-name-dialog');
+    if (dialog) {
+        dialog.remove();
+    }
+}
+
+/**
+ * 儲存新姓名
+ */
+async function saveNewName(userId) {
+    const input = document.getElementById('new-name-input');
+    const newName = input.value.trim();
+    
+    // 驗證
+    if (!newName) {
+        showNotification('請輸入新姓名', 'error');
+        input.focus();
+        return;
+    }
+    
+    if (newName.length < 2) {
+        showNotification('姓名至少需要 2 個字', 'error');
+        input.focus();
+        return;
+    }
+    
+    if (newName.length > 50) {
+        showNotification('姓名不能超過 50 個字', 'error');
+        input.focus();
+        return;
+    }
+    
+    try {
+        showNotification('更新中...', 'info');
+        
+        const res = await callApifetch(
+            `updateEmployeeName&userId=${encodeURIComponent(userId)}&newName=${encodeURIComponent(newName)}`
+        );
+        
+        if (res.ok) {
+            showNotification(`✅ 姓名已更新為「${res.newName}」`, 'success');
+            
+            // 關閉對話框
+            closeEditNameDialog();
+            
+            // 重新載入用戶列表
+            await loadAllUsers();
+        } else {
+            showNotification(res.msg || '更新失敗', 'error');
+        }
+        
+    } catch (error) {
+        console.error('更新姓名失敗:', error);
+        showNotification('更新失敗，請稍後再試', 'error');
+    }
+}
+
+// ==================== 📢 佈告欄功能 (改用後端) ====================
+
+/**
+ * 載入公告 (從後端)
+ */
+async function loadAnnouncements() {
+    try {
+        const res = await callApifetch('getAnnouncements');
+        
+        if (res.ok) {
+            return res.announcements || [];
+        }
+        
+        return [];
+        
+    } catch (error) {
+        console.error('載入公告失敗:', error);
+        return [];
+    }
+}
+
+/**
+ * 顯示公告 (儀表板)
+ */
+async function displayAnnouncements() {
+    const list = document.getElementById('announcements-list');
+    const empty = document.getElementById('announcements-empty');
+    
+    if (!list) return;
+    
+    const announcements = await loadAnnouncements();
+    const displayAnnouncements = announcements.slice(0, 3); // 只顯示前 3 筆
+    
+    if (displayAnnouncements.length === 0) {
+        if (empty) empty.style.display = 'block';
+        list.innerHTML = '';
+        return;
+    }
+    
+    if (empty) empty.style.display = 'none';
+    list.innerHTML = '';
+    
+    displayAnnouncements.forEach(a => {
+        const icon = a.priority === 'high' ? '🔴' : a.priority === 'medium' ? '🟡' : '🔵';
+        const div = document.createElement('div');
+        div.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 mb-3';
+        div.innerHTML = `
+            <div class="flex items-start justify-between mb-2">
+                <h3 class="font-bold text-gray-800 dark:text-white">${icon} ${a.title}</h3>
+                <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleDateString()}</span>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-300">${a.content}</p>
+        `;
+        list.appendChild(div);
+    });
+}
+
+/**
+ * 顯示管理員公告列表
+ */
+async function displayAdminAnnouncements() {
+    const list = document.getElementById('admin-announcements-list');
+    if (!list) return;
+    
+    const announcements = await loadAnnouncements();
+    list.innerHTML = '';
+    
+    if (announcements.length === 0) {
+        list.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">目前沒有公告</p>';
+        return;
+    }
+    
+    announcements.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
+        div.innerHTML = `
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <h3 class="font-bold text-gray-800 dark:text-white mb-1">${a.title}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">${a.content}</p>
+                    <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleString()}</span>
+                </div>
+                <button class="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded ml-4" 
+                        data-i18n="BTN_DELETE"
+                        onclick="deleteAnnouncement('${a.id}')">
+                    刪除
+                </button>
+            </div>
+        `;
+        list.appendChild(div);
+        renderTranslations(div);
+    });
+}
+
+/**
+ * 刪除公告
+ */
+async function deleteAnnouncement(id) {
+    if (!confirm(t('DELETE_ANNOUNCEMENT_CONFIRM') || '確定要刪除此公告嗎？')) {
+        return;
+    }
+    
+    try {
+        const res = await callApifetch(`deleteAnnouncement&id=${id}`);
+        
+        if (res.ok) {
+            showNotification(t('ANNOUNCEMENT_DELETED') || '公告已刪除', 'success');
+            displayAdminAnnouncements();
+            displayAnnouncements();
+        } else {
+            showNotification(res.msg || '刪除失敗', 'error');
+        }
+        
+    } catch (error) {
+        console.error('刪除公告失敗:', error);
+        showNotification('刪除失敗', 'error');
     }
 }

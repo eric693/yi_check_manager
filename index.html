@@ -2,15 +2,15 @@
 <html lang="zh-Hant">
     <head>
         <meta charset="UTF-8">
-        <link rel="icon" href="/check_manager_plus/0rigin.svg" type="image/x-icon">
+        <link rel="icon" href="/Ting_check_manager/0rigin.svg" type="image/x-icon">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <title data-i18n="APP_TITLE">出勤管家</title>
         
         <!-- Open Graph Meta Tags -->
         <meta property="og:title" content="出勤管家">
         <meta property="og:description" content="智能出勤打卡管理系統 - 支援排班管理、薪資計算、加班請假申請">
-        <meta property="og:image" content="https://eric693.github.io/check_manager_plus/0rigin.svg">
-        <meta property="og:url" content="https://eric693.github.io/check_manager_plus/">
+        <meta property="og:image" content="https://eric693.github.io/Ting_check_manager/0rigin.svg">
+        <meta property="og:url" content="https://eric693.github.io/Ting_check_manager/">
         <meta property="og:type" content="website">
         <meta property="og:site_name" content="出勤管家">
         <meta property="og:locale" content="zh_TW">
@@ -19,7 +19,7 @@
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="出勤管家">
         <meta name="twitter:description" content="智能出勤打卡管理系統 - 支援排班管理、薪資計算、加班請假申請">
-        <meta name="twitter:image" content="https://eric693.github.io/check_manager_plus/0rigin.svg">
+        <meta name="twitter:image" content="https://eric693.github.io/Ting_check_manager/0rigin.svg">
         
         <!-- 一般 Meta -->
         <meta name="description" content="智能出勤打卡管理系統 - 支援排班管理、薪資計算、加班請假申請">
@@ -143,7 +143,7 @@
             
             <!-- Login Section -->
             <section id="login-section" class="text-center p-8 card fade-in">
-                <img src="/check_manager_plus/0rigin.svg" alt="打卡系統橫幅圖" class="main-image">
+                <img src="/Ting_check_manager/0rigin.svg" alt="打卡系統橫幅圖" class="main-image">
                 <h1 id="appTitle" data-i18n="SUBTITLE_LOGIN" class="text-2xl font-bold text-gray-800 mb-2 dark:text-white">歡迎出勤管家</h1>
                 <p class="text-gray-600 mb-6" data-i18n="LOGIN_INFO" id="status">請點擊登入以繼續。</p>
                 <div id="login" class="space-y-4">
@@ -253,7 +253,7 @@
                             </div>
                         </div>
                         <!-- LINE 頻道快速加入按鈕 -->
-                        <a href="https://line.me/R/ti/p/@789cdyeg" 
+                        <a href="https://line.me/R/ti/p/@803oqhrs" 
                             target="_blank"
                             class="block mt-4 p-4 bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl">
                             <div class="flex items-center justify-center space-x-3">
@@ -265,7 +265,7 @@
                                         加入員工 LINE 頻道，掌握最新公告！
                                     </p>
                                     <p data-i18n="LINE_CHANNEL_ID" class="text-green-100 text-xs mt-0.5">
-                                        @789cdyeg
+                                        @803oqhrs
                                     </p>
                                 </div>
                             </div>
@@ -319,14 +319,6 @@
                         
                         <!-- 統計數據列表（四行垂直排列） -->
                         <div class="space-y-3">
-                            <!-- 總工時 -->
-                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20 rounded-lg border border-indigo-200 dark:border-indigo-700/50 transition-all hover:shadow-md">
-                                <span data-i18n="STATS_TOTAL_HOURS" class="text-sm font-medium text-gray-700 dark:text-gray-300">總工時</span>
-                                <div class="flex items-baseline">
-                                    <span id="stats-total-hours-value" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">0</span>
-                                    <span data-i18n="UNIT_HOURS" class="text-sm font-medium text-indigo-500 dark:text-indigo-400 ml-1">小時</span>
-                                </div>
-                            </div>
                             
                             <!-- 出勤天數 -->
                             <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20 rounded-lg border border-green-200 dark:border-green-700/50 transition-all hover:shadow-md">
@@ -727,10 +719,11 @@
                                     </label>
                                     <input type="datetime-local" 
                                         id="leave-start-datetime" 
+                                        step="3600"
                                         onchange="updateWorkHoursPreview()"
                                         class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
-                                
+
                                 <!-- 結束時間 -->
                                 <div>
                                     <label for="leave-end-datetime" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">
@@ -738,6 +731,7 @@
                                     </label>
                                     <input type="datetime-local" 
                                         id="leave-end-datetime" 
+                                        step="3600"
                                         onchange="updateWorkHoursPreview()"
                                         class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
@@ -1291,7 +1285,7 @@
             </div>
             <footer class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
                 <p>
-                    <span data-i18n="APP_TITLE">出勤管家</span> v4.2.7 |
+                    <span data-i18n="APP_TITLE">出勤管家</span> v4.2.9 |
                     <span class="text-gray-400 dark:text-gray-500">
                     <a data-i18n="FOOTER_CREDITS" href="https://github.com/0rigind1865-bit/Attendance-System"
                         class="hover:underline hover:text-indigo-600 dark:hover:text-indigo-400">

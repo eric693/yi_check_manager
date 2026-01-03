@@ -565,7 +565,7 @@ function displayEmployeeSalary(data) {
     safeSet('detail-meal-allowance', formatCurrency(data['伙食費'] || 0));
     safeSet('detail-transport-allowance', formatCurrency(data['交通補助'] || 0));
     safeSet('detail-attendance-bonus', formatCurrency(data['全勤獎金'] || 0));
-    safeSet('detail-performance-bonus', formatCurrency(data['績效獎金'] || 0));
+    safeSet('detail-performance-bonus', formatCurrency(data['業績獎金'] || 0));
     // safeSet('detail-weekday-overtime', formatCurrency(data['平日加班費']));
     // safeSet('detail-restday-overtime', formatCurrency(data['休息日加班費']));
     // safeSet('detail-holiday-overtime', formatCurrency(data['國定假日加班費']));
@@ -1096,7 +1096,7 @@ function displaySalaryCalculation(data, container) {
                         <span class="font-mono">${formatCurrency(data.attendanceBonus || 0)}</span>
                     </div>
                     <div class="calculation-row">
-                        <span>績效獎金</span>
+                        <span>業績獎金</span>
                         <span class="font-mono">${formatCurrency(data.performanceBonus || 0)}</span>
                     </div>
                     ${weekdayOvertimePay > 0 ? `
@@ -1178,39 +1178,72 @@ function displaySalaryCalculation(data, container) {
 }
 
 /**
- * ✅ 儲存薪資記錄
+ * ✅ 儲存薪資記錄（修正版 - 包含所有必要欄位）
  */
 async function saveSalaryRecord(data) {
     try {
         showNotification(t('SALARY_SAVING_RECORD'), 'info');
         
+        // ⭐⭐⭐ 修正：加入完整的欄位（特別是 salaryType, hourlyRate, totalWorkHours）
         const queryString = 
             `employeeId=${encodeURIComponent(data.employeeId)}` +
             `&employeeName=${encodeURIComponent(data.employeeName)}` +
             `&yearMonth=${encodeURIComponent(data.yearMonth)}` +
+            
+            // ⭐ 新增：薪資類型相關欄位
+            `&salaryType=${encodeURIComponent(data.salaryType || '月薪')}` +
+            `&hourlyRate=${encodeURIComponent(data.hourlyRate || 0)}` +
+            `&totalWorkHours=${encodeURIComponent(data.totalWorkHours || 0)}` +
+            `&totalOvertimeHours=${encodeURIComponent(data.totalOvertimeHours || 0)}` +
+            
+            // 應發項目
             `&baseSalary=${encodeURIComponent(data.baseSalary)}` +
             `&positionAllowance=${encodeURIComponent(data.positionAllowance || 0)}` +
             `&mealAllowance=${encodeURIComponent(data.mealAllowance || 0)}` +
             `&transportAllowance=${encodeURIComponent(data.transportAllowance || 0)}` +
             `&attendanceBonus=${encodeURIComponent(data.attendanceBonus || 0)}` +
             `&performanceBonus=${encodeURIComponent(data.performanceBonus || 0)}` +
+            `&otherAllowances=${encodeURIComponent(data.otherAllowances || 0)}` +
+            
+            // ⭐ 修正：加班費（三種）
             `&weekdayOvertimePay=${encodeURIComponent(data.weekdayOvertimePay || 0)}` +
             `&restdayOvertimePay=${encodeURIComponent(data.restdayOvertimePay || 0)}` +
             `&holidayOvertimePay=${encodeURIComponent(data.holidayOvertimePay || 0)}` +
+            
+            // 法定扣款
             `&laborFee=${encodeURIComponent(data.laborFee || 0)}` +
             `&healthFee=${encodeURIComponent(data.healthFee || 0)}` +
             `&employmentFee=${encodeURIComponent(data.employmentFee || 0)}` +
             `&pensionSelf=${encodeURIComponent(data.pensionSelf || 0)}` +
+            `&pensionSelfRate=${encodeURIComponent(data.pensionSelfRate || 0)}` +
             `&incomeTax=${encodeURIComponent(data.incomeTax || 0)}` +
+            
+            // 其他扣款
             `&leaveDeduction=${encodeURIComponent(data.leaveDeduction || 0)}` +
             `&welfareFee=${encodeURIComponent(data.welfareFee || 0)}` +
             `&dormitoryFee=${encodeURIComponent(data.dormitoryFee || 0)}` +
             `&groupInsurance=${encodeURIComponent(data.groupInsurance || 0)}` +
             `&otherDeductions=${encodeURIComponent(data.otherDeductions || 0)}` +
+            
+            // 總計
             `&grossSalary=${encodeURIComponent(data.grossSalary)}` +
             `&netSalary=${encodeURIComponent(data.netSalary)}` +
+            
+            // 銀行資訊
             `&bankCode=${encodeURIComponent(data.bankCode || '')}` +
-            `&bankAccount=${encodeURIComponent(data.bankAccount || '')}`;
+            `&bankAccount=${encodeURIComponent(data.bankAccount || '')}` +
+            
+            // 狀態
+            `&status=${encodeURIComponent(data.status || '已計算')}` +
+            `&note=${encodeURIComponent(data.note || '')}`;
+        
+        console.log('📤 儲存薪資記錄，包含參數:', {
+            employeeId: data.employeeId,
+            yearMonth: data.yearMonth,
+            salaryType: data.salaryType,  // ⭐ 確認有傳遞
+            hourlyRate: data.hourlyRate,
+            totalWorkHours: data.totalWorkHours
+        });
         
         const res = await callApifetch(`saveMonthlySalary&${queryString}`);
         
@@ -1218,7 +1251,6 @@ async function saveSalaryRecord(data) {
             showNotification(t('SALARY_RECORD_SAVED'), 'success');
         } else {
             showNotification(t('SALARY_SAVE_FAILED') + ': ' + (res.msg || t('UNKNOWN_ERROR')), 'error');
-
         }
         
     } catch (error) {
@@ -1410,52 +1442,48 @@ async function loadAttendanceDetails(yearMonth) {
     }
 }
 
-/**
- * ✅ 從薪資計算結果顯示工作時數（只顯示統計，不顯示明細）
- */
 function displayWorkHoursFromCalculation(data) {
     const detailsSection = document.getElementById('attendance-details-section');
     if (!detailsSection) return;
     
-    // 移除舊的工時卡片
     const oldCard = document.getElementById('work-hours-card');
     if (oldCard) oldCard.remove();
     
-    // 建立新的工時卡片
     const workHoursCard = document.createElement('div');
     workHoursCard.id = 'work-hours-card';
     workHoursCard.className = 'feature-box bg-purple-900/20 border-purple-700 mb-4';
     
-    const totalWorkHours = Math.floor(data.totalWorkHours || 0);
+    // ⭐⭐⭐ 修正：保留小數位數
+    const totalWorkHours = parseFloat(data.totalWorkHours || 0).toFixed(1);
     const hourlyRate = data.hourlyRate || 0;
     const baseSalary = data.baseSalary || 0;
     
     workHoursCard.innerHTML = `
-        <h4 class="font-semibold mb-3 text-purple-400">本月工作時數統計</h4>
-        
-        <div class="grid grid-cols-3 gap-4 mb-4">
-            <div class="text-center p-3 bg-purple-800/20 rounded-lg">
-                <p class="text-sm text-purple-300 mb-1">時薪</p>
-                <p class="text-2xl font-bold text-purple-200">$${hourlyRate}</p>
-            </div>
-            <div class="text-center p-3 bg-purple-800/20 rounded-lg">
-                <p class="text-sm text-purple-300 mb-1">總工作時數</p>
-                <p class="text-2xl font-bold text-purple-200">${totalWorkHours}h</p>
-            </div>
-            <div class="text-center p-3 bg-purple-800/20 rounded-lg">
-                <p class="text-sm text-purple-300 mb-1">基本薪資</p>
-                <p class="text-2xl font-bold text-purple-200">${formatCurrency(baseSalary)}</p>
-                <p class="text-xs text-purple-400 mt-1">(時薪 × 工時)</p>
-            </div>
+      <h4 class="font-semibold mb-3 text-purple-400">本月工作時數統計</h4>
+      
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="text-center p-3 bg-purple-800/20 rounded-lg">
+          <p class="text-sm text-purple-300 mb-1">時薪</p>
+          <p class="text-2xl font-bold text-purple-200">$${hourlyRate}</p>
         </div>
-        
-        <div class="p-3 bg-purple-800/10 rounded-lg text-sm text-purple-300">
-            💡 工作時數已包含在薪資計算中
+        <div class="text-center p-3 bg-purple-800/20 rounded-lg">
+          <p class="text-sm text-purple-300 mb-1">總工作時數</p>
+          <p class="text-2xl font-bold text-purple-200">${totalWorkHours}h</p>
         </div>
+        <div class="text-center p-3 bg-purple-800/20 rounded-lg">
+          <p class="text-sm text-purple-300 mb-1">基本薪資</p>
+          <p class="text-2xl font-bold text-purple-200">${formatCurrency(baseSalary)}</p>
+          <p class="text-xs text-purple-400 mt-1">(時薪 × 工時)</p>
+        </div>
+      </div>
+      
+      <div class="p-3 bg-purple-800/10 rounded-lg text-sm text-purple-300">
+        💡 工作時數已包含在薪資計算中
+      </div>
     `;
     
     detailsSection.insertBefore(workHoursCard, detailsSection.firstChild);
-}
+  }
 
 
 function displayOvertimeFromCalculation(data) {
@@ -1815,3 +1843,30 @@ console.log('✅ 薪資匯出功能已載入（管理員專用）');
 
 console.log('✅ 薪資管理系統（完整版 v2.0）JS 已載入');
 console.log('📋 包含：基本薪資 + 6項津貼 + 10項扣款');
+
+/**
+ * ✅ 呼叫 API：取得員工總工作時數
+ * 
+ * @param {string} yearMonth - 年月 (YYYY-MM)
+ * @returns {Promise<Object>} { ok, totalWorkHours, workDays, records }
+ */
+async function getEmployeeWorkHours(yearMonth) {
+    try {
+      console.log(`📡 呼叫 API: getEmployeeWorkHours, 年月: ${yearMonth}`);
+      
+      const res = await callApifetch(`getEmployeeWorkHours&yearMonth=${encodeURIComponent(yearMonth)}`);
+      
+      if (res.ok && res.data) {
+        console.log(`✅ 總工作時數: ${res.data.totalWorkHours}h`);
+        console.log(`📊 工作天數: ${res.data.workDays} 天`);
+        return res;
+      } else {
+        console.error('❌ 取得工作時數失敗:', res.msg);
+        return { ok: false, msg: res.msg };
+      }
+      
+    } catch (error) {
+      console.error('❌ 呼叫 API 失敗:', error);
+      return { ok: false, msg: error.toString() };
+    }
+  }
