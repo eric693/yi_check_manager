@@ -2,10 +2,10 @@
 
 const API_CONFIG = {
   // 正式環境的 API URL
-  apiUrl: "https://script.google.com/macros/s/AKfycbwIbjgqYKO1ahlU65u36FSblSC5PKIxwkC9lKRVIYvRnO7wwMc-Thm1CUAs1K5XO0jD/exec",
+  apiUrl: "https://script.google.com/macros/s/AKfycbx6UNrBPz6p85-bmTK030OgFSagVIIGvFAEqO_NyIZuawhQL1aFX_yXzvK3BhvZFQgK/exec",
   
   // 新增回呼網址
-  redirectUrl: "https://eric693.github.io/check_manager_plus/"
+  redirectUrl: "https://eric693.github.io/Dajun_check_manager/"
   // 你也可以在這裡加入其他設定，例如：
   // timeout: 5000,
   // version: 'v4.2.9'
