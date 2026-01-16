@@ -1601,6 +1601,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tabOvertimeBtn = document.getElementById('tab-overtime-btn');
     const tabLeaveBtn = document.getElementById('tab-leave-btn'); // 👈 新增請假按鈕
     const tabSalaryBtn = document.getElementById('tab-salary-btn'); // 👈 新增
+    const tabWorklogBtn = document.getElementById('tab-worklog-btn');
     const abnormalList = document.getElementById('abnormal-list');
     const adjustmentFormContainer = document.getElementById('adjustment-form-container');
     const calendarGrid = document.getElementById('calendar-grid');
@@ -1622,6 +1623,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             filterUsersList(e.target.value);
         });
     }
+
+    if (tabWorklogBtn) {
+        tabWorklogBtn.addEventListener('click', () => {
+            switchTab('worklog-view');
+            initWorklogTab();
+        });
+    }
+
     let pendingRequests = []; // 新增：用於快取待審核的請求
     
     // 全域變數，用於儲存地圖實例
@@ -2062,10 +2071,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // UI切換邏輯
     const switchTab = (tabId) => {
         // 修改這一行，加入 'shift-view'
-        const tabs = ['dashboard-view', 'monthly-view', 'location-view', 'shift-view', 'admin-view', 'overtime-view', 'leave-view', 'salary-view'];
+        const tabs = ['dashboard-view', 'monthly-view', 'location-view', 'shift-view', 'admin-view', 'overtime-view', 'leave-view', 'salary-view', 'worklog-view'];
         
         // 修改這一行，加入 'tab-shift-btn'
-        const btns = ['tab-dashboard-btn', 'tab-monthly-btn', 'tab-location-btn', 'tab-shift-btn', 'tab-admin-btn', 'tab-overtime-btn', 'tab-leave-btn', 'tab-salary-btn'];
+        const btns = ['tab-dashboard-btn', 'tab-monthly-btn', 'tab-location-btn', 'tab-shift-btn', 'tab-admin-btn', 'tab-overtime-btn', 'tab-leave-btn', 'tab-salary-btn', 'tab-worklog-btn'];
     
         // 1. 移除舊的 active 類別和 CSS 屬性
         tabs.forEach(id => {
@@ -2108,6 +2117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (tabId === 'admin-view') {
             fetchAndRenderReviewRequests();
             loadPendingOvertimeRequests();
+            loadPendingWorklogs();  // 
             loadPendingLeaveRequests();
             displayAdminAnnouncements();
             initAdminAnalysis();
@@ -2118,6 +2128,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             initLeaveTab();
         } else if (tabId === 'salary-view') { // 👈 新增
             initSalaryTab();
+        } else if (tabId === 'worklog-view') { // 👈 新增
+            initWorklogTab();
         }
         
     };
@@ -2979,14 +2991,41 @@ let punchTimeChart = null;
 async function initAdminAnalysis() {
     await loadEmployeeListForAnalysis();
     
+    // 👇 新增：為工作日誌匯出載入員工列表
+    const worklogExportSelect = document.getElementById('worklog-export-employee');
+    if (worklogExportSelect) {
+        try {
+            const res = await callApifetch('getAllUsers');
+            
+            if (res.ok && res.users) {
+                worklogExportSelect.innerHTML = '<option value="">請選擇員工</option>';
+                
+                res.users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.userId;
+                    option.textContent = `${user.name} (${user.dept || '未分類'})`;
+                    worklogExportSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('載入員工列表失敗:', error);
+        }
+    }
+    
+    // 設定預設月份
     const now = new Date();
     const defaultMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    
     const monthInput = document.getElementById('analysis-month');
     if (monthInput) {
         monthInput.value = defaultMonth;
     }
+    
+    const worklogMonthInput = document.getElementById('worklog-export-month');
+    if (worklogMonthInput) {
+        worklogMonthInput.value = defaultMonth;
+    }
 }
-
 /**
  * 載入員工列表到下拉選單
  */

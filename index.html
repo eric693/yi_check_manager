@@ -166,6 +166,12 @@
                     <!-- 👇 請假按鈕 -->
                     <button id="tab-leave-btn" data-i18n="TAB_LEAVE" class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200 dark:text-gray-300 dark:bg-gray-700">請假</button>
                     <button id="tab-admin-btn" data-i18n="TAB_ADMIN" class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200 dark:text-gray-300 dark:bg-gray-700" style="display: none;">管理員</button>
+                
+                    <button id="tab-worklog-btn" data-i18n="TAB_WORKLOG" 
+                            class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200 dark:text-gray-300 dark:bg-gray-700">
+                        工作日誌
+                    </button>
+
                 </div>
                 
                 <!-- Dashboard View -->
@@ -861,6 +867,107 @@
                         </div>
                     </div>
                 </section>
+
+                <section id="worklog-view" class="space-y-6" style="display: none;">
+    
+                    <!-- 工作日誌填寫表單 -->
+                    <div class="card p-6" id="worklog-form-container">
+                        <h2 data-i18n="WORKLOG_TITLE" 
+                            class="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                            📝 工作日誌
+                        </h2>
+                        <p data-i18n="WORKLOG_DESCRIPTION" 
+                           class="text-gray-500 dark:text-gray-400 mb-4">
+                            記錄每日工作內容與工時，提交後由主管審核
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <!-- 工作日期 -->
+                            <div>
+                                <label data-i18n="WORKLOG_DATE_LABEL" 
+                                       for="worklog-date" 
+                                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    工作日期 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" 
+                                       id="worklog-date" 
+                                       class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            
+                            <!-- 工作時數 -->
+                            <div>
+                                <label data-i18n="WORKLOG_HOURS_LABEL" 
+                                       for="worklog-hours" 
+                                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    工作時數 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="number" 
+                                       id="worklog-hours" 
+                                       step="0.5" 
+                                       min="0.5" 
+                                       max="24"
+                                       placeholder="8.0" 
+                                       class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    <span data-i18n="WORKLOG_HOURS_HINT">可輸入小數，例如：8.5 小時</span>
+                                </p>
+                            </div>
+                            
+                            <!-- 工作內容 -->
+                            <div>
+                                <label data-i18n="WORKLOG_CONTENT_LABEL" 
+                                       for="worklog-content" 
+                                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    工作內容 <span class="text-red-500">*</span>
+                                </label>
+                                <textarea id="worklog-content" 
+                                          rows="6" 
+                                          placeholder="請詳細描述今日工作內容...&#10;例如：&#10;1. 完成客戶 A 專案需求分析&#10;2. 與團隊討論下週開發計畫&#10;3. 撰寫技術文件..."
+                                          class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    <span data-i18n="WORKLOG_CONTENT_HINT">請至少填寫 10 個字</span>
+                                </p>
+                            </div>
+                            
+                            <!-- 提交按鈕 -->
+                            <button id="submit-worklog-btn" 
+                                    data-i18n="BTN_SUBMIT_WORKLOG"
+                                    class="w-full py-3 px-4 rounded-lg font-bold btn-primary">
+                                提交工作日誌
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 我的工作日誌記錄 -->
+                    <div class="card p-6">
+                        <h2 data-i18n="WORKLOG_RECORDS_TITLE" 
+                            class="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                            📋 我的工作日誌
+                        </h2>
+                        <p data-i18n="WORKLOG_RECORDS_DESCRIPTION" 
+                           class="text-gray-500 dark:text-gray-400 mb-4">
+                            查看已提交的工作日誌與審核狀態
+                        </p>
+                        
+                        <div id="worklog-records-container">
+                            <div id="worklog-records-loading" 
+                                 data-i18n="RECORDS_LOADING" 
+                                 class="text-center text-gray-500 dark:text-gray-400 py-4">
+                                正在載入記錄...
+                            </div>
+                            <div id="worklog-records-empty" 
+                                 class="text-center text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg" 
+                                 style="display: none;">
+                                <p data-i18n="WORKLOG_NO_RECORDS" 
+                                   class="font-semibold">
+                                    目前沒有工作日誌記錄
+                                </p>
+                            </div>
+                            <ul id="worklog-records-list" class="space-y-3"></ul>
+                        </div>
+                    </div>
+                    
+                </section>
                 <!-- Admin View -->
                 <section id="admin-view" class="space-y-6" style="display: none;">
                     <!-- 📢 公告管理 -->
@@ -1273,6 +1380,82 @@
                             </p>
                         </div>
                     </div>
+
+                    <!-- 管理員頁面中加入工作日誌審核區塊 -->
+                    <div class="card p-6 mt-6">
+                        <h2 data-i18n="WORKLOG_PENDING_TITLE" 
+                            class="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                            📝 待審核工作日誌
+                        </h2>
+                        <p data-i18n="WORKLOG_PENDING_DESCRIPTION" 
+                        class="text-gray-500 dark:text-gray-400 mb-4">
+                            審核員工提交的工作日誌
+                        </p>
+                        
+                        <div id="pending-worklog-container">
+                            <div id="worklog-requests-loading" 
+                                data-i18n="REQUESTS_LOADING" 
+                                class="text-center text-gray-500 dark:text-gray-400 py-4">
+                                正在載入請求...
+                            </div>
+                            <div id="worklog-requests-empty" 
+                                class="text-center text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 p-4 rounded-lg" 
+                                style="display: none;">
+                                <p data-i18n="WORKLOG_NO_PENDING" 
+                                class="font-semibold">
+                                    太棒了！目前沒有待審核的工作日誌。
+                                </p>
+                            </div>
+                            <ul id="pending-worklog-list" class="space-y-3"></ul>
+                        </div>
+                    </div>
+
+                    <!-- 管理員匯出工作日誌報表 -->
+                    <div class="card p-6 mt-6">
+                        <h2 data-i18n="WORKLOG_EXPORT_TITLE" 
+                            class="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                            匯出工作日誌報表
+                        </h2>
+                        <p data-i18n="WORKLOG_EXPORT_DESCRIPTION" 
+                        class="text-gray-500 dark:text-gray-400 mb-4">
+                            匯出員工的工作日誌為 Excel 或 PDF 格式
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <!-- 選擇員工 -->
+                            <div>
+                                <label data-i18n="SELECT_EMPLOYEE_LABEL" 
+                                    for="worklog-export-employee" 
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    選擇員工
+                                </label>
+                                <select id="worklog-export-employee" 
+                                        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="">請選擇員工</option>
+                                </select>
+                            </div>
+                            
+                            <!-- 選擇月份 -->
+                            <div>
+                                <label data-i18n="SELECT_MONTH_LABEL" 
+                                    for="worklog-export-month" 
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    選擇月份
+                                </label>
+                                <input type="month" 
+                                    id="worklog-export-month" 
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            
+                            <!-- 匯出按鈕 -->
+                            <button id="export-worklog-btn" 
+                                    onclick="exportWorklogReport()"
+                                    data-i18n="BTN_EXPORT_WORKLOG"
+                                    class="w-full py-3 px-4 rounded-lg font-bold btn-primary">
+                                匯出工作日誌報表
+                            </button>
+                        </div>
+                    </div>
                     <div class="card p-6 mt-6">
                         <h2 data-i18n="API_TEST_TITLE" class="text-xl font-bold text-gray-800 dark:text-white mb-2">API 測試區</h2>
                         <p data-i18n="API_TEST_DESCRIPTION" class="text-gray-500 dark:text-gray-400 mb-4">點擊下方按鈕以測試新的 API 功能。</p>
@@ -1309,5 +1492,7 @@
         <script src="overtime.js"></script>
         <script src="leave.js"></script>
         <script src="salary.js"></script>
+        <script src="worklog.js"></script>
+        
     </body>
 </html>
