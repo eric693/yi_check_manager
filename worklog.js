@@ -138,6 +138,8 @@ async function loadWorklogRecords() {
     }
 }
 
+// worklog.js - 修正時間顯示
+
 /**
  * 渲染工作日誌記錄
  */
@@ -156,6 +158,25 @@ function renderWorklogRecords(worklogs) {
         const li = document.createElement('li');
         li.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
         
+        // ⭐⭐⭐ 修正：格式化提交時間
+        let submittedTimeStr = '';
+        if (log.submittedAt) {
+            try {
+                const submittedDate = new Date(log.submittedAt);
+                // 轉換成台灣時區格式
+                submittedTimeStr = submittedDate.toLocaleString('zh-TW', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch (e) {
+                submittedTimeStr = log.submittedAt;
+            }
+        }
+        
         // 狀態樣式
         let statusClass = '';
         let statusText = '';
@@ -165,7 +186,7 @@ function renderWorklogRecords(worklogs) {
         switch(log.status) {
             case 'PENDING':
                 statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-                statusText = t('STATUS_PENDING') || '待審核';
+                statusText = t('STATUS_PENDING') || '待審核';  // ⭐ 使用翻譯函數
                 statusIcon = '⏳';
                 actionButtons = `
                     <button onclick="editWorklog('${log.id}')" 
@@ -180,12 +201,12 @@ function renderWorklogRecords(worklogs) {
                 break;
             case 'APPROVED':
                 statusClass = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-                statusText = t('STATUS_APPROVED') || '已核准';
+                statusText = t('STATUS_APPROVED') || '已核准';  // ⭐ 使用翻譯函數
                 statusIcon = '✅';
                 break;
             case 'REJECTED':
                 statusClass = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-                statusText = t('STATUS_REJECTED') || '已拒絕';
+                statusText = t('STATUS_REJECTED') || '已拒絕';  // ⭐ 使用翻譯函數
                 statusIcon = '❌';
                 actionButtons = `
                     <button onclick="editWorklog('${log.id}')" 
@@ -207,7 +228,7 @@ function renderWorklogRecords(worklogs) {
                     </div>
                     <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                         <span>⏱️ ${log.hours} ${t('UNIT_HOURS') || '小時'}</span>
-                        ${log.submittedAt ? `<span>📅 ${new Date(log.submittedAt).toLocaleString()}</span>` : ''}
+                        ${submittedTimeStr ? `<span>📅 ${submittedTimeStr}</span>` : ''}
                     </div>
                 </div>
             </div>
@@ -404,6 +425,24 @@ function renderPendingWorklogs(worklogs) {
         const li = document.createElement('li');
         li.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
         
+        // ⭐⭐⭐ 修正：格式化提交時間
+        let submittedTimeStr = '';
+        if (log.submittedAt) {
+            try {
+                const submittedDate = new Date(log.submittedAt);
+                submittedTimeStr = submittedDate.toLocaleString('zh-TW', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch (e) {
+                submittedTimeStr = log.submittedAt;
+            }
+        }
+        
         li.innerHTML = `
             <div class="flex justify-between items-start mb-3">
                 <div class="flex-1">
@@ -416,6 +455,7 @@ function renderPendingWorklogs(worklogs) {
                     <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                         <span>📅 ${log.date}</span>
                         <span>⏱️ ${log.hours} ${t('UNIT_HOURS') || '小時'}</span>
+                        ${submittedTimeStr ? `<span>🕐 ${submittedTimeStr}</span>` : ''}
                     </div>
                 </div>
             </div>
@@ -452,7 +492,6 @@ function renderPendingWorklogs(worklogs) {
         listEl.appendChild(li);
     });
 }
-
 /**
  * 核准工作日誌
  */
