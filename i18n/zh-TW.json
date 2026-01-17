@@ -759,5 +759,13 @@
   "OPTIONAL": "選填",
   "REVIEW_COMMENT_PLACEHOLDER": "填寫審核意見（選填）...",
   "SELECT_EMPLOYEE_FIRST": "請先選擇員工",
-  "SELECT_MONTH_FIRST": "請先選擇月份"
+  "SELECT_MONTH_FIRST": "請先選擇月份",
+  "_comment_status": "=== 工作日誌狀態 ===",
+  "STATUS_PENDING": "待審核",
+  "STATUS_APPROVED": "已核准",
+  "STATUS_REJECTED": "已拒絕",
+  "_comment_common": "=== 通用按鈕與標籤 ===",
+  "DELETE_FAILED": "刪除失敗",
+  "LOAD_FAILED": "載入失敗"
+
 }
