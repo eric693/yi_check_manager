@@ -196,6 +196,12 @@ function renderWorklogRecords(worklogs) {
             }
         }
         
+        // 如果 t() 函數不存在或回傳 undefined，使用預設值
+        const safeTranslate = (key, fallback) => {
+            if (typeof t !== 'function') return fallback;
+            const result = t(key);
+            return (result && result !== key) ? result : fallback;
+        };
         // ⭐ 關鍵修正：在 switch 之前就取得所有翻譯文字
         const unitHours = t('UNIT_HOURS') || '小時';
         const btnEdit = t('BTN_EDIT') || '編輯';
@@ -617,9 +623,8 @@ async function rejectWorklog(logId) {
         showNotification('網路錯誤', 'error');
     }
 }
-
 /**
- * 匯出工作日誌報表（PDF）
+ * 匯出工作日誌報表（支援全部員工）
  */
 async function exportWorklogReport() {
     const employeeSelect = document.getElementById('worklog-export-employee');
@@ -632,16 +637,16 @@ async function exportWorklogReport() {
     const yearMonth = monthInput.value;
     
     if (!employeeId) {
-        showNotification(t('SELECT_EMPLOYEE_FIRST') || '請先選擇員工', 'error');
+        showNotification('請先選擇員工', 'error');
         return;
     }
     
     if (!yearMonth) {
-        showNotification(t('SELECT_MONTH_FIRST') || '請先選擇月份', 'error');
+        showNotification('請先選擇月份', 'error');
         return;
     }
     
-    const loadingText = t('EXPORT_LOADING') || '正在準備報表...';
+    const loadingText = '正在準備報表...';
     showNotification(loadingText, 'warning');
     
     if (exportBtn) {
@@ -649,23 +654,44 @@ async function exportWorklogReport() {
     }
     
     try {
-        const employeeName = employeeSelect.options[employeeSelect.selectedIndex].text.split(' (')[0];
+        let employeeName, worklogs;
         
-        const res = await callApifetch(`getWorklogReport&employeeId=${employeeId}&yearMonth=${yearMonth}`);
-        
-        if (!res.ok || !res.worklogs || res.worklogs.length === 0) {
-            showNotification(t('EXPORT_NO_DATA') || '本月沒有工作日誌', 'warning');
-            return;
+        // ⭐ 判斷是否要匯出全部員工
+        if (employeeId === 'ALL') {
+            employeeName = '全部員工';
+            
+            // 取得全部員工的工作日誌
+            const res = await callApifetch(`getAllWorklogReport&yearMonth=${yearMonth}`);
+            
+            if (!res.ok || !res.worklogs || res.worklogs.length === 0) {
+                showNotification('本月沒有任何工作日誌', 'warning');
+                return;
+            }
+            
+            worklogs = res.worklogs;
+            
+        } else {
+            // 單一員工
+            employeeName = employeeSelect.options[employeeSelect.selectedIndex].text.split(' (')[0];
+            
+            const res = await callApifetch(`getWorklogReport&employeeId=${employeeId}&yearMonth=${yearMonth}`);
+            
+            if (!res.ok || !res.worklogs || res.worklogs.length === 0) {
+                showNotification('本月沒有工作日誌', 'warning');
+                return;
+            }
+            
+            worklogs = res.worklogs;
         }
         
-        // 使用 jsPDF 生成 PDF
-        await generateWorklogPDF(employeeName, yearMonth, res.worklogs);
+        // 使用 SheetJS 生成 Excel
+        await generateWorklogExcel(employeeName, yearMonth, worklogs);
         
-        showNotification(t('EXPORT_SUCCESS') || '報表已成功匯出！', 'success');
+        showNotification('報表已成功匯出！', 'success');
         
     } catch (error) {
         console.error('匯出失敗:', error);
-        showNotification(t('EXPORT_FAILED') || '匯出失敗，請稍後再試', 'error');
+        showNotification('匯出失敗，請稍後再試', 'error');
         
     } finally {
         if (exportBtn) {
@@ -675,32 +701,53 @@ async function exportWorklogReport() {
 }
 
 /**
- * 生成工作日誌 PDF
+ * 生成工作日誌 Excel（支援全部員工）
  */
-async function generateWorklogPDF(employeeName, yearMonth, worklogs) {
-    // 這裡需要引入 jsPDF 庫
-    // 由於系統限制,這裡提供基本框架
-    // 實際使用時需要在 HTML 中引入 jsPDF
-    
+async function generateWorklogExcel(employeeName, yearMonth, worklogs) {
     const [year, month] = yearMonth.split('-');
     
-    // 如果有 jsPDF，可以這樣使用：
-    // const { jsPDF } = window.jspdf;
-    // const doc = new jsPDF();
+    // ⭐ 根據是否為全部員工，調整欄位
+    const isAllEmployees = (employeeName === '全部員工');
     
-    // 或者先使用 Excel 格式作為替代
-    const exportData = worklogs.map(log => ({
-        '日期': log.date,
-        '工作時數': log.hours,
-        '工作內容': log.content,
-        '狀態': getStatusText(log.status),
-        '審核意見': log.reviewComment || '-',
-        '提交時間': log.submittedAt ? new Date(log.submittedAt).toLocaleString() : '-'
-    }));
+    let exportData;
+    
+    if (isAllEmployees) {
+        // 全部員工：包含員工姓名欄位
+        exportData = worklogs.map(log => ({
+            '員工姓名': log.userName || '未知',
+            '部門': log.department || '未分類',
+            '日期': log.date,
+            '工作時數': log.hours,
+            '工作內容': log.content,
+            '狀態': getStatusText(log.status),
+            '審核意見': log.reviewComment || '-',
+            '提交時間': log.submittedAt ? new Date(log.submittedAt).toLocaleString('zh-TW') : '-'
+        }));
+    } else {
+        // 單一員工：不需要員工姓名
+        exportData = worklogs.map(log => ({
+            '日期': log.date,
+            '工作時數': log.hours,
+            '工作內容': log.content,
+            '狀態': getStatusText(log.status),
+            '審核意見': log.reviewComment || '-',
+            '提交時間': log.submittedAt ? new Date(log.submittedAt).toLocaleString('zh-TW') : '-'
+        }));
+    }
     
     const ws = XLSX.utils.json_to_sheet(exportData);
     
-    const wscols = [
+    // ⭐ 根據欄位數量調整寬度
+    const wscols = isAllEmployees ? [
+        { wch: 12 },  // 員工姓名
+        { wch: 12 },  // 部門
+        { wch: 12 },  // 日期
+        { wch: 10 },  // 工作時數
+        { wch: 50 },  // 工作內容
+        { wch: 12 },  // 狀態
+        { wch: 30 },  // 審核意見
+        { wch: 20 }   // 提交時間
+    ] : [
         { wch: 12 },  // 日期
         { wch: 10 },  // 工作時數
         { wch: 50 },  // 工作內容
@@ -708,6 +755,7 @@ async function generateWorklogPDF(employeeName, yearMonth, worklogs) {
         { wch: 30 },  // 審核意見
         { wch: 20 }   // 提交時間
     ];
+    
     ws['!cols'] = wscols;
     
     const wb = XLSX.utils.book_new();
@@ -716,7 +764,6 @@ async function generateWorklogPDF(employeeName, yearMonth, worklogs) {
     const fileName = `${employeeName}_${year}年${month}月_工作日誌.xlsx`;
     XLSX.writeFile(wb, fileName);
 }
-
 /**
  * 獲取狀態文字
  */
