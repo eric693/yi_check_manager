@@ -602,53 +602,150 @@ function displayEmployeeSalary(data) {
     safeSet('detail-income-tax', formatCurrency(data['所得稅']));
     safeSet('detail-leave-deduction', formatCurrency(data['請假扣款']));
     
-    // ⭐⭐⭐ 新增：顯示病假/事假明細
-    const sickLeaveDays = parseFloat(data['病假天數']) || 0;
-    const sickLeaveDeduction = parseFloat(data['病假扣款']) || 0;
-    const personalLeaveDays = parseFloat(data['事假天數']) || 0;
-    const personalLeaveDeduction = parseFloat(data['事假扣款']) || 0;
+    // ⭐⭐⭐ 修正：兼容兩種格式（camelCase 和中文欄位）
+    const sickLeaveDays = parseFloat(
+        data.sickLeaveDays !== undefined 
+            ? data.sickLeaveDays 
+            : data['病假天數']
+    ) || 0;
+
+    const sickLeaveDeduction = parseFloat(
+        data.sickLeaveDeduction !== undefined 
+            ? data.sickLeaveDeduction 
+            : data['病假扣款']
+    ) || 0;
+
+    const personalLeaveDays = parseFloat(
+        data.personalLeaveDays !== undefined 
+            ? data.personalLeaveDays 
+            : data['事假天數']
+    ) || 0;
+
+    const personalLeaveDeduction = parseFloat(
+        data.personalLeaveDeduction !== undefined 
+            ? data.personalLeaveDeduction 
+            : data['事假扣款']
+    ) || 0;
+
+    console.log('🔍 請假資料檢查:');
+    console.log('   病假天數:', sickLeaveDays);
+    console.log('   病假扣款:', sickLeaveDeduction);
+    console.log('   事假天數:', personalLeaveDays);
+    console.log('   事假扣款:', personalLeaveDeduction);
 
     // 找到請假扣款的顯示元素
     const leaveDeductionEl = document.getElementById('detail-leave-deduction');
-    if (leaveDeductionEl && leaveDeductionEl.parentElement) {
-    // 移除舊的明細（如果存在）
-    const oldLeaveDetails = leaveDeductionEl.parentElement.querySelector('.leave-details');
-    if (oldLeaveDetails) {
-        oldLeaveDetails.remove();
+
+    if (leaveDeductionEl) {
+        // ⭐ 修正：使用更準確的父容器選擇
+        let container = leaveDeductionEl.closest('.space-y-2');
+        
+        if (!container) {
+            // 備用方案：使用 parentElement
+            container = leaveDeductionEl.parentElement;
+        }
+        
+        if (container) {
+            // 移除舊的明細（如果存在）
+            const oldLeaveDetails = container.querySelector('.leave-details');
+            if (oldLeaveDetails) {
+                oldLeaveDetails.remove();
+            }
+            
+            // ⭐ 如果有請假記錄，顯示明細
+            if (sickLeaveDays > 0 || personalLeaveDays > 0) {
+                const leaveDetails = document.createElement('div');
+                leaveDetails.className = 'leave-details p-2 bg-yellow-900/20 rounded-lg mt-2 mb-2 border border-yellow-700/30';
+                
+                let detailsHTML = '<div class="text-xs space-y-1">';
+                
+                if (sickLeaveDays > 0) {
+                    detailsHTML += `
+                        <div class="flex justify-between">
+                            <span class="text-yellow-300">🤒 病假 ${sickLeaveDays} 天 (半薪)</span>
+                            <span class="font-mono text-yellow-200 font-bold">${formatCurrency(sickLeaveDeduction)}</span>
+                        </div>
+                    `;
+                }
+                
+                if (personalLeaveDays > 0) {
+                    detailsHTML += `
+                        <div class="flex justify-between">
+                            <span class="text-yellow-300">📝 事假 ${personalLeaveDays} 天 (全薪)</span>
+                            <span class="font-mono text-yellow-200 font-bold">${formatCurrency(personalLeaveDeduction)}</span>
+                        </div>
+                    `;
+                }
+                
+                detailsHTML += '</div>';
+                leaveDetails.innerHTML = detailsHTML;
+                
+                // ⭐ 修正：插入到請假扣款項目的下一行
+                const leaveDeductionRow = leaveDeductionEl.closest('.flex');
+                if (leaveDeductionRow && leaveDeductionRow.nextSibling) {
+                    leaveDeductionRow.parentNode.insertBefore(leaveDetails, leaveDeductionRow.nextSibling);
+                } else {
+                    // 備用方案：添加到容器末尾
+                    container.appendChild(leaveDetails);
+                }
+                
+                console.log('✅ 請假明細已顯示');
+            } else {
+                console.log('ℹ️ 本月無請假記錄');
+            }
+        } else {
+            console.warn('⚠️ 找不到父容器');
+        }
+    } else {
+        console.warn('⚠️ 找不到請假扣款元素 #detail-leave-deduction');
     }
+    // // ⭐⭐⭐ 新增：顯示病假/事假明細
+    // const sickLeaveDays = parseFloat(data['病假天數']) || 0;
+    // const sickLeaveDeduction = parseFloat(data['病假扣款']) || 0;
+    // const personalLeaveDays = parseFloat(data['事假天數']) || 0;
+    // const personalLeaveDeduction = parseFloat(data['事假扣款']) || 0;
+
+    // // 找到請假扣款的顯示元素
+    // const leaveDeductionEl = document.getElementById('detail-leave-deduction');
+    // if (leaveDeductionEl && leaveDeductionEl.parentElement) {
+    // // 移除舊的明細（如果存在）
+    // const oldLeaveDetails = leaveDeductionEl.parentElement.querySelector('.leave-details');
+    // if (oldLeaveDetails) {
+    //     oldLeaveDetails.remove();
+    // }
     
-    // 如果有請假記錄，顯示明細
-    if (sickLeaveDays > 0 || personalLeaveDays > 0) {
-        const leaveDetails = document.createElement('div');
-        leaveDetails.className = 'leave-details p-2 bg-yellow-900/20 rounded-lg mt-2 mb-2';
+    // // 如果有請假記錄，顯示明細
+    // if (sickLeaveDays > 0 || personalLeaveDays > 0) {
+    //     const leaveDetails = document.createElement('div');
+    //     leaveDetails.className = 'leave-details p-2 bg-yellow-900/20 rounded-lg mt-2 mb-2';
         
-        let detailsHTML = '<div class="text-xs space-y-1">';
+    //     let detailsHTML = '<div class="text-xs space-y-1">';
         
-        if (sickLeaveDays > 0) {
-        detailsHTML += `
-            <div class="flex justify-between">
-            <span class="text-yellow-300">病假 ${sickLeaveDays} 天 (半薪)</span>
-            <span class="font-mono text-yellow-200">${formatCurrency(sickLeaveDeduction)}</span>
-            </div>
-        `;
-        }
+    //     if (sickLeaveDays > 0) {
+    //     detailsHTML += `
+    //         <div class="flex justify-between">
+    //         <span class="text-yellow-300">病假 ${sickLeaveDays} 天 (半薪)</span>
+    //         <span class="font-mono text-yellow-200">${formatCurrency(sickLeaveDeduction)}</span>
+    //         </div>
+    //     `;
+    //     }
         
-        if (personalLeaveDays > 0) {
-        detailsHTML += `
-            <div class="flex justify-between">
-            <span class="text-yellow-300">事假 ${personalLeaveDays} 天 (全薪)</span>
-            <span class="font-mono text-yellow-200">${formatCurrency(personalLeaveDeduction)}</span>
-            </div>
-        `;
-        }
+    //     if (personalLeaveDays > 0) {
+    //     detailsHTML += `
+    //         <div class="flex justify-between">
+    //         <span class="text-yellow-300">事假 ${personalLeaveDays} 天 (全薪)</span>
+    //         <span class="font-mono text-yellow-200">${formatCurrency(personalLeaveDeduction)}</span>
+    //         </div>
+    //     `;
+    //     }
         
-        detailsHTML += '</div>';
-        leaveDetails.innerHTML = detailsHTML;
+    //     detailsHTML += '</div>';
+    //     leaveDetails.innerHTML = detailsHTML;
         
-        // 插入到請假扣款下方
-        leaveDeductionEl.parentElement.appendChild(leaveDetails);
-    }
-    }
+    //     // 插入到請假扣款下方
+    //     leaveDeductionEl.parentElement.appendChild(leaveDetails);
+    // }
+    // }
     const otherDeductions = 
         (parseFloat(data['福利金扣款']) || 0) +
         (parseFloat(data['宿舍費用']) || 0) +
