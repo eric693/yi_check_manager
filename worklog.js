@@ -156,13 +156,22 @@ function renderWorklogRecords(worklogs) {
         const li = document.createElement('li');
         li.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
         
-        // ⭐ 修正：格式化工作日期（只顯示日期部分）
+        // ⭐ 修正：格式化工作日期（避免時區問題）
         let workDateStr = log.date;
         if (log.date) {
             try {
-                // 如果是 ISO 格式，只取日期部分
-                if (log.date.includes('T')) {
-                    workDateStr = log.date.split('T')[0];
+                // 如果已經是 YYYY-MM-DD 格式，直接使用
+                if (/^\d{4}-\d{2}-\d{2}$/.test(log.date)) {
+                    workDateStr = log.date;
+                } 
+                // 如果是 ISO 格式（包含時間），解析後格式化為本地日期
+                else if (log.date.includes('T')) {
+                    const date = new Date(log.date);
+                    // 使用本地時區格式化日期
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    workDateStr = `${year}-${month}-${day}`;
                 }
             } catch (e) {
                 workDateStr = log.date;
@@ -442,10 +451,26 @@ function renderPendingWorklogs(worklogs) {
         const li = document.createElement('li');
         li.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
         
-        // ⭐ 格式化工作日期
+        // ⭐ 修正：格式化工作日期（避免時區問題）
         let workDateStr = log.date;
-        if (log.date && log.date.includes('T')) {
-            workDateStr = log.date.split('T')[0];
+        if (log.date) {
+            try {
+                // 如果已經是 YYYY-MM-DD 格式，直接使用
+                if (/^\d{4}-\d{2}-\d{2}$/.test(log.date)) {
+                    workDateStr = log.date;
+                } 
+                // 如果是 ISO 格式（包含時間），解析後格式化為本地日期
+                else if (log.date.includes('T')) {
+                    const date = new Date(log.date);
+                    // 使用本地時區格式化日期
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    workDateStr = `${year}-${month}-${day}`;
+                }
+            } catch (e) {
+                workDateStr = log.date;
+            }
         }
         
         // ⭐ 格式化提交時間
