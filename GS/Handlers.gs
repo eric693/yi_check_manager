@@ -2455,3 +2455,156 @@ function handleDeleteAnnouncement(params) {
     return { ok: false, msg: error.toString() };
   }
 }
+
+
+// ==================== 費用管理系統 Handler ====================
+
+function handleSubmitAdvanceApplication(params) {
+  try {
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    const result = submitAdvanceApplication({
+      parameter: {
+        userId: getUserIdFromSession(params.token),
+        date: params.date,
+        amount: params.amount,
+        purpose: params.purpose
+      }
+    });
+    
+    return result;
+  } catch (error) {
+    Logger.log('❌ handleSubmitAdvanceApplication 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+function handleSubmitReimbursement(params) {
+  try {
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    const userId = getUserIdFromSession(params.token);
+    
+    const dataStr = JSON.stringify({
+      userId: userId,
+      date: params.date,
+      summary: params.summary,
+      amount: params.amount,
+      invoiceNumber: params.invoiceNumber,
+      note: params.note,
+      invoiceImage: params.invoiceImage,
+      fileName: params.fileName
+    });
+    
+    const result = submitReimbursement({
+      parameter: { data: dataStr }
+    });
+    
+    return result;
+  } catch (error) {
+    Logger.log('❌ handleSubmitReimbursement 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+function handleGetAdvanceRecords(params) {
+  try {
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    const userId = getUserIdFromSession(params.token);
+    
+    const result = getAdvanceRecords({
+      parameter: { userId: userId }
+    });
+    
+    return result;
+  } catch (error) {
+    Logger.log('❌ handleGetAdvanceRecords 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+function handleGetReimbursementRecords(params) {
+  try {
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    const userId = getUserIdFromSession(params.token);
+    
+    const result = getReimbursementRecords({
+      parameter: { userId: userId }
+    });
+    
+    return result;
+  } catch (error) {
+    Logger.log('❌ handleGetReimbursementRecords 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+function handleReviewAdvanceApplication(params) {
+  try {
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    // 驗證管理員權限
+    const session = checkSession_(params.token);
+    if (!session.ok || session.user.dept !== '管理員') {
+      return { ok: false, msg: "需要管理員權限" };
+    }
+    
+    const reviewerId = session.user.userId;
+    
+    const result = reviewAdvanceApplication({
+      parameter: {
+        id: params.id,
+        action: params.action,
+        comment: params.comment,
+        reviewerId: reviewerId
+      }
+    });
+    
+    return result;
+  } catch (error) {
+    Logger.log('❌ handleReviewAdvanceApplication 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+function handleReviewReimbursement(params) {
+  try {
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    // 驗證管理員權限
+    const session = checkSession_(params.token);
+    if (!session.ok || session.user.dept !== '管理員') {
+      return { ok: false, msg: "需要管理員權限" };
+    }
+    
+    const reviewerId = session.user.userId;
+    
+    const result = reviewReimbursement({
+      parameter: {
+        id: params.id,
+        action: params.action,
+        comment: params.comment,
+        reviewerId: reviewerId
+      }
+    });
+    
+    return result;
+  } catch (error) {
+    Logger.log('❌ handleReviewReimbursement 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}

@@ -3,7 +3,7 @@
 // ==================== LINE 登入設定 ====================
 const LINE_CHANNEL_ID     = PropertiesService.getScriptProperties().getProperty("LINE_CHANNEL_ID");
 const LINE_CHANNEL_SECRET = PropertiesService.getScriptProperties().getProperty("LINE_CHANNEL_SECRET");
-const LINE_REDIRECT_URL   = "https://eric693.github.io/check_manager_plus/";
+const LINE_REDIRECT_URL   = "https://eric693.github.io/Dajun_check_manager/";
 
 // ==================== Session 設定 ====================
 const SESSION_TTL_MS = 7000 * 60 * 60 * 24; // 1 天
@@ -23,6 +23,15 @@ const SHEET_OVERTIME_RECORDS = '加班紀錄';
 const SHEET_LEAVE_RECORDS = '請假紀錄';
 const SHEET_LEAVE_BALANCE = '員工假期額度';
 
+// ==================== 工作表名稱（新增）====================
+// const SHEET_WORKLOG = '工作日誌';
+
+// ==================== 工作日誌狀態（新增）====================
+// const WORKLOG_STATUS = {
+//   PENDING: 'PENDING',      // 待審核
+//   APPROVED: 'APPROVED',    // 已核准
+//   REJECTED: 'REJECTED'     // 已拒絕
+// };
 // ==================== 員工資料表欄位索引 ====================
 const EMPLOYEE_COL = {
   USER_ID: 0,      // A 欄：userId

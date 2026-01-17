@@ -102,6 +102,21 @@ function doGet(e) {
       case "initializeEmployeeLeave":
         return respond1(handleInitializeEmployeeLeave(e.parameter));
       
+      // ==================== 工作日誌系統（⭐ 新增在這裡）====================
+      case "submitWorklog":
+        return respond1(handleSubmitWorklog(e.parameter));
+      case "getWorklogs":
+        return respond1(handleGetWorklogs(e.parameter));
+      case "getWorklogDetail":
+        return respond1(handleGetWorklogDetail(e.parameter));
+      case "getPendingWorklogs":
+        return respond1(handleGetPendingWorklogs(e.parameter));
+      case "reviewWorklog":
+        return respond1(handleReviewWorklog(e.parameter));
+      case "getWorklogReport":
+        return respond1(handleGetWorklogReport(e.parameter));
+      case "getAllWorklogReport":  
+        return respond1(handleGetAllWorklogReport(e.parameter));
       // ==================== 排班系統 ====================
       case "addShift":
         return respond1(handleAddShift(e.parameter));
@@ -276,6 +291,20 @@ function doGet(e) {
         return respond1(handleAddAnnouncement(e.parameter));
       case "deleteAnnouncement":
         return respond1(handleDeleteAnnouncement(e.parameter));
+      
+      // ==================== 費用管理系統 ====================
+      case "submitAdvanceApplication":
+        return respond1(handleSubmitAdvanceApplication(e.parameter));
+      case "submitReimbursement":
+        return respond1(handleSubmitReimbursement(e.parameter));
+      case "getAdvanceRecords":
+        return respond1(handleGetAdvanceRecords(e.parameter));
+      case "getReimbursementRecords":
+        return respond1(handleGetReimbursementRecords(e.parameter));
+      case "reviewAdvanceApplication":
+        return respond1(handleReviewAdvanceApplication(e.parameter));
+      case "reviewReimbursement":
+        return respond1(handleReviewReimbursement(e.parameter));
       // ==================== 測試端點 ====================
       case "initApp":
         return respond1(handleInitApp(e.parameter));

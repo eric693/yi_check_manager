@@ -3010,7 +3010,7 @@ async function initAdminAnalysis() {
                 // ⭐⭐⭐ 加入「全部員工」選項
                 const allOption = document.createElement('option');
                 allOption.value = 'ALL';
-                allOption.textContent = '📊 全部員工';
+                allOption.textContent = '全部員工';
                 worklogExportSelect.appendChild(allOption);
                 
                 // ⭐ 加入每個員工
