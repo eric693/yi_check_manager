@@ -514,7 +514,7 @@ function displayEmployeeSalary(data) {
             const workHoursSummary = document.createElement('div');
             workHoursSummary.className = 'work-hours-summary mb-3 p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg';
             
-            let summaryHTML = '<div class="text-sm font-semibold text-blue-300 mb-2">📊 本月工時統計</div>';
+            let summaryHTML = '<div class="text-sm font-semibold text-blue-300 mb-2">本月工時統計</div>';
             
             if (isHourly && totalWorkHours > 0) {
                 summaryHTML += `
@@ -603,7 +603,7 @@ function displayEmployeeSalary(data) {
                 if (sickLeaveDays > 0) {
                     detailsHTML += `
                         <div class="flex justify-between">
-                            <span class="text-yellow-300">🤒 病假 ${sickLeaveDays} 天 (半薪)</span>
+                            <span class="text-yellow-300">病假 ${sickLeaveDays} 天 (半薪)</span>
                             <span class="font-mono text-yellow-200 font-bold">${formatCurrency(sickLeaveDeduction)}</span>
                         </div>
                     `;
@@ -612,7 +612,7 @@ function displayEmployeeSalary(data) {
                 if (personalLeaveDays > 0) {
                     detailsHTML += `
                         <div class="flex justify-between">
-                            <span class="text-yellow-300">📝 事假 ${personalLeaveDays} 天 (全薪)</span>
+                            <span class="text-yellow-300">事假 ${personalLeaveDays} 天 (全薪)</span>
                             <span class="font-mono text-yellow-200 font-bold">${formatCurrency(personalLeaveDeduction)}</span>
                         </div>
                     `;
@@ -628,9 +628,9 @@ function displayEmployeeSalary(data) {
                     container.appendChild(leaveDetails);
                 }
                 
-                console.log('✅ 請假明細已顯示');
+                console.log('請假明細已顯示');
             } else {
-                console.log('ℹ️ 本月無請假記錄');
+                console.log('本月無請假記錄');
             }
         }
     }
