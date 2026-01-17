@@ -139,7 +139,7 @@ async function loadWorklogRecords() {
 }
 
 /**
- * 渲染工作日誌記錄（修正日期顯示）
+ * 渲染工作日誌記錄（修正日期顯示和翻譯）
  */
 function renderWorklogRecords(worklogs) {
     const listEl = document.getElementById('worklog-records-list');
@@ -187,6 +187,13 @@ function renderWorklogRecords(worklogs) {
             }
         }
         
+        // ⭐ 關鍵修正：在 switch 之前就取得所有翻譯文字
+        const unitHours = t('UNIT_HOURS') || '小時';
+        const btnEdit = t('BTN_EDIT') || '編輯';
+        const btnDelete = t('BTN_DELETE') || '刪除';
+        const btnResubmit = t('BTN_RESUBMIT') || '重新提交';
+        const reviewComment = t('REVIEW_COMMENT') || '審核意見';
+        
         // 狀態樣式
         let statusClass = '';
         let statusText = '';
@@ -201,11 +208,11 @@ function renderWorklogRecords(worklogs) {
                 actionButtons = `
                     <button onclick="editWorklog('${log.id}')" 
                             class="px-3 py-1.5 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors">
-                        ✏️ ${t('BTN_EDIT') || '編輯'}
+                        ✏️ ${btnEdit}
                     </button>
                     <button onclick="deleteWorklog('${log.id}')" 
                             class="px-3 py-1.5 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors">
-                        🗑️ ${t('BTN_DELETE') || '刪除'}
+                        🗑️ ${btnDelete}
                     </button>
                 `;
                 break;
@@ -221,7 +228,7 @@ function renderWorklogRecords(worklogs) {
                 actionButtons = `
                     <button onclick="editWorklog('${log.id}')" 
                             class="px-3 py-1.5 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded-md transition-colors">
-                        🔄 ${t('BTN_RESUBMIT') || '重新提交'}
+                        🔄 ${btnResubmit}
                     </button>
                 `;
                 break;
@@ -237,7 +244,7 @@ function renderWorklogRecords(worklogs) {
                         </span>
                     </div>
                     <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                        <span>⏱️ ${log.hours} ${t('UNIT_HOURS') || '小時'}</span>
+                        <span>⏱️ ${log.hours} ${unitHours}</span>
                         ${submittedTimeStr ? `<span>📅 ${submittedTimeStr}</span>` : ''}
                     </div>
                 </div>
@@ -250,7 +257,7 @@ function renderWorklogRecords(worklogs) {
             ${log.reviewComment ? `
                 <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-600 rounded p-3 mb-3">
                     <p class="text-xs font-semibold text-blue-800 dark:text-blue-300 mb-1">
-                        💬 ${t('REVIEW_COMMENT') || '審核意見'}：
+                        💬 ${reviewComment}：
                     </p>
                     <p class="text-sm text-blue-700 dark:text-blue-400">${log.reviewComment}</p>
                 </div>
@@ -266,6 +273,7 @@ function renderWorklogRecords(worklogs) {
         listEl.appendChild(li);
     });
 }
+
 /**
  * 編輯工作日誌
  */
@@ -458,6 +466,9 @@ function renderPendingWorklogs(worklogs) {
             }
         }
         
+        // ⭐ 取得翻譯文字
+        const unitHours = t('UNIT_HOURS') || '小時';
+        
         li.innerHTML = `
             <div class="flex justify-between items-start mb-3">
                 <div class="flex-1">
@@ -469,7 +480,7 @@ function renderPendingWorklogs(worklogs) {
                     </div>
                     <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                         <span>📅 ${workDateStr}</span>
-                        <span>⏱️ ${log.hours} ${t('UNIT_HOURS') || '小時'}</span>
+                        <span>⏱️ ${log.hours} ${unitHours}</span>
                         ${submittedTimeStr ? `<span>🕐 提交於 ${submittedTimeStr}</span>` : ''}
                     </div>
                 </div>
@@ -643,7 +654,7 @@ async function exportWorklogReport() {
  */
 async function generateWorklogPDF(employeeName, yearMonth, worklogs) {
     // 這裡需要引入 jsPDF 庫
-    // 由於系統限制，這裡提供基本框架
+    // 由於系統限制,這裡提供基本框架
     // 實際使用時需要在 HTML 中引入 jsPDF
     
     const [year, month] = yearMonth.split('-');
