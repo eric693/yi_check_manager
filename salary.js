@@ -71,7 +71,149 @@ async function initSalaryTab() {
     }
 }
 // ==================== 員工薪資功能 ====================
-
+/**
+ * ✅ 按月份查詢員工薪資（重新計算 + 顯示）
+ */
+async function loadEmployeeSalaryByMonth() {
+    try {
+        console.log('🔍 按月份查詢薪資');
+        
+        // 1. 取得選擇的年月
+        const yearMonthEl = document.getElementById('employee-salary-month');
+        if (!yearMonthEl) {
+            showNotification('找不到月份選擇器', 'error');
+            return;
+        }
+        
+        const yearMonth = yearMonthEl.value;
+        if (!yearMonth) {
+            showNotification('請先選擇月份', 'error');
+            return;
+        }
+        
+        console.log(`📅 查詢月份: ${yearMonth}`);
+        
+        // 2. 驗證 Session
+        const session = await callApifetch("checkSession");
+        if (!session.ok || !session.user) {
+            showNotification('請先登入', 'error');
+            return;
+        }
+        
+        const employeeId = session.user.userId;
+        console.log(`👤 員工ID: ${employeeId}`);
+        
+        // 3. 顯示載入狀態
+        const loadingEl = document.getElementById('current-salary-loading');
+        const emptyEl = document.getElementById('current-salary-empty');
+        const contentEl = document.getElementById('current-salary-content');
+        
+        if (loadingEl) loadingEl.style.display = 'block';
+        if (emptyEl) emptyEl.style.display = 'none';
+        if (contentEl) contentEl.style.display = 'none';
+        
+        // 4. 呼叫後端重新計算薪資
+        console.log('🔄 重新計算薪資（包含最新請假記錄）...');
+        showNotification('正在重新計算薪資...', 'info');
+        
+        const calcResult = await callApifetch(
+            `calculateMonthlySalary&employeeId=${encodeURIComponent(employeeId)}&yearMonth=${encodeURIComponent(yearMonth)}`
+        );
+        
+        if (!calcResult.success || !calcResult.data) {
+            throw new Error(calcResult.message || '計算失敗');
+        }
+        
+        console.log('✅ 計算完成');
+        
+        // 5. 儲存計算結果到後端
+        console.log('💾 儲存薪資記錄...');
+        
+        const saveParams = new URLSearchParams({
+            employeeId: calcResult.data.employeeId,
+            employeeName: calcResult.data.employeeName,
+            yearMonth: calcResult.data.yearMonth,
+            salaryType: calcResult.data.salaryType || '月薪',
+            hourlyRate: calcResult.data.hourlyRate || 0,
+            totalWorkHours: calcResult.data.totalWorkHours || 0,
+            totalOvertimeHours: calcResult.data.totalOvertimeHours || 0,
+            baseSalary: calcResult.data.baseSalary,
+            positionAllowance: calcResult.data.positionAllowance || 0,
+            mealAllowance: calcResult.data.mealAllowance || 0,
+            transportAllowance: calcResult.data.transportAllowance || 0,
+            attendanceBonus: calcResult.data.attendanceBonus || 0,
+            performanceBonus: calcResult.data.performanceBonus || 0,
+            otherAllowances: calcResult.data.otherAllowances || 0,
+            weekdayOvertimePay: calcResult.data.weekdayOvertimePay || 0,
+            restdayOvertimePay: calcResult.data.restdayOvertimePay || 0,
+            holidayOvertimePay: calcResult.data.holidayOvertimePay || 0,
+            laborFee: calcResult.data.laborFee || 0,
+            healthFee: calcResult.data.healthFee || 0,
+            employmentFee: calcResult.data.employmentFee || 0,
+            pensionSelf: calcResult.data.pensionSelf || 0,
+            pensionSelfRate: calcResult.data.pensionSelfRate || 0,
+            incomeTax: calcResult.data.incomeTax || 0,
+            leaveDeduction: calcResult.data.leaveDeduction || 0,
+            sickLeaveDays: calcResult.data.sickLeaveDays || 0,
+            sickLeaveDeduction: calcResult.data.sickLeaveDeduction || 0,
+            personalLeaveDays: calcResult.data.personalLeaveDays || 0,
+            personalLeaveDeduction: calcResult.data.personalLeaveDeduction || 0,
+            welfareFee: calcResult.data.welfareFee || 0,
+            dormitoryFee: calcResult.data.dormitoryFee || 0,
+            groupInsurance: calcResult.data.groupInsurance || 0,
+            otherDeductions: calcResult.data.otherDeductions || 0,
+            grossSalary: calcResult.data.grossSalary,
+            netSalary: calcResult.data.netSalary,
+            bankCode: calcResult.data.bankCode || '',
+            bankAccount: calcResult.data.bankAccount || '',
+            status: calcResult.data.status || '已計算',
+            note: calcResult.data.note || ''
+        });
+        
+        await callApifetch(`saveMonthlySalary&${saveParams.toString()}`);
+        console.log('✅ 薪資記錄已儲存');
+        
+        // 6. 顯示計算結果
+        if (loadingEl) loadingEl.style.display = 'none';
+        
+        displayEmployeeSalary(calcResult.data);
+        
+        if (contentEl) contentEl.style.display = 'block';
+        
+        // 7. 載入出勤明細（打卡、加班）
+        await loadAttendanceDetails(yearMonth);
+        
+        // 8. 重新載入薪資歷史
+        await loadSalaryHistory();
+        
+        showNotification('✅ 薪資已更新（包含最新請假記錄）', 'success');
+        
+        console.log('✅ 查詢完成');
+        
+    } catch (error) {
+        console.error('❌ 查詢失敗:', error);
+        
+        const loadingEl = document.getElementById('current-salary-loading');
+        const emptyEl = document.getElementById('current-salary-empty');
+        
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (emptyEl) {
+            emptyEl.innerHTML = `
+                <div class="empty-state-icon">⚠️</div>
+                <div class="empty-state-title">查詢失敗</div>
+                <div class="empty-state-text">
+                    <p>${error.message || '未知錯誤'}</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">
+                        請稍後再試，或聯繫管理員
+                    </p>
+                </div>
+            `;
+            emptyEl.style.display = 'block';
+        }
+        
+        showNotification('查詢失敗: ' + error.message, 'error');
+    }
+}
 /**
  * ✅ 載入當前員工的薪資（修正版 - 自動重算）
  */
@@ -545,7 +687,7 @@ function displayEmployeeSalary(data) {
             const workHoursSummary = document.createElement('div');
             workHoursSummary.className = 'work-hours-summary mb-3 p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg';
             
-            let summaryHTML = '<div class="text-sm font-semibold text-blue-300 mb-2">📊 本月工時統計</div>';
+            let summaryHTML = '<div class="text-sm font-semibold text-blue-300 mb-2">本月工時統計</div>';
             
             if (isHourly && totalWorkHours > 0) {
                 summaryHTML += `
