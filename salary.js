@@ -423,11 +423,8 @@ async function loadWorkHoursCard(yearMonth, salaryData) {
     await loadDailyWorkHours(yearMonth);
 }
 
-/**
- * ✅ 顯示薪資明細（完整版 - 支援時薪顯示 + 工時統計）
- */
 function displayEmployeeSalary(data) {
-    console.log('顯示薪資明細（完整版）:', data);
+    console.log('📊 顯示薪資明細（完整版）:', data);
     
     const safeSet = (id, value) => {
         const el = document.getElementById(id);
@@ -438,49 +435,44 @@ function displayEmployeeSalary(data) {
         }
     };
     
-    // ⭐ 判斷是否為時薪
-    const salaryType = data['薪資類型'] || '月薪';
+    // ⭐⭐⭐ 關鍵修正：改用英文欄位
+    const salaryType = data.salaryType || '月薪';
     const isHourly = salaryType === '時薪';
     
     // 應發總額與實發金額
-    safeSet('gross-salary', formatCurrency(data['應發總額']));
-    safeSet('net-salary', formatCurrency(data['實發金額']));
+    safeSet('gross-salary', formatCurrency(data.grossSalary));  // ← 改這裡
+    safeSet('net-salary', formatCurrency(data.netSalary));      // ← 改這裡
     
     // 計算扣款總額
     const deductions = 
-        (parseFloat(data['勞保費']) || 0) + 
-        (parseFloat(data['健保費']) || 0) + 
-        (parseFloat(data['就業保險費']) || 0) + 
-        (parseFloat(data['勞退自提']) || 0) + 
-        (parseFloat(data['所得稅']) || 0) +
-        (parseFloat(data['請假扣款']) || 0) +
-        (parseFloat(data['福利金扣款']) || 0) +
-        (parseFloat(data['宿舍費用']) || 0) +
-        (parseFloat(data['團保費用']) || 0) +
-        (parseFloat(data['其他扣款']) || 0);
+        (parseFloat(data.laborFee) || 0) +           // ← 改這裡
+        (parseFloat(data.healthFee) || 0) +          // ← 改這裡
+        (parseFloat(data.employmentFee) || 0) +      // ← 改這裡
+        (parseFloat(data.pensionSelf) || 0) +        // ← 改這裡
+        (parseFloat(data.incomeTax) || 0) +          // ← 改這裡
+        (parseFloat(data.leaveDeduction) || 0) +     // ← 改這裡
+        (parseFloat(data.welfareFee) || 0) +         // ← 改這裡
+        (parseFloat(data.dormitoryFee) || 0) +       // ← 改這裡
+        (parseFloat(data.groupInsurance) || 0) +     // ← 改這裡
+        (parseFloat(data.otherDeductions) || 0);     // ← 改這裡
     
     safeSet('total-deductions', formatCurrency(deductions));
     
-    // ⭐⭐⭐ 應發項目（時薪 vs 月薪顯示不同）
+    // 應發項目（全部改成英文欄位）
     if (isHourly) {
-        // 時薪顯示方式
-        const hourlyRate = parseFloat(data['時薪']) || 0;
-        const totalWorkHours = parseFloat(data['工作時數']) || 0;
-        const totalWorkHoursInt = Math.floor(totalWorkHours);
-        // 修改基本薪資的顯示文字
+        const hourlyRate = parseFloat(data.hourlyRate) || 0;
+        const totalWorkHours = parseFloat(data.totalWorkHours) || 0;
+        
         const baseSalaryLabel = document.querySelector('[for="detail-base-salary"]') || 
                                 document.querySelector('#detail-base-salary')?.previousElementSibling;
         if (baseSalaryLabel) {
             baseSalaryLabel.textContent = '基本薪資 (時薪×工時)';
         }
         
-        // 在基本薪資下方顯示時薪資訊
-        safeSet('detail-base-salary', formatCurrency(data['基本薪資']));
+        safeSet('detail-base-salary', formatCurrency(data.baseSalary));
         
-        // 可以考慮添加一個額外的顯示區域
         const baseSalaryEl = document.getElementById('detail-base-salary');
         if (baseSalaryEl && baseSalaryEl.parentElement) {
-            // 檢查是否已存在時薪資訊
             let hourlyInfo = baseSalaryEl.parentElement.querySelector('.hourly-info');
             if (!hourlyInfo) {
                 hourlyInfo = document.createElement('div');
@@ -490,10 +482,8 @@ function displayEmployeeSalary(data) {
             hourlyInfo.textContent = `時薪 $${hourlyRate} × ${Math.floor(totalWorkHours)}h`;
         }
     } else {
-        // 月薪顯示方式（原本的邏輯）
-        safeSet('detail-base-salary', formatCurrency(data['基本薪資']));
+        safeSet('detail-base-salary', formatCurrency(data.baseSalary));
         
-        // 移除時薪資訊（如果存在）
         const baseSalaryEl = document.getElementById('detail-base-salary');
         if (baseSalaryEl && baseSalaryEl.parentElement) {
             const hourlyInfo = baseSalaryEl.parentElement.querySelector('.hourly-info');
@@ -501,7 +491,6 @@ function displayEmployeeSalary(data) {
                 hourlyInfo.remove();
             }
             
-            // 恢復原本的標籤文字
             const baseSalaryLabel = document.querySelector('[for="detail-base-salary"]') || 
                                     baseSalaryEl.previousElementSibling;
             if (baseSalaryLabel) {
@@ -510,22 +499,17 @@ function displayEmployeeSalary(data) {
         }
     }
     
-    // ⭐⭐⭐ 在加班費上方加入工時統計資訊
-    const totalWorkHours = parseFloat(data['工作時數']) || 0;
-    const totalOvertimeHours = parseFloat(data['總加班時數']) || 0;
-    // ✅ 強制取整數
-    const totalWorkHoursInt = Math.floor(totalWorkHours);
-    const totalOvertimeHoursInt = Math.floor(totalOvertimeHours);
-    // 找到平日加班費的元素
+    // ⭐ 工時統計資訊
+    const totalWorkHours = parseFloat(data.totalWorkHours) || 0;
+    const totalOvertimeHours = parseFloat(data.totalOvertimeHours) || 0;
+    
     const weekdayOvertimeEl = document.getElementById('detail-weekday-overtime');
     if (weekdayOvertimeEl && weekdayOvertimeEl.parentElement) {
-        // 移除舊的工時資訊（如果存在）
         const oldWorkHoursInfo = weekdayOvertimeEl.parentElement.querySelector('.work-hours-summary');
         if (oldWorkHoursInfo) {
             oldWorkHoursInfo.remove();
         }
         
-        // 只有在有工時或加班時數時才顯示
         if (totalWorkHours > 0 || totalOvertimeHours > 0) {
             const workHoursSummary = document.createElement('div');
             workHoursSummary.className = 'work-hours-summary mb-3 p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg';
@@ -552,7 +536,6 @@ function displayEmployeeSalary(data) {
             
             workHoursSummary.innerHTML = summaryHTML;
             
-            // 插入到平日加班費之前
             weekdayOvertimeEl.parentElement.parentElement.insertBefore(
                 workHoursSummary,
                 weekdayOvertimeEl.parentElement
@@ -560,72 +543,35 @@ function displayEmployeeSalary(data) {
         }
     }
     
-    // 其他津貼（時薪和月薪都顯示）
-    safeSet('detail-position-allowance', formatCurrency(data['職務加給'] || 0));
-    safeSet('detail-meal-allowance', formatCurrency(data['伙食費'] || 0));
-    safeSet('detail-transport-allowance', formatCurrency(data['交通補助'] || 0));
-    safeSet('detail-attendance-bonus', formatCurrency(data['全勤獎金'] || 0));
-    safeSet('detail-performance-bonus', formatCurrency(data['業績獎金'] || 0));
-    // safeSet('detail-weekday-overtime', formatCurrency(data['平日加班費']));
-    // safeSet('detail-restday-overtime', formatCurrency(data['休息日加班費']));
-    // safeSet('detail-holiday-overtime', formatCurrency(data['國定假日加班費']));
-    // ⭐⭐⭐ 修正：兼容兩種格式（camelCase 和中文欄位）
-    const weekdayPay = data.weekdayOvertimePay !== undefined 
-        ? data.weekdayOvertimePay 
-        : (data['平日加班費'] || 0);
+    // 其他津貼
+    safeSet('detail-position-allowance', formatCurrency(data.positionAllowance || 0));
+    safeSet('detail-meal-allowance', formatCurrency(data.mealAllowance || 0));
+    safeSet('detail-transport-allowance', formatCurrency(data.transportAllowance || 0));
+    safeSet('detail-attendance-bonus', formatCurrency(data.attendanceBonus || 0));
+    safeSet('detail-performance-bonus', formatCurrency(data.performanceBonus || 0));
     
-    const restdayPay = data.restdayOvertimePay !== undefined 
-        ? data.restdayOvertimePay 
-        : (data['休息日加班費'] || 0);
+    // 加班費
+    safeSet('detail-weekday-overtime', formatCurrency(data.weekdayOvertimePay || 0));
+    safeSet('detail-restday-overtime', formatCurrency(data.restdayOvertimePay || 0));
+    safeSet('detail-holiday-overtime', formatCurrency(data.holidayOvertimePay || 0));
     
-    const holidayPay = data.holidayOvertimePay !== undefined 
-        ? data.holidayOvertimePay 
-        : (data['國定假日加班費'] || 0);
-    
-    console.log('🔍 加班費讀取檢查:');
-    console.log('   平日:', weekdayPay);
-    console.log('   休息日:', restdayPay);
-    console.log('   例假日:', holidayPay);
-
-    safeSet('detail-weekday-overtime', formatCurrency(weekdayPay));
-    safeSet('detail-restday-overtime', formatCurrency(restdayPay));
-    safeSet('detail-holiday-overtime', formatCurrency(holidayPay));
     // 扣款項目
-    safeSet('detail-labor-fee', formatCurrency(data['勞保費']));
-    safeSet('detail-health-fee', formatCurrency(data['健保費']));
-    safeSet('detail-employment-fee', formatCurrency(data['就業保險費']));
+    safeSet('detail-labor-fee', formatCurrency(data.laborFee));
+    safeSet('detail-health-fee', formatCurrency(data.healthFee));
+    safeSet('detail-employment-fee', formatCurrency(data.employmentFee));
     
-    const pensionRate = parseFloat(data['勞退自提率']) || 0;
+    const pensionRate = parseFloat(data.pensionSelfRate) || 0;
     safeSet('detail-pension-rate', `${pensionRate}%`);
     
-    safeSet('detail-pension-self', formatCurrency(data['勞退自提']));
-    safeSet('detail-income-tax', formatCurrency(data['所得稅']));
-    safeSet('detail-leave-deduction', formatCurrency(data['請假扣款']));
+    safeSet('detail-pension-self', formatCurrency(data.pensionSelf));
+    safeSet('detail-income-tax', formatCurrency(data.incomeTax));
+    safeSet('detail-leave-deduction', formatCurrency(data.leaveDeduction));
     
-    // ⭐⭐⭐ 修正：兼容兩種格式（camelCase 和中文欄位）
-    const sickLeaveDays = parseFloat(
-        data.sickLeaveDays !== undefined 
-            ? data.sickLeaveDays 
-            : data['病假天數']
-    ) || 0;
-
-    const sickLeaveDeduction = parseFloat(
-        data.sickLeaveDeduction !== undefined 
-            ? data.sickLeaveDeduction 
-            : data['病假扣款']
-    ) || 0;
-
-    const personalLeaveDays = parseFloat(
-        data.personalLeaveDays !== undefined 
-            ? data.personalLeaveDays 
-            : data['事假天數']
-    ) || 0;
-
-    const personalLeaveDeduction = parseFloat(
-        data.personalLeaveDeduction !== undefined 
-            ? data.personalLeaveDeduction 
-            : data['事假扣款']
-    ) || 0;
+    // ⭐⭐⭐ 修正：病假/事假明細（改用英文欄位）
+    const sickLeaveDays = parseFloat(data.sickLeaveDays) || 0;
+    const sickLeaveDeduction = parseFloat(data.sickLeaveDeduction) || 0;
+    const personalLeaveDays = parseFloat(data.personalLeaveDays) || 0;
+    const personalLeaveDeduction = parseFloat(data.personalLeaveDeduction) || 0;
 
     console.log('🔍 請假資料檢查:');
     console.log('   病假天數:', sickLeaveDays);
@@ -633,26 +579,21 @@ function displayEmployeeSalary(data) {
     console.log('   事假天數:', personalLeaveDays);
     console.log('   事假扣款:', personalLeaveDeduction);
 
-    // 找到請假扣款的顯示元素
     const leaveDeductionEl = document.getElementById('detail-leave-deduction');
 
     if (leaveDeductionEl) {
-        // ⭐ 修正：使用更準確的父容器選擇
         let container = leaveDeductionEl.closest('.space-y-2');
         
         if (!container) {
-            // 備用方案：使用 parentElement
             container = leaveDeductionEl.parentElement;
         }
         
         if (container) {
-            // 移除舊的明細（如果存在）
             const oldLeaveDetails = container.querySelector('.leave-details');
             if (oldLeaveDetails) {
                 oldLeaveDetails.remove();
             }
             
-            // ⭐ 如果有請假記錄，顯示明細
             if (sickLeaveDays > 0 || personalLeaveDays > 0) {
                 const leaveDetails = document.createElement('div');
                 leaveDetails.className = 'leave-details p-2 bg-yellow-900/20 rounded-lg mt-2 mb-2 border border-yellow-700/30';
@@ -680,12 +621,10 @@ function displayEmployeeSalary(data) {
                 detailsHTML += '</div>';
                 leaveDetails.innerHTML = detailsHTML;
                 
-                // ⭐ 修正：插入到請假扣款項目的下一行
                 const leaveDeductionRow = leaveDeductionEl.closest('.flex');
                 if (leaveDeductionRow && leaveDeductionRow.nextSibling) {
                     leaveDeductionRow.parentNode.insertBefore(leaveDetails, leaveDeductionRow.nextSibling);
                 } else {
-                    // 備用方案：添加到容器末尾
                     container.appendChild(leaveDetails);
                 }
                 
@@ -693,69 +632,19 @@ function displayEmployeeSalary(data) {
             } else {
                 console.log('ℹ️ 本月無請假記錄');
             }
-        } else {
-            console.warn('⚠️ 找不到父容器');
         }
-    } else {
-        console.warn('⚠️ 找不到請假扣款元素 #detail-leave-deduction');
     }
-    // // ⭐⭐⭐ 新增：顯示病假/事假明細
-    // const sickLeaveDays = parseFloat(data['病假天數']) || 0;
-    // const sickLeaveDeduction = parseFloat(data['病假扣款']) || 0;
-    // const personalLeaveDays = parseFloat(data['事假天數']) || 0;
-    // const personalLeaveDeduction = parseFloat(data['事假扣款']) || 0;
-
-    // // 找到請假扣款的顯示元素
-    // const leaveDeductionEl = document.getElementById('detail-leave-deduction');
-    // if (leaveDeductionEl && leaveDeductionEl.parentElement) {
-    // // 移除舊的明細（如果存在）
-    // const oldLeaveDetails = leaveDeductionEl.parentElement.querySelector('.leave-details');
-    // if (oldLeaveDetails) {
-    //     oldLeaveDetails.remove();
-    // }
     
-    // // 如果有請假記錄，顯示明細
-    // if (sickLeaveDays > 0 || personalLeaveDays > 0) {
-    //     const leaveDetails = document.createElement('div');
-    //     leaveDetails.className = 'leave-details p-2 bg-yellow-900/20 rounded-lg mt-2 mb-2';
-        
-    //     let detailsHTML = '<div class="text-xs space-y-1">';
-        
-    //     if (sickLeaveDays > 0) {
-    //     detailsHTML += `
-    //         <div class="flex justify-between">
-    //         <span class="text-yellow-300">病假 ${sickLeaveDays} 天 (半薪)</span>
-    //         <span class="font-mono text-yellow-200">${formatCurrency(sickLeaveDeduction)}</span>
-    //         </div>
-    //     `;
-    //     }
-        
-    //     if (personalLeaveDays > 0) {
-    //     detailsHTML += `
-    //         <div class="flex justify-between">
-    //         <span class="text-yellow-300">事假 ${personalLeaveDays} 天 (全薪)</span>
-    //         <span class="font-mono text-yellow-200">${formatCurrency(personalLeaveDeduction)}</span>
-    //         </div>
-    //     `;
-    //     }
-        
-    //     detailsHTML += '</div>';
-    //     leaveDetails.innerHTML = detailsHTML;
-        
-    //     // 插入到請假扣款下方
-    //     leaveDeductionEl.parentElement.appendChild(leaveDetails);
-    // }
-    // }
     const otherDeductions = 
-        (parseFloat(data['福利金扣款']) || 0) +
-        (parseFloat(data['宿舍費用']) || 0) +
-        (parseFloat(data['團保費用']) || 0) +
-        (parseFloat(data['其他扣款']) || 0);
+        (parseFloat(data.welfareFee) || 0) +
+        (parseFloat(data.dormitoryFee) || 0) +
+        (parseFloat(data.groupInsurance) || 0) +
+        (parseFloat(data.otherDeductions) || 0);
     safeSet('detail-other-deductions', formatCurrency(otherDeductions));
     
     // 銀行資訊
-    let bankCode = data['銀行代碼'];
-    const bankAccount = data['銀行帳號'];
+    let bankCode = data.bankCode;
+    const bankAccount = data.bankAccount;
     
     if (bankCode) {
         bankCode = String(bankCode).padStart(3, '0');
@@ -764,9 +653,8 @@ function displayEmployeeSalary(data) {
     safeSet('detail-bank-name', getBankName(bankCode));
     safeSet('detail-bank-account', bankAccount || '--');
     
-    console.log('✅ 薪資明細顯示完成（完整版 - 支援時薪 + 工時統計）');
+    console.log('✅ 薪資明細顯示完成');
 }
-
 /**
  * ✅ 載入薪資歷史
  */
