@@ -1684,10 +1684,15 @@ function displayWorkHoursFromCalculation(data) {
     workHoursCard.id = 'work-hours-card';
     workHoursCard.className = 'feature-box bg-purple-900/20 border-purple-700 mb-4';
     
-    // ⭐⭐⭐ 修正：保留小數位數
-    const totalWorkHours = parseFloat(data.totalWorkHours || 0).toFixed(1);
-    const hourlyRate = data.hourlyRate || 0;
-    const baseSalary = data.baseSalary || 0;
+    // ⭐⭐⭐ 修正：統一使用中文欄位
+    const totalWorkHours = parseFloat(data['工作時數'] || 0).toFixed(1);
+    const hourlyRate = data['時薪'] || 0;
+    const baseSalary = data['基本薪資'] || 0;
+    
+    console.log('🔍 displayWorkHoursFromCalculation 讀取的工時資料:');
+    console.log('   總工作時數:', totalWorkHours);
+    console.log('   時薪:', hourlyRate);
+    console.log('   基本薪資:', baseSalary);
     
     workHoursCard.innerHTML = `
       <h4 class="font-semibold mb-3 text-purple-400">本月工作時數統計</h4>
@@ -1714,7 +1719,7 @@ function displayWorkHoursFromCalculation(data) {
     `;
     
     detailsSection.insertBefore(workHoursCard, detailsSection.firstChild);
-  }
+}
 
 
 function displayOvertimeFromCalculation(data) {
@@ -1728,16 +1733,17 @@ function displayOvertimeFromCalculation(data) {
     overtimeCard.id = 'overtime-card';
     overtimeCard.className = 'feature-box bg-orange-900/20 border-orange-700 mt-4';
     
-    // ⭐⭐⭐ 修正：正確讀取三種加班費
-    const totalOvertimeHours = Math.floor(data.totalOvertimeHours || 0);
-    const weekdayOvertimePay = parseFloat(data.weekdayOvertimePay) || 0;
-    const restdayOvertimePay = parseFloat(data.restdayOvertimePay) || 0;
-    const holidayOvertimePay = parseFloat(data.holidayOvertimePay) || 0;
+    // ⭐⭐⭐ 修正：統一使用中文欄位
+    const totalOvertimeHours = Math.floor(parseFloat(data['總加班時數']) || 0);
+    const weekdayOvertimePay = parseFloat(data['平日加班費']) || 0;
+    const restdayOvertimePay = parseFloat(data['休息日加班費']) || 0;
+    const holidayOvertimePay = parseFloat(data['國定假日加班費']) || 0;
     
     console.log('🔍 displayOvertimeFromCalculation 讀取的加班費:');
-    console.log('   平日:', weekdayOvertimePay);
-    console.log('   休息日:', restdayOvertimePay);
-    console.log('   例假日:', holidayOvertimePay);
+    console.log('   總加班時數:', totalOvertimeHours);
+    console.log('   平日加班費:', weekdayOvertimePay);
+    console.log('   休息日加班費:', restdayOvertimePay);
+    console.log('   例假日加班費:', holidayOvertimePay);
     
     overtimeCard.innerHTML = `
         <h4 class="font-semibold mb-3 text-orange-400">⏰ 本月加班統計</h4>
