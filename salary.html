@@ -759,6 +759,9 @@
                                         <span data-i18n="SALARY_LEAVE_DEDUCT">請假扣款</span>
                                         <span id="detail-leave-deduction" class="font-mono">$0</span>
                                     </div>
+                                    <div id="leave-details-section" class="mt-2" style="display: none;">
+                                        <!-- JavaScript 會在這裡插入明細 -->
+                                    </div>
                                     <div class="flex justify-between">
                                         <span data-i18n="SALARY_OTHER_DEDUCT">其他扣款</span>
                                         <span id="detail-other-deductions" class="font-mono">$0</span>
@@ -1520,6 +1523,45 @@
             safeSet('detail-income-tax', formatCurrency(data['所得稅']));
             safeSet('detail-leave-deduction', formatCurrency(data['請假扣款']));
             
+            // ⭐⭐⭐ 顯示病假/事假明細
+            const sickLeaveDays = parseFloat(data['病假天數']) || 0;
+            const sickLeaveDeduction = parseFloat(data['病假扣款']) || 0;
+            const personalLeaveDays = parseFloat(data['事假天數']) || 0;
+            const personalLeaveDeduction = parseFloat(data['事假扣款']) || 0;
+
+            const leaveDetailsSection = document.getElementById('leave-details-section');
+
+            if (leaveDetailsSection) {
+                if (sickLeaveDays > 0 || personalLeaveDays > 0) {
+                    let detailsHTML = '<div class="p-2 bg-yellow-900/20 rounded-lg border border-yellow-700/30">';
+                    detailsHTML += '<div class="text-xs space-y-1">';
+                    
+                    if (sickLeaveDays > 0) {
+                        detailsHTML += `
+                            <div class="flex justify-between">
+                                <span class="text-yellow-300">病假 ${sickLeaveDays} 天 (半薪)</span>
+                                <span class="font-mono text-yellow-200">${formatCurrency(sickLeaveDeduction)}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    if (personalLeaveDays > 0) {
+                        detailsHTML += `
+                            <div class="flex justify-between">
+                                <span class="text-yellow-300">事假 ${personalLeaveDays} 天 (全薪)</span>
+                                <span class="font-mono text-yellow-200">${formatCurrency(personalLeaveDeduction)}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    detailsHTML += '</div></div>';
+                    
+                    leaveDetailsSection.innerHTML = detailsHTML;
+                    leaveDetailsSection.style.display = 'block';
+                } else {
+                    leaveDetailsSection.style.display = 'none';
+                }
+            }
             const otherDeductions = 
                 (parseFloat(data['福利金']) || 0) +
                 (parseFloat(data['宿舍費用']) || 0) +
