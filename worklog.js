@@ -138,10 +138,8 @@ async function loadWorklogRecords() {
     }
 }
 
-// worklog.js - 修正時間顯示
-
 /**
- * 渲染工作日誌記錄
+ * 渲染工作日誌記錄（修正日期顯示）
  */
 function renderWorklogRecords(worklogs) {
     const listEl = document.getElementById('worklog-records-list');
@@ -158,12 +156,24 @@ function renderWorklogRecords(worklogs) {
         const li = document.createElement('li');
         li.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
         
-        // ⭐⭐⭐ 修正：格式化提交時間
+        // ⭐ 修正：格式化工作日期（只顯示日期部分）
+        let workDateStr = log.date;
+        if (log.date) {
+            try {
+                // 如果是 ISO 格式，只取日期部分
+                if (log.date.includes('T')) {
+                    workDateStr = log.date.split('T')[0];
+                }
+            } catch (e) {
+                workDateStr = log.date;
+            }
+        }
+        
+        // ⭐ 格式化提交時間
         let submittedTimeStr = '';
         if (log.submittedAt) {
             try {
                 const submittedDate = new Date(log.submittedAt);
-                // 轉換成台灣時區格式
                 submittedTimeStr = submittedDate.toLocaleString('zh-TW', {
                     year: 'numeric',
                     month: '2-digit',
@@ -186,7 +196,7 @@ function renderWorklogRecords(worklogs) {
         switch(log.status) {
             case 'PENDING':
                 statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-                statusText = t('STATUS_PENDING') || '待審核';  // ⭐ 使用翻譯函數
+                statusText = t('STATUS_PENDING') || '待審核';
                 statusIcon = '⏳';
                 actionButtons = `
                     <button onclick="editWorklog('${log.id}')" 
@@ -201,12 +211,12 @@ function renderWorklogRecords(worklogs) {
                 break;
             case 'APPROVED':
                 statusClass = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-                statusText = t('STATUS_APPROVED') || '已核准';  // ⭐ 使用翻譯函數
+                statusText = t('STATUS_APPROVED') || '已核准';
                 statusIcon = '✅';
                 break;
             case 'REJECTED':
                 statusClass = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-                statusText = t('STATUS_REJECTED') || '已拒絕';  // ⭐ 使用翻譯函數
+                statusText = t('STATUS_REJECTED') || '已拒絕';
                 statusIcon = '❌';
                 actionButtons = `
                     <button onclick="editWorklog('${log.id}')" 
@@ -221,7 +231,7 @@ function renderWorklogRecords(worklogs) {
             <div class="flex justify-between items-start mb-3">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2 mb-2">
-                        <span class="font-bold text-gray-800 dark:text-white">${log.date}</span>
+                        <span class="font-bold text-gray-800 dark:text-white">${workDateStr}</span>
                         <span class="px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
                             ${statusIcon} ${statusText}
                         </span>
@@ -256,7 +266,6 @@ function renderWorklogRecords(worklogs) {
         listEl.appendChild(li);
     });
 }
-
 /**
  * 編輯工作日誌
  */
