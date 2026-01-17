@@ -111,59 +111,71 @@ async function loadCurrentEmployeeSalary() {
 }
 
 /**
- * ✅ 按月份查詢薪資
+ * ✅ 載入當前員工的薪資（修正版 - 自動重算）
  */
-async function loadEmployeeSalaryByMonth() {
-    const monthInput = document.getElementById('employee-salary-month');
-    const yearMonth = monthInput ? monthInput.value : '';
-    
-    if (!yearMonth) {
-        showNotification(t('SALARY_SELECT_MONTH'), 'error');
-        return;
-    }
-    
-    const loadingEl = document.getElementById('current-salary-loading');
-    const emptyEl = document.getElementById('current-salary-empty');
-    const contentEl = document.getElementById('current-salary-content');
-    
-    if (!loadingEl || !emptyEl || !contentEl) {
-        console.warn('薪資顯示元素未找到');
-        return;
-    }
-    
+async function loadCurrentEmployeeSalary() {
     try {
-        console.log(`🔍 查詢 ${yearMonth} 薪資`);
+        console.log(`💰 載入員工薪資（含重新計算）`);
         
-        loadingEl.style.display = 'block';
-        emptyEl.style.display = 'none';
-        contentEl.style.display = 'none';
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         
-        const res = await callApifetch(`getMySalary&yearMonth=${yearMonth}`);
+        const loadingEl = document.getElementById('current-salary-loading');
+        const emptyEl = document.getElementById('current-salary-empty');
+        const contentEl = document.getElementById('current-salary-content');
         
-        console.log(`📥 查詢 ${yearMonth} 薪資回應:`, res);
+        if (loadingEl) loadingEl.style.display = 'block';
+        if (emptyEl) emptyEl.style.display = 'none';
+        if (contentEl) contentEl.style.display = 'none';
         
-        loadingEl.style.display = 'none';
+        // ⭐⭐⭐ 步驟 1：先重新計算薪資
+        console.log('🔄 重新計算中...');
+        const session = await callApifetch("checkSession");
         
-        if (res.ok && res.data) {
-            console.log(`✅ 找到 ${yearMonth} 的薪資記錄`);
-            displayEmployeeSalary(res.data);
-            contentEl.style.display = 'block';
-            await loadAttendanceDetails(yearMonth);
+        if (!session.ok || !session.user) {
+            throw new Error('Session 驗證失敗');
+        }
+        
+        const employeeId = session.user.userId;
+        
+        // 呼叫計算 API
+        const calcResult = await callApifetch(`calculateMonthlySalary&employeeId=${encodeURIComponent(employeeId)}&yearMonth=${currentMonth}`);
+        
+        if (calcResult.success && calcResult.data) {
+            console.log('✅ 計算成功，儲存結果...');
+            
+            // ⭐⭐⭐ 步驟 2：儲存計算結果
+            await saveMonthlySalary(calcResult.data);
+        }
+        
+        // ⭐⭐⭐ 步驟 3：查詢最新資料
+        const result = await callApifetch(`getMySalary&yearMonth=${currentMonth}`);
+        
+        console.log('📥 薪資資料回應:', result);
+        
+        if (loadingEl) loadingEl.style.display = 'none';
+        
+        if (result.ok && result.data) {
+            console.log('✅ 成功載入薪資資料（已重算）');
+            displayEmployeeSalary(result.data);
+            if (contentEl) contentEl.style.display = 'block';
+            await loadAttendanceDetails(currentMonth);
         } else {
-            console.log(`⚠️ 沒有 ${yearMonth} 的薪資記錄`);
-            showNoSalaryMessage(yearMonth);
-            emptyEl.style.display = 'block';
-            const detailsSection = document.getElementById('attendance-details-section');
-            if (detailsSection) detailsSection.style.display = 'none';
+            console.log(`⚠️ 沒有 ${currentMonth} 的薪資記錄`);
+            if (emptyEl) {
+                showNoSalaryMessage(currentMonth);
+                emptyEl.style.display = 'block';
+            }
         }
         
     } catch (error) {
-        console.error(`❌ 載入 ${yearMonth} 薪資失敗:`, error);
-        loadingEl.style.display = 'none';
-        emptyEl.style.display = 'block';
+        console.error('❌ 載入失敗:', error);
+        const loadingEl = document.getElementById('current-salary-loading');
+        const emptyEl = document.getElementById('current-salary-empty');
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (emptyEl) emptyEl.style.display = 'block';
     }
 }
-
 /**
  * ✅ 載入每日加班明細
  */
