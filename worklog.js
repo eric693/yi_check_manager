@@ -422,7 +422,7 @@ async function loadPendingWorklogs() {
 }
 
 /**
- * 渲染待審核的工作日誌（完全修正版 - 加入翻譯與日期格式化）
+ * 渲染待審核的工作日誌（完全修正版）
  */
 function renderPendingWorklogs(worklogs) {
     const listEl = document.getElementById('pending-worklog-list');
@@ -434,17 +434,10 @@ function renderPendingWorklogs(worklogs) {
         const li = document.createElement('li');
         li.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
         
-        // ⭐ 格式化工作日期（只顯示日期部分）
+        // ⭐ 格式化工作日期
         let workDateStr = log.date;
-        if (log.date) {
-            try {
-                // 如果是 ISO 格式，只取日期部分
-                if (log.date.includes('T')) {
-                    workDateStr = log.date.split('T')[0];
-                }
-            } catch (e) {
-                workDateStr = log.date;
-            }
+        if (log.date && log.date.includes('T')) {
+            workDateStr = log.date.split('T')[0];
         }
         
         // ⭐ 格式化提交時間
@@ -484,29 +477,29 @@ function renderPendingWorklogs(worklogs) {
             
             <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 mb-3">
                 <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    📝 ${t('WORK_CONTENT') || '工作內容'}：
+                    📝 工作內容：
                 </p>
                 <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">${log.content}</p>
             </div>
             
             <div class="mb-3">
                 <label for="review-comment-${log.id}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    💬 ${t('REVIEW_COMMENT') || '審核意見'} <span class="text-xs text-gray-500">(${t('OPTIONAL') || '選填'})</span>
+                    💬 審核意見 <span class="text-xs text-gray-500">(選填)</span>
                 </label>
                 <textarea id="review-comment-${log.id}" 
                           rows="2" 
-                          placeholder="${t('REVIEW_COMMENT_PLACEHOLDER') || '填寫審核意見（選填）...'}"
+                          placeholder="填寫審核意見（選填）..."
                           class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white text-sm"></textarea>
             </div>
             
             <div class="flex space-x-2">
                 <button onclick="approveWorklog('${log.id}')" 
                         class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md font-semibold transition-colors">
-                    ✅ ${t('BTN_APPROVE') || '核准'}
+                    ✅ 核准
                 </button>
                 <button onclick="rejectWorklog('${log.id}')" 
                         class="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md font-semibold transition-colors">
-                    ❌ ${t('BTN_REJECT') || '拒絕'}
+                    ❌ 拒絕
                 </button>
             </div>
         `;
@@ -514,61 +507,76 @@ function renderPendingWorklogs(worklogs) {
         listEl.appendChild(li);
     });
 }
+
 /**
- * 核准工作日誌（完全修正版）
+ * 核准工作日誌（除錯版本）
  */
 async function approveWorklog(logId) {
     const commentInput = document.getElementById(`review-comment-${logId}`);
     const comment = commentInput?.value.trim() || '';
     
+    console.log('🔍 核准工作日誌 - 開始');
+    console.log('   日誌ID:', logId);
+    console.log('   審核意見:', comment);
+    
     try {
-        // ⭐ 正確方式：只傳 action 名稱，其他參數用 & 連接
-        const res = await callApifetch(
-            `reviewWorklog&id=${encodeURIComponent(logId)}&action=approve&comment=${encodeURIComponent(comment)}`
-        );
+        // ⭐ 建立 URL（除錯版）
+        const url = `reviewWorklog&id=${encodeURIComponent(logId)}&action=approve&comment=${encodeURIComponent(comment)}`;
+        console.log('📤 發送 URL:', url);
+        
+        const res = await callApifetch(url);
+        
+        console.log('📥 收到回應:', res);
         
         if (res.ok) {
-            showNotification(t('WORKLOG_APPROVED') || '工作日誌已核准', 'success');
+            showNotification('工作日誌已核准', 'success');
             await loadPendingWorklogs();
         } else {
-            showNotification(res.msg || t('APPROVE_FAILED') || '核准失敗', 'error');
+            showNotification(res.msg || '核准失敗', 'error');
+            console.error('❌ 錯誤訊息:', res.msg);
         }
         
     } catch (error) {
-        console.error('核准工作日誌失敗:', error);
-        showNotification(t('NETWORK_ERROR') || '網路錯誤', 'error');
+        console.error('❌ 核准失敗:', error);
+        showNotification('網路錯誤', 'error');
     }
 }
-
 /**
- * 拒絕工作日誌（完全修正版）
+ * 拒絕工作日誌（除錯版本）
  */
 async function rejectWorklog(logId) {
     const commentInput = document.getElementById(`review-comment-${logId}`);
     const comment = commentInput?.value.trim();
     
     if (!comment) {
-        showNotification(t('REJECT_REASON_REQUIRED') || '請填寫拒絕原因', 'error');
+        showNotification('請填寫拒絕原因', 'error');
         commentInput?.focus();
         return;
     }
     
+    console.log('🔍 拒絕工作日誌 - 開始');
+    console.log('   日誌ID:', logId);
+    console.log('   拒絕原因:', comment);
+    
     try {
-        // ⭐ 正確方式：只傳 action 名稱，其他參數用 & 連接
-        const res = await callApifetch(
-            `reviewWorklog&id=${encodeURIComponent(logId)}&action=reject&comment=${encodeURIComponent(comment)}`
-        );
+        const url = `reviewWorklog&id=${encodeURIComponent(logId)}&action=reject&comment=${encodeURIComponent(comment)}`;
+        console.log('📤 發送 URL:', url);
+        
+        const res = await callApifetch(url);
+        
+        console.log('📥 收到回應:', res);
         
         if (res.ok) {
-            showNotification(t('WORKLOG_REJECTED') || '工作日誌已拒絕', 'success');
+            showNotification('工作日誌已拒絕', 'success');
             await loadPendingWorklogs();
         } else {
-            showNotification(res.msg || t('REJECT_FAILED') || '拒絕失敗', 'error');
+            showNotification(res.msg || '拒絕失敗', 'error');
+            console.error('❌ 錯誤訊息:', res.msg);
         }
         
     } catch (error) {
-        console.error('拒絕工作日誌失敗:', error);
-        showNotification(t('NETWORK_ERROR') || '網路錯誤', 'error');
+        console.error('❌ 拒絕失敗:', error);
+        showNotification('網路錯誤', 'error');
     }
 }
 
