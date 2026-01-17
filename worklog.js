@@ -138,9 +138,6 @@ async function loadWorklogRecords() {
     }
 }
 
-/**
- * 渲染工作日誌記錄（修正日期顯示和翻譯）
- */
 function renderWorklogRecords(worklogs) {
     const listEl = document.getElementById('worklog-records-list');
     if (!listEl) return;
@@ -156,18 +153,14 @@ function renderWorklogRecords(worklogs) {
         const li = document.createElement('li');
         li.className = 'bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
         
-        // ⭐ 修正：格式化工作日期（避免時區問題）
+        // 格式化工作日期
         let workDateStr = log.date;
         if (log.date) {
             try {
-                // 如果已經是 YYYY-MM-DD 格式，直接使用
                 if (/^\d{4}-\d{2}-\d{2}$/.test(log.date)) {
                     workDateStr = log.date;
-                } 
-                // 如果是 ISO 格式（包含時間），解析後格式化為本地日期
-                else if (log.date.includes('T')) {
+                } else if (log.date.includes('T')) {
                     const date = new Date(log.date);
-                    // 使用本地時區格式化日期
                     const year = date.getFullYear();
                     const month = String(date.getMonth() + 1).padStart(2, '0');
                     const day = String(date.getDate()).padStart(2, '0');
@@ -178,7 +171,7 @@ function renderWorklogRecords(worklogs) {
             }
         }
         
-        // ⭐ 格式化提交時間
+        // 格式化提交時間
         let submittedTimeStr = '';
         if (log.submittedAt) {
             try {
@@ -196,18 +189,19 @@ function renderWorklogRecords(worklogs) {
             }
         }
         
-        // 如果 t() 函數不存在或回傳 undefined，使用預設值
+        // ⭐⭐⭐ 安全翻譯函數
         const safeTranslate = (key, fallback) => {
             if (typeof t !== 'function') return fallback;
             const result = t(key);
             return (result && result !== key) ? result : fallback;
         };
-        // ⭐ 關鍵修正：在 switch 之前就取得所有翻譯文字
-        const unitHours = t('UNIT_HOURS') || '小時';
-        const btnEdit = t('BTN_EDIT') || '編輯';
-        const btnDelete = t('BTN_DELETE') || '刪除';
-        const btnResubmit = t('BTN_RESUBMIT') || '重新提交';
-        const reviewComment = t('REVIEW_COMMENT') || '審核意見';
+        
+        // 取得翻譯文字
+        const unitHours = safeTranslate('UNIT_HOURS', '小時');
+        const btnEdit = safeTranslate('BTN_EDIT', '編輯');
+        const btnDelete = safeTranslate('BTN_DELETE', '刪除');
+        const btnResubmit = safeTranslate('BTN_RESUBMIT', '重新提交');
+        const reviewComment = safeTranslate('REVIEW_COMMENT', '審核意見');
         
         // 狀態樣式
         let statusClass = '';
@@ -218,7 +212,7 @@ function renderWorklogRecords(worklogs) {
         switch(log.status) {
             case 'PENDING':
                 statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-                statusText = t('STATUS_PENDING') || '待審核';
+                statusText = safeTranslate('STATUS_PENDING', '待審核');  // ⭐ 使用 safeTranslate
                 statusIcon = '⏳';
                 actionButtons = `
                     <button onclick="editWorklog('${log.id}')" 
@@ -233,12 +227,12 @@ function renderWorklogRecords(worklogs) {
                 break;
             case 'APPROVED':
                 statusClass = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-                statusText = t('STATUS_APPROVED') || '已核准';
+                statusText = safeTranslate('STATUS_APPROVED', '已核准');  // ⭐ 使用 safeTranslate
                 statusIcon = '✅';
                 break;
             case 'REJECTED':
                 statusClass = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-                statusText = t('STATUS_REJECTED') || '已拒絕';
+                statusText = safeTranslate('STATUS_REJECTED', '已拒絕');  // ⭐ 使用 safeTranslate
                 statusIcon = '❌';
                 actionButtons = `
                     <button onclick="editWorklog('${log.id}')" 
@@ -288,7 +282,6 @@ function renderWorklogRecords(worklogs) {
         listEl.appendChild(li);
     });
 }
-
 /**
  * 編輯工作日誌
  */
