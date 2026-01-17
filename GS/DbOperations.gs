@@ -6,7 +6,7 @@
  * 修正：僅 admin_list 內的 userId 才是管理員，其餘為員工
  */
 const ADMIN_LIST = [
-  "U1771fd65da16e2f2000a3c3805fbe256",
+  "Ue76b65367821240ac26387d2972a5adf",
   "U69d37ae1b9a878ba9408527026bd5b44"
 ];
 
@@ -1413,7 +1413,7 @@ function testGetApprovedOvertimeRecords() {
  * @param {string} name - 地點名稱
  * @param {number} lat - 緯度
  * @param {number} lng - 經度
- * @param {number} radius - 打卡範圍（公尺），預設 200，範圍 100-2000
+ * @param {number} radius - 打卡範圍（公尺），預設 200，範圍 30-2000
  */
 function addLocation(name, lat, lng, radius) {
   if (!name || !lat || !lng) {
@@ -1422,7 +1422,7 @@ function addLocation(name, lat, lng, radius) {
   
   // 驗證 radius 參數，確保在合理範圍內
   const validRadius = radius && !isNaN(radius) ? parseInt(radius) : 200;
-  const finalRadius = Math.max(100, Math.min(2000, validRadius)); // 限制在 100-2000 之間
+  const finalRadius = Math.max(30, Math.min(2000, validRadius)); // 限制在 30-2000 之間
   
   const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_LOCATIONS);
   sh.appendRow(["", name, lat, lng, finalRadius]);
@@ -1430,15 +1430,6 @@ function addLocation(name, lat, lng, radius) {
   Logger.log(`✅ 新增地點：${name}，範圍：${finalRadius}公尺`);
   return { ok: true, code: "LOCATION_ADD_SUCCESS" };
 }
-// function addLocation(name, lat, lng) {
-//   if (!name || !lat || !lng) {
-//     return { ok: false, code: "ERR_INVALID_INPUT" };
-//   }
-  
-//   const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_LOCATIONS);
-//   sh.appendRow(["", name, lat, lng, "100"]);
-//   return { ok: true, code: "LOCATION_ADD_SUCCESS" };
-// }
 
 /**
  * 取得所有打卡地點

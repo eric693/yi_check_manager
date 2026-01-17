@@ -328,42 +328,128 @@ function doGet(e) {
  */
 function doPost(e) {
   try {
-    const json = JSON.parse(e.postData.contents);
+    Logger.log('═══════════════════════════════════════');
+    Logger.log('📥 收到 LINE Webhook 請求');
+    Logger.log('═══════════════════════════════════════');
     
-    // 驗證 LINE Signature（安全性）
-    const signature = e.parameter.signature || e.headers['X-Line-Signature'];
-    if (!verifyLineSignature_(e.postData.contents, signature)) {
-      return ContentService.createTextOutput(JSON.stringify({ error: 'Invalid signature' }))
-        .setMimeType(ContentService.MimeType.JSON);
+    // 檢查是否有 postData
+    if (!e || !e.postData || !e.postData.contents) {
+      Logger.log('⚠️ 缺少 postData');
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'error',
+        message: 'No postData'
+      })).setMimeType(ContentService.MimeType.JSON);
     }
     
-    // 處理 LINE 事件
-    json.events.forEach(event => {
-      if (event.type === 'message' && event.message.type === 'text') {
-        handleLineMessage(event);
-      } else if (event.type === 'message' && event.message.type === 'location') {
-        handleLineLocation(event);
+    Logger.log('📋 postData.contents: ' + e.postData.contents.substring(0, 200) + '...');
+    
+    // 解析 JSON
+    const json = JSON.parse(e.postData.contents);
+    
+    Logger.log('📊 收到 ' + json.events.length + ' 個事件');
+    
+    // ⚠️ 測試期間暫時停用 Signature 驗證
+    // 正式上線後請啟用以下程式碼：
+    /*
+    const signature = e.parameter.signature || e.headers['X-Line-Signature'];
+    if (!verifyLineSignature_(e.postData.contents, signature)) {
+      Logger.log('❌ Signature 驗證失敗');
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'error',
+        message: 'Invalid signature'
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    */
+    
+    // 處理每個事件
+    json.events.forEach((event, index) => {
+      Logger.log('');
+      Logger.log(`📌 處理事件 ${index + 1}/${json.events.length}`);
+      Logger.log('   type: ' + event.type);
+      
+      try {
+        if (event.type === 'message') {
+          if (event.message.type === 'text') {
+            Logger.log('   message.type: text');
+            Logger.log('   message.text: ' + event.message.text);
+            handleLineMessage(event);
+          } else if (event.message.type === 'location') {
+            Logger.log('   message.type: location');
+            Logger.log('   latitude: ' + event.message.latitude);
+            Logger.log('   longitude: ' + event.message.longitude);
+            handleLineLocation(event);
+          }
+        }
+      } catch (eventError) {
+        Logger.log('❌ 事件處理錯誤: ' + eventError);
+        Logger.log('   錯誤堆疊: ' + eventError.stack);
       }
     });
     
-    return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
-      .setMimeType(ContentService.MimeType.JSON);
-      
+    Logger.log('');
+    Logger.log('✅ Webhook 處理完成');
+    Logger.log('═══════════════════════════════════════');
+    
+    // ⭐⭐⭐ 關鍵：回傳 200 OK + JSON
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'ok'
+    })).setMimeType(ContentService.MimeType.JSON);
+    
   } catch (error) {
-    Logger.log('❌ Webhook 錯誤: ' + error);
-    return ContentService.createTextOutput(JSON.stringify({ error: error.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+    Logger.log('');
+    Logger.log('❌ doPost 錯誤: ' + error);
+    Logger.log('   錯誤訊息: ' + error.message);
+    Logger.log('   錯誤堆疊: ' + error.stack);
+    Logger.log('═══════════════════════════════════════');
+    
+    // 即使錯誤也回傳 200 OK（避免 LINE 重試）
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error',
+      message: error.message
+    })).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-/**
- * 驗證 LINE Signature
- */
+// function doPost(e) {
+//   try {
+//     const json = JSON.parse(e.postData.contents);
+    
+//     // 驗證 LINE Signature（安全性）
+//     const signature = e.parameter.signature || e.headers['X-Line-Signature'];
+//     if (!verifyLineSignature_(e.postData.contents, signature)) {
+//       return ContentService.createTextOutput(JSON.stringify({ error: 'Invalid signature' }))
+//         .setMimeType(ContentService.MimeType.JSON);
+//     }
+    
+//     // 處理 LINE 事件
+//     json.events.forEach(event => {
+//       if (event.type === 'message' && event.message.type === 'text') {
+//         handleLineMessage(event);
+//       } else if (event.type === 'message' && event.message.type === 'location') {
+//         handleLineLocation(event);
+//       }
+//     });
+    
+//     return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
+//       .setMimeType(ContentService.MimeType.JSON);
+      
+//   } catch (error) {
+//     Logger.log('❌ Webhook 錯誤: ' + error);
+//     return ContentService.createTextOutput(JSON.stringify({ error: error.message }))
+//       .setMimeType(ContentService.MimeType.JSON);
+//   }
+// }
+
 /**
  * 驗證 LINE Signature（測試模式：暫時停用）
  */
+/**
+ * ⚠️ Signature 驗證（測試模式：已停用）
+ * 
+ * 正式上線時請啟用此函數
+ */
 function verifyLineSignature_(body, signature) {
-  // ⚠️ 測試期間暫時返回 true
+  // 測試期間暫時返回 true
   Logger.log('⚠️ Signature 驗證已暫時停用（測試模式）');
   return true;
   
@@ -391,6 +477,35 @@ function verifyLineSignature_(body, signature) {
   }
   */
 }
+// function verifyLineSignature_(body, signature) {
+//   // ⚠️ 測試期間暫時返回 true
+//   Logger.log('⚠️ Signature 驗證已暫時停用（測試模式）');
+//   return true;
+
+//   /* 
+//   // ✅ 正式上線時請啟用以下程式碼：
+//   try {
+//     const channelSecret = PropertiesService.getScriptProperties().getProperty('LINE_CHANNEL_SECRET');
+    
+//     if (!channelSecret) {
+//       Logger.log('❌ 找不到 LINE_CHANNEL_SECRET');
+//       return false;
+//     }
+    
+//     const hash = Utilities.computeHmacSha256Signature(body, channelSecret);
+//     const expectedSignature = Utilities.base64Encode(hash);
+    
+//     Logger.log('🔐 Expected Signature: ' + expectedSignature);
+//     Logger.log('🔐 Received Signature: ' + signature);
+    
+//     return expectedSignature === signature;
+    
+//   } catch (error) {
+//     Logger.log('❌ Signature 驗證錯誤: ' + error);
+//     return false;
+//   }
+//   */
+// }
 
 // function verifyLineSignature_(body, signature) {
 //   const channelSecret = PropertiesService.getScriptProperties().getProperty('LINE_CHANNEL_SECRET');

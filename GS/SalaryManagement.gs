@@ -198,6 +198,9 @@ function getMonthlySalarySheetEnhanced() {
       
       // 其他扣款
       "請假扣款", "福利金扣款", "宿舍費用", "團保費用", "其他扣款",
+
+      // ⭐⭐⭐ 新增這 4 欄
+      "病假天數", "病假扣款", "事假天數", "事假扣款",
       
       // 總計
       "應發總額", "實發金額",
@@ -221,6 +224,19 @@ function getMonthlySalarySheetEnhanced() {
   return sheet;
 }
 
+function rebuildMonthlySalarySheet() {
+  // 刪除舊表（如果存在）
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const oldSheet = ss.getSheetByName('月薪資記錄');
+  if (oldSheet) {
+    ss.deleteSheet(oldSheet);
+  }
+  
+  // 建立新表
+  getMonthlySalarySheetEnhanced();
+  
+  Logger.log('✅ 月薪資記錄試算表已重建');
+}
 // ==================== 薪資設定功能 ====================
 
 /**
@@ -637,6 +653,10 @@ function saveMonthlySalary(salaryData) {
       salaryData.groupInsurance || salaryData['團保費用'] || 0,
       salaryData.otherDeductions || salaryData['其他扣款'] || 0,
       
+      salaryData.sickLeaveDays || salaryData['病假天數'] || 0,
+      salaryData.sickLeaveDeduction || salaryData['病假扣款'] || 0,
+      salaryData.personalLeaveDays || salaryData['事假天數'] || 0,
+      salaryData.personalLeaveDeduction || salaryData['事假扣款'] || 0,
       // 總計
       salaryData.grossSalary || salaryData['應發總額'] || 0,
       salaryData.netSalary || salaryData['實發金額'] || 0,
@@ -759,19 +779,50 @@ function saveMonthlySalaryAPI() {
   }
 }
 /**
- * ✅ 查詢我的薪資（完整版）
+ * ✅ 查詢我的薪資（完整版 - 即時重算）
+ * 
+ * @param {string} userId - 員工ID
+ * @param {string} yearMonth - 年月 (YYYY-MM)
+ * @returns {Object} 薪資資料
  */
 function getMySalary(userId, yearMonth) {
   try {
     const employeeId = userId;
+    
+    Logger.log(`💰 查詢薪資: ${employeeId}, ${yearMonth}`);
+    
+    // ⭐⭐⭐ 步驟 1：先重新計算薪資（確保資料是最新的）
+    Logger.log('🔄 重新計算薪資...');
+    const calculatedResult = calculateMonthlySalary(employeeId, yearMonth);
+    
+    if (calculatedResult.success) {
+      // ⭐ 步驟 2：儲存計算結果到 Sheet
+      Logger.log('💾 儲存計算結果...');
+      const saveResult = saveMonthlySalary(calculatedResult.data);
+      
+      if (!saveResult.success) {
+        Logger.log('⚠️ 儲存失敗，但仍返回計算結果');
+      }
+      
+      // ⭐ 步驟 3：返回最新的計算結果
+      Logger.log('✅ 返回最新薪資資料');
+      return { 
+        success: true, 
+        data: calculatedResult.data 
+      };
+    }
+    
+    // ⭐ 如果計算失敗，嘗試從 Sheet 讀取舊資料
+    Logger.log('⚠️ 計算失敗，嘗試讀取舊資料...');
+    
     const sheet = getMonthlySalarySheetEnhanced();
     const data = sheet.getDataRange().getValues();
+    const headers = data[0];
     
     if (data.length < 2) {
       return { success: false, message: "薪資記錄表中沒有資料" };
     }
     
-    const headers = data[0];
     const employeeIdIndex = headers.indexOf('員工ID');
     const yearMonthIndex = headers.indexOf('年月');
     
@@ -811,6 +862,7 @@ function getMySalary(userId, yearMonth) {
     
   } catch (error) {
     Logger.log('❌ 查詢薪資失敗: ' + error);
+    Logger.log('❌ 錯誤堆疊: ' + error.stack);
     return { success: false, message: error.toString() };
   }
 }
@@ -966,30 +1018,39 @@ function getEmployeeOvertimeRecords(employeeId, yearMonth) {
   }
 }
 
-/**
- * ✅ 取得員工請假記錄
- */
 function getEmployeeMonthlySalary(employeeId, yearMonth) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("請假記錄");
+    Logger.log(`📋 開始取得 ${employeeId} 在 ${yearMonth} 的請假紀錄`);
+    
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("請假紀錄");
     
     if (!sheet) {
+      Logger.log('⚠️ 找不到「請假紀錄」工作表');
       return { success: true, data: [] };
     }
     
     const values = sheet.getDataRange().getValues();
     const records = [];
     
+    Logger.log(`📊 請假紀錄總行數: ${values.length - 1}`);
+    
     for (let i = 1; i < values.length; i++) {
       const row = values[i];
       
-      if (!row[1] || !row[5]) continue;
+      // ⭐⭐⭐ 修正：使用正確的欄位索引
+      const rowEmployeeId = String(row[1] || '').trim();  // B 欄
+      const leaveType = String(row[4] || '').trim();      // E 欄
+      const startDate = row[5];                            // F 欄
+      const leaveDays = parseFloat(row[8]) || 0;          // I 欄
+      const status = String(row[10] || '').trim();        // K 欄
       
-      const rowEmployeeId = String(row[1]).trim();
-      const startDate = row[5];
+      // 跳過空白行
+      if (!rowEmployeeId || !startDate) continue;
       
+      // 檢查員工ID
       if (rowEmployeeId !== employeeId) continue;
       
+      // 解析日期
       let dateStr = "";
       if (startDate instanceof Date) {
         dateStr = Utilities.formatDate(startDate, "Asia/Taipei", "yyyy-MM");
@@ -997,23 +1058,33 @@ function getEmployeeMonthlySalary(employeeId, yearMonth) {
         dateStr = startDate.substring(0, 7);
       }
       
+      // 檢查年月
       if (dateStr !== yearMonth) continue;
       
-      const status = String(row[9] || "").trim().toUpperCase();
-      if (status !== "APPROVED") continue;
+      // ⭐⭐⭐ 檢查狀態（兼容多種格式）
+      const statusUpper = status.toUpperCase();
+      if (statusUpper !== "APPROVED" && statusUpper !== "核准") {
+        Logger.log(`   ⏭️ 跳過未核准的請假: ${dateStr}, 狀態: ${status}`);
+        continue;
+      }
+      
+      Logger.log(`   ✅ ${dateStr}: ${leaveType}, ${leaveDays} 天 (${status})`);
       
       records.push({
-        leaveType: row[4] || "",
+        leaveType: leaveType,
         startDate: startDate,
-        leaveDays: parseFloat(row[7]) || 0,
+        leaveDays: leaveDays,
         reviewStatus: "核准"
       });
     }
+    
+    Logger.log(`✅ 找到 ${records.length} 筆已核准的請假紀錄`);
     
     return { success: true, data: records };
     
   } catch (error) {
     Logger.log("❌ 取得請假記錄失敗: " + error);
+    Logger.log("❌ 錯誤堆疊: " + error.stack);
     return { success: false, message: error.toString(), data: [] };
   }
 }
@@ -1769,19 +1840,44 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
     
     // 7. 請假扣款
     let leaveDeduction = 0;
+    let sickLeaveDays = 0;        // 病假天數
+    let sickLeaveDeduction = 0;    // 病假扣款
+    let personalLeaveDays = 0;     // 事假天數
+    let personalLeaveDeduction = 0; // 事假扣款
+    
     if (leaveRecords.success && leaveRecords.data) {
       leaveRecords.data.forEach(record => {
         if (record.reviewStatus === '核准') {
           const leaveType = String(record.leaveType).toUpperCase();
+          const days = parseFloat(record.leaveDays) || 0;
+          const dailyRate = Math.round(baseSalary / 30);
           
-          // 只有事假需要扣薪
+          // ⭐ 病假：扣半薪
+          if (leaveType === 'SICK_LEAVE' || leaveType === '病假') {
+            sickLeaveDays += days;
+            const deduction = Math.round(days * dailyRate * 0.5); // 病假扣50%
+            sickLeaveDeduction += deduction;
+            Logger.log(`   病假 ${days} 天 × $${dailyRate} × 50% = $${deduction}`);
+          }
+          
+          // ⭐ 事假：扣全薪
           if (leaveType === 'PERSONAL_LEAVE' || leaveType === '事假') {
-            const dailyRate = Math.round(baseSalary / 30);
-            leaveDeduction += record.leaveDays * dailyRate;
+            personalLeaveDays += days;
+            const deduction = Math.round(days * dailyRate);
+            personalLeaveDeduction += deduction;
+            Logger.log(`   事假 ${days} 天 × $${dailyRate} = $${deduction}`);
           }
         }
       });
     }
+
+    // 計算總請假扣款
+    leaveDeduction = sickLeaveDeduction + personalLeaveDeduction;
+    
+    Logger.log(`\n📋 請假扣款統計:`);
+    Logger.log(`   病假: ${sickLeaveDays} 天，扣款 $${sickLeaveDeduction} (半薪)`);
+    Logger.log(`   事假: ${personalLeaveDays} 天，扣款 $${personalLeaveDeduction} (全薪)`);
+    Logger.log(`   合計扣款: $${leaveDeduction}`);
     
     // 如果有請假，取消全勤獎金
     if (leaveDeduction > 0) {
@@ -1847,14 +1943,13 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
     Logger.log('═══════════════════════════════════════');
     Logger.log('');
     
-    // 13. 返回結果
     const result = {
       employeeId: employeeId,
       employeeName: config['員工姓名'],
       yearMonth: yearMonth,
       salaryType: '月薪',
-      hourlyRate: 0,       // ⭐ 月薪員工時薪為 0
-      totalWorkHours: 0,   // ⭐ 月薪員工不計工時
+      hourlyRate: 0,
+      totalWorkHours: 0,
       baseSalary: baseSalary,
       positionAllowance: positionAllowance,
       mealAllowance: mealAllowance,
@@ -1862,9 +1957,9 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
       attendanceBonus: attendanceBonus,
       performanceBonus: performanceBonus,
       otherAllowances: otherAllowances,
-      weekdayOvertimePay: weekdayOvertimePay,      // ⭐ 只有平日
-      restdayOvertimePay: restdayOvertimePay,      // ⭐ 只有休息日（週六）
-      holidayOvertimePay: holidayOvertimePay,      // ⭐ 只有例假日（週日）
+      weekdayOvertimePay: weekdayOvertimePay,
+      restdayOvertimePay: restdayOvertimePay,
+      holidayOvertimePay: holidayOvertimePay,
       totalOvertimeHours: totalOvertimeHours,
       laborFee: laborFee,
       healthFee: healthFee,
@@ -1873,6 +1968,10 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
       pensionSelfRate: pensionSelfRate,
       incomeTax: incomeTax,
       leaveDeduction: Math.round(leaveDeduction),
+      sickLeaveDays: sickLeaveDays,              // ⭐ 新增：病假天數
+      sickLeaveDeduction: sickLeaveDeduction,    // ⭐ 新增：病假扣款
+      personalLeaveDays: personalLeaveDays,      // ⭐ 新增：事假天數
+      personalLeaveDeduction: personalLeaveDeduction, // ⭐ 新增：事假扣款
       welfareFee: welfareFee,
       dormitoryFee: dormitoryFee,
       groupInsurance: groupInsurance,
@@ -1882,7 +1981,9 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
       bankCode: config['銀行代碼'] || "",
       bankAccount: config['銀行帳號'] || "",
       status: "已計算",
-      note: `本月加班${totalOvertimeHours.toFixed(1)}小時`
+      note: `本月加班${totalOvertimeHours.toFixed(1)}小時` + 
+            (sickLeaveDays > 0 ? `，病假${sickLeaveDays}天(半薪)` : '') +
+            (personalLeaveDays > 0 ? `，事假${personalLeaveDays}天` : '')
     };
     
     Logger.log('✅ 月薪計算完成');
@@ -1896,6 +1997,39 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
   }
 }
 
+
+/**
+ * 🧪 測試病假半薪計算
+ */
+function testSickLeaveHalfPay() {
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('🧪 測試病假半薪計算');
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('');
+  
+  const employeeId = 'Ue76b65367821240ac26387d2972a5adf'; // 替換成實際員工ID
+  const yearMonth = '2026-01';
+  
+  const result = calculateMonthlySalary(employeeId, yearMonth);
+  
+  if (result.success) {
+    const data = result.data;
+    Logger.log('✅ 計算成功');
+    Logger.log(`   員工: ${data.employeeName}`);
+    Logger.log(`   基本薪資: $${data.baseSalary}`);
+    Logger.log(`   病假: ${data.sickLeaveDays || 0} 天`);
+    Logger.log(`   病假扣款: $${data.sickLeaveDeduction || 0} (半薪)`);
+    Logger.log(`   事假: ${data.personalLeaveDays || 0} 天`);
+    Logger.log(`   事假扣款: $${data.personalLeaveDeduction || 0} (全薪)`);
+    Logger.log(`   總扣款: $${data.leaveDeduction}`);
+    Logger.log(`   實發金額: $${data.netSalary}`);
+  } else {
+    Logger.log('❌ 計算失敗:', result.message);
+  }
+  
+  Logger.log('');
+  Logger.log('═══════════════════════════════════════');
+}
 
 /**
  * ✅ API：取得員工該月份的打卡記錄
@@ -2442,4 +2576,239 @@ function testSalaryTypePreservation() {
   }
   
   Logger.log('\n✅ 測試完成，請檢查「月薪資記錄」工作表');
+}
+
+function debugCSFSalary() {
+  const employeeId = 'Ue76b65367821240ac26387d2972a5adf'; // CSF
+  const yearMonth = '2026-01';
+  
+  Logger.log('🧪 測試 CSF 的薪資計算');
+  
+  // 步驟 1：計算薪資
+  const result = calculateMonthlySalary(employeeId, yearMonth);
+  
+  Logger.log('📊 計算結果:');
+  Logger.log('   success: ' + result.success);
+  
+  if (result.success && result.data) {
+    Logger.log('   薪資類型: ' + result.data.salaryType);
+    Logger.log('   時薪: ' + result.data.hourlyRate);
+    Logger.log('   工作時數: ' + result.data.totalWorkHours);
+    Logger.log('   基本薪資: ' + result.data.baseSalary);
+    Logger.log('   應發總額: ' + result.data.grossSalary);
+    Logger.log('   實發金額: ' + result.data.netSalary);
+    
+    // ⭐⭐⭐ 檢查完整的 data 結構
+    Logger.log('\n完整的 result.data:');
+    Logger.log(JSON.stringify(result.data, null, 2));
+  } else {
+    Logger.log('❌ 計算失敗: ' + result.message);
+  }
+  
+  // 步驟 2：檢查 Sheet 中的資料
+  Logger.log('\n📋 檢查 Sheet 中的資料:');
+  const sheet = getMonthlySalarySheetEnhanced();
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  
+  const salaryIdToFind = `SAL-${yearMonth}-${employeeId}`;
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === salaryIdToFind) {
+      Logger.log(`✅ 找到薪資單: ${salaryIdToFind}`);
+      Logger.log(`   薪資類型 (欄位5): ${data[i][4]}`);
+      Logger.log(`   時薪 (欄位6): ${data[i][5]}`);
+      Logger.log(`   工作時數 (欄位7): ${data[i][6]}`);
+      Logger.log(`   基本薪資 (欄位9): ${data[i][8]}`);
+      Logger.log(`   應發總額 (欄位30): ${data[i][29]}`);
+      Logger.log(`   實發金額 (欄位31): ${data[i][30]}`);
+      break;
+    }
+  }
+}
+
+function checkSheetColumns() {
+  const sheet = getMonthlySalarySheetEnhanced();
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  
+  Logger.log('📊 月薪資記錄 Sheet 的欄位:');
+  headers.forEach((header, index) => {
+    Logger.log(`   欄位 ${index + 1}: ${header}`);
+  });
+  
+  Logger.log(`\n✅ 總共 ${headers.length} 個欄位`);
+}
+
+function debugEricSalaryFull() {
+  const employeeId = 'Ue76b65367821240ac26387d2972a5adf'; // Eric
+  const yearMonth = '2026-01';
+  
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('🧪 測試 Eric 的薪資計算與儲存（完整版）');
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('');
+  
+  // 步驟 1：計算薪資
+  Logger.log('📊 步驟 1：計算薪資...');
+  const result = calculateMonthlySalary(employeeId, yearMonth);
+  
+  if (!result.success) {
+    Logger.log('❌ 計算失敗: ' + result.message);
+    return;
+  }
+  
+  Logger.log('✅ 計算成功');
+  Logger.log(`   應發總額: $${result.data.grossSalary}`);
+  Logger.log(`   實發金額: $${result.data.netSalary}`);
+  Logger.log('');
+  
+  // 步驟 2：儲存薪資
+  Logger.log('📊 步驟 2：儲存薪資...');
+  const saveResult = saveMonthlySalary(result.data);
+  
+  if (!saveResult.success) {
+    Logger.log('❌ 儲存失敗: ' + saveResult.message);
+    return;
+  }
+  
+  Logger.log('✅ 儲存成功: ' + saveResult.salaryId);
+  Logger.log('');
+  
+  // 步驟 3：從 Sheet 讀取驗證
+  Logger.log('📊 步驟 3：從 Sheet 讀取驗證...');
+  const sheet = getMonthlySalarySheetEnhanced();
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  
+  const salaryId = saveResult.salaryId;
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === salaryId) {
+      Logger.log('✅ 找到薪資單: ' + salaryId);
+      Logger.log('');
+      Logger.log('📋 關鍵欄位驗證:');
+      Logger.log(`   薪資類型 (欄位5): ${data[i][4]}`);
+      Logger.log(`   基本薪資 (欄位9): ${data[i][8]}`);
+      Logger.log(`   平日加班費 (欄位16): ${data[i][15]}`);
+      Logger.log(`   請假扣款 (欄位24): ${data[i][23]}`);
+      Logger.log(`   病假天數 (欄位29): ${data[i][28]}`);
+      Logger.log(`   病假扣款 (欄位30): ${data[i][29]}`);
+      Logger.log(`   事假天數 (欄位31): ${data[i][30]}`);
+      Logger.log(`   事假扣款 (欄位32): ${data[i][31]}`);
+      Logger.log(`   應發總額 (欄位33): ${data[i][32]}`);
+      Logger.log(`   實發金額 (欄位34): ${data[i][33]}`);
+      Logger.log('');
+      
+      // 驗證數值是否正確
+      const savedGross = parseFloat(data[i][32]) || 0;
+      const savedNet = parseFloat(data[i][33]) || 0;
+      const calculatedGross = result.data.grossSalary;
+      const calculatedNet = result.data.netSalary;
+      
+      if (savedGross === calculatedGross && savedNet === calculatedNet) {
+        Logger.log('✅ 數值驗證通過！');
+        Logger.log(`   應發: ${savedGross} = ${calculatedGross} ✓`);
+        Logger.log(`   實發: ${savedNet} = ${calculatedNet} ✓`);
+      } else {
+        Logger.log('❌ 數值驗證失敗！');
+        Logger.log(`   應發: ${savedGross} ≠ ${calculatedGross} ✗`);
+        Logger.log(`   實發: ${savedNet} ≠ ${calculatedNet} ✗`);
+      }
+      
+      break;
+    }
+  }
+  
+  Logger.log('');
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('🎯 測試完成');
+  Logger.log('═══════════════════════════════════════');
+}
+
+
+function checkEricSalaryInSheet() {
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('🔍 檢查 Eric 在 Sheet 中的薪資資料');
+  Logger.log('═══════════════════════════════════════');
+  
+  const employeeId = 'Ue76b65367821240ac26387d2972a5adf';
+  const yearMonth = '2026-01';
+  
+  const sheet = getMonthlySalarySheetEnhanced();
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  
+  const salaryId = `SAL-${yearMonth}-${employeeId}`;
+  
+  Logger.log(`\n📋 尋找薪資單: ${salaryId}`);
+  Logger.log(`📊 Sheet 總行數: ${data.length}`);
+  
+  let found = false;
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === salaryId) {
+      found = true;
+      Logger.log(`\n✅ 找到薪資單在第 ${i + 1} 行`);
+      Logger.log('\n📋 完整資料:');
+      
+      // 顯示所有欄位
+      for (let j = 0; j < Math.min(headers.length, data[i].length); j++) {
+        const header = headers[j];
+        const value = data[i][j];
+        
+        // 重點欄位用特殊標記
+        const isImportant = [
+          '基本薪資', '平日加班費', '休息日加班費', '國定假日加班費',
+          '請假扣款', '病假天數', '病假扣款', '事假天數', '事假扣款',
+          '應發總額', '實發金額'
+        ].includes(header);
+        
+        const prefix = isImportant ? '⭐' : '  ';
+        Logger.log(`${prefix} [${j + 1}] ${header}: ${value}`);
+      }
+      
+      break;
+    }
+  }
+  
+  if (!found) {
+    Logger.log(`\n❌ 找不到薪資單: ${salaryId}`);
+    Logger.log('\n📋 Sheet 中現有的薪資單ID:');
+    
+    for (let i = 1; i < Math.min(data.length, 6); i++) {
+      Logger.log(`   第 ${i + 1} 行: ${data[i][0]}`);
+    }
+  }
+  
+  Logger.log('\n═══════════════════════════════════════');
+}
+
+function testGetMySalaryAPI() {
+  Logger.log('🧪 測試 getMySalary API');
+  
+  const userId = 'Ue76b65367821240ac26387d2972a5adf';
+  const yearMonth = '2026-01';
+  
+  const result = getMySalary(userId, yearMonth);
+  
+  Logger.log('\n📊 API 回應:');
+  Logger.log('   success: ' + result.success);
+  
+  if (result.success && result.data) {
+    Logger.log('\n✅ 資料欄位:');
+    Logger.log('   基本薪資: ' + result.data['基本薪資']);
+    Logger.log('   平日加班費: ' + result.data['平日加班費']);
+    Logger.log('   請假扣款: ' + result.data['請假扣款']);
+    Logger.log('   病假天數: ' + result.data['病假天數']);
+    Logger.log('   病假扣款: ' + result.data['病假扣款']);
+    Logger.log('   事假天數: ' + result.data['事假天數']);
+    Logger.log('   事假扣款: ' + result.data['事假扣款']);
+    Logger.log('   應發總額: ' + result.data['應發總額']);
+    Logger.log('   實發金額: ' + result.data['實發金額']);
+    
+    Logger.log('\n📋 完整 data 物件:');
+    Logger.log(JSON.stringify(result.data, null, 2));
+  } else {
+    Logger.log('❌ 取得資料失敗: ' + result.message);
+  }
 }
