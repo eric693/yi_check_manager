@@ -48,6 +48,12 @@ async function initSalaryTab() {
         console.log('📋 開始載入薪資歷史...');
         await loadSalaryHistory();
         
+        // ⭐⭐⭐ 新增：綁定查詢按鈕
+        const queryBtn = document.getElementById('query-salary-btn');
+        if (queryBtn) {
+            queryBtn.addEventListener('click', loadEmployeeSalaryByMonth);
+            console.log('✅ 查詢按鈕已綁定');
+        }
         // 步驟 4：綁定事件（管理員才需要）
         if (session.user.dept === "管理員") {
             console.log('🔧 綁定管理員功能...');
