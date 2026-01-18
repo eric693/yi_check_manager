@@ -1,8 +1,6 @@
 // LineBotPunch.gs - LINE Bot 打卡完整實作
 
-/**
- * 處理 LINE 文字訊息
- */
+// ========== 修改 handleLineMessage ==========
 function handleLineMessage(event) {
   try {
     const userId = event.source.userId;
@@ -13,7 +11,6 @@ function handleLineMessage(event) {
     Logger.log('   userId: ' + userId);
     Logger.log('   text: ' + text);
     
-    // 檢查員工是否已註冊
     const employee = findEmployeeByLineUserId_(userId);
     
     if (!employee.ok) {
@@ -23,9 +20,24 @@ function handleLineMessage(event) {
     
     Logger.log('✅ 員工已註冊: ' + employee.name);
     
-    // 處理不同的指令
+    // 處理打卡指令
     if (text === '打卡' || text === '上班' || text === '下班') {
-      sendPunchLocationRequest(replyToken, employee.name, text);
+      
+      // 🔧 修正：根據指令決定打卡類型
+      let punchType;
+      if (text === '上班') {
+        punchType = '上班';
+      } else if (text === '下班') {
+        punchType = '下班';
+      } else {
+        // 「打卡」指令：自動判斷
+        punchType = determinePunchType(userId);
+      }
+      
+      // 🔧 修正：將打卡類型暫存起來
+      savePunchIntent_(userId, punchType);
+      
+      sendPunchLocationRequest(replyToken, employee.name, punchType);
     } 
     else if (text === '查詢' || text === '我的打卡') {
       sendTodayPunchRecords(replyToken, userId, employee.name);
@@ -37,7 +49,6 @@ function handleLineMessage(event) {
       sendHelpMessage(replyToken);
     }
     else {
-      // 未知指令，顯示提示
       replyMessage(replyToken, '💡 我不太明白您的意思\n\n請輸入「指令」查看可用功能');
     }
     
@@ -46,6 +57,139 @@ function handleLineMessage(event) {
   }
 }
 
+// ========== 新增：暫存打卡意圖 ==========
+/**
+ * 暫存用戶的打卡意圖
+ * @param {string} userId - LINE userId
+ * @param {string} punchType - 打卡類型（上班/下班）
+ */
+function savePunchIntent_(userId, punchType) {
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const key = 'PUNCH_INTENT_' + userId;
+    
+    // 暫存 5 分鐘
+    const intent = {
+      type: punchType,
+      timestamp: new Date().getTime()
+    };
+    
+    props.setProperty(key, JSON.stringify(intent));
+    Logger.log('💾 已暫存打卡意圖: ' + punchType);
+    
+  } catch (error) {
+    Logger.log('❌ savePunchIntent_ 錯誤: ' + error);
+  }
+}
+
+/**
+ * 取得用戶的打卡意圖
+ * @param {string} userId - LINE userId
+ * @returns {string|null} - 打卡類型或 null
+ */
+function getPunchIntent_(userId) {
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const key = 'PUNCH_INTENT_' + userId;
+    const intentStr = props.getProperty(key);
+    
+    if (!intentStr) {
+      return null;
+    }
+    
+    const intent = JSON.parse(intentStr);
+    const now = new Date().getTime();
+    
+    // 檢查是否過期（5 分鐘 = 300000 毫秒）
+    if (now - intent.timestamp > 300000) {
+      props.deleteProperty(key);
+      Logger.log('⏰ 打卡意圖已過期');
+      return null;
+    }
+    
+    Logger.log('✅ 取得打卡意圖: ' + intent.type);
+    return intent.type;
+    
+  } catch (error) {
+    Logger.log('❌ getPunchIntent_ 錯誤: ' + error);
+    return null;
+  }
+}
+
+/**
+ * 清除打卡意圖
+ * @param {string} userId - LINE userId
+ */
+function clearPunchIntent_(userId) {
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const key = 'PUNCH_INTENT_' + userId;
+    props.deleteProperty(key);
+    Logger.log('🗑️ 已清除打卡意圖');
+  } catch (error) {
+    Logger.log('❌ clearPunchIntent_ 錯誤: ' + error);
+  }
+}
+
+/**
+ * 檢查是否為重複打卡（1分鐘內相同類型）
+ */
+function isDuplicatePunch_(userId, punchType) {
+  try {
+    const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_ATTENDANCE);
+    const values = sheet.getDataRange().getValues();
+    const now = new Date().getTime();
+    
+    // 檢查最近 1 分鐘內的記錄
+    for (let i = values.length - 1; i >= 1; i--) {
+      const recordTime = new Date(values[i][0]).getTime();
+      const recordUserId = values[i][1];
+      const recordType = values[i][4];
+      
+      // 如果是同一個人、同一種類型、時間在 1 分鐘內
+      if (recordUserId === userId && 
+          recordType === punchType && 
+          (now - recordTime) < 60000) {  // 60000ms = 1分鐘
+        Logger.log('⚠️ 偵測到重複打卡，已忽略');
+        return true;
+      }
+      
+      // 只檢查最近 10 筆記錄即可
+      if (values.length - i > 10) break;
+    }
+    
+    return false;
+    
+  } catch (error) {
+    Logger.log('❌ isDuplicatePunch_ 錯誤: ' + error);
+    return false;
+  }
+}
+
+/**
+ * 檢查事件是否已處理過（防止 LINE Webhook 重複觸發）
+ */
+function isEventProcessed_(eventId) {
+  try {
+    const cache = CacheService.getScriptCache();
+    const key = 'EVENT_' + eventId;
+    
+    // 檢查快取中是否存在
+    if (cache.get(key)) {
+      Logger.log('⚠️ 事件已處理過: ' + eventId);
+      return true;
+    }
+    
+    // 標記為已處理（快取 10 分鐘）
+    cache.put(key, 'processed', 600);
+    Logger.log('✅ 標記事件為已處理: ' + eventId);
+    return false;
+    
+  } catch (error) {
+    Logger.log('❌ isEventProcessed_ 錯誤: ' + error);
+    return false;  // 發生錯誤時允許處理，避免卡住
+  }
+}
 /**
  * 處理 LINE 位置訊息（執行打卡）
  */
@@ -60,7 +204,6 @@ function handleLineLocation(event) {
     Logger.log('   userId: ' + userId);
     Logger.log('   座標: ' + lat + ', ' + lng);
     
-    // 檢查員工
     const employee = findEmployeeByLineUserId_(userId);
     
     if (!employee.ok) {
@@ -68,12 +211,18 @@ function handleLineLocation(event) {
       return;
     }
     
-    // 判斷打卡類型（根據今天的打卡記錄）
-    const punchType = determinePunchType(userId);
+    // 🔧 修正：先嘗試從暫存取得打卡意圖
+    let punchType = getPunchIntent_(userId);
     
-    Logger.log('🔍 判斷打卡類型: ' + punchType);
+    // 如果沒有暫存（可能是直接傳送位置），才自動判斷
+    if (!punchType) {
+      punchType = determinePunchType(userId);
+      Logger.log('🔍 自動判斷打卡類型: ' + punchType);
+    } else {
+      Logger.log('📋 使用暫存的打卡類型: ' + punchType);
+    }
     
-    // 檢查是否在打卡範圍內
+    // 檢查位置
     const locationCheck = checkPunchLocation(lat, lng);
     
     if (!locationCheck.valid) {
@@ -84,11 +233,21 @@ function handleLineLocation(event) {
       };
       
       sendLineReply_(replyToken, [message]);
+      
+      // 🔧 修正：打卡失敗也要清除意圖
+      clearPunchIntent_(userId);
       return;
     }
     
     Logger.log('✅ 位置檢查通過: ' + locationCheck.locationName);
     
+    // 🔧 新增：檢查是否為重複打卡
+    if (isDuplicatePunch_(userId, punchType)) {
+      Logger.log('⚠️ 重複打卡，已忽略');
+      replyMessage(replyToken, '⚠️ 您剛剛已經打過卡了，請勿重複操作');
+      clearPunchIntent_(userId);
+      return;
+    }
     // 執行打卡
     const punchResult = executePunch(userId, punchType, lat, lng, locationCheck.locationName);
     
@@ -105,8 +264,12 @@ function handleLineLocation(event) {
       };
       
       sendLineReply_(replyToken, [message]);
+      
+      // 🔧 修正：打卡成功後清除意圖
+      clearPunchIntent_(userId);
     } else {
       replyMessage(replyToken, '❌ 打卡失敗\n\n' + punchResult.message);
+      clearPunchIntent_(userId);
     }
     
   } catch (error) {
@@ -313,10 +476,12 @@ function sendPunchLocationRequest(replyToken, employeeName, punchType) {
           },
           {
             type: 'text',
-            text: punchType === '打卡' ? '系統將自動判斷上班或下班' : `準備${punchType}打卡`,
-            size: 'sm',
-            color: '#666666',
-            margin: 'md'
+            // 🔧 修正：明確顯示打卡類型
+            text: `準備進行【${punchType}】打卡`,
+            size: 'md',
+            color: punchType === '上班' ? '#4CAF50' : '#FF9800',
+            margin: 'md',
+            weight: 'bold'
           },
           {
             type: 'separator',
