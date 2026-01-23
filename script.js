@@ -1630,14 +1630,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             initWorklogTab();
         });
     }
-
-    await initEmployeeBasicInfo();
-    // ⭐ 新增：綁定儲存按鈕
-    const saveBasicInfoBtn = document.getElementById('save-basic-info-btn');
-    if (saveBasicInfoBtn) {
-        saveBasicInfoBtn.addEventListener('click', saveEmployeeBasicInfo);
-    }
-
     let pendingRequests = []; // 新增：用於快取待審核的請求
     
     // 全域變數，用於儲存地圖實例
@@ -2694,6 +2686,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showNotification('發布失敗', 'error');
             }
         });
+    }
+
+    // ⭐ 在這裡加入基本資料的初始化和事件綁定
+    await initEmployeeBasicInfo();
+    
+    const saveBasicInfoBtn = document.getElementById('save-basic-info-btn');
+    if (saveBasicInfoBtn) {
+        saveBasicInfoBtn.addEventListener('click', saveEmployeeBasicInfo);
+        console.log('✅ 基本資料儲存按鈕已綁定');
+    } else {
+        console.warn('⚠️ 找不到基本資料儲存按鈕');
     }
     displayAnnouncements();
 });
