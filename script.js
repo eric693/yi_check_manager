@@ -4282,17 +4282,16 @@ async function deleteAnnouncement(id) {
 }
 
 // ==================== 員工基本資料功能 ====================
-
 /**
  * ✅ 初始化員工基本資料（自動載入）
  */
 async function initEmployeeBasicInfo() {
     try {
-        Logger.log('📋 初始化員工基本資料');
+        console.log('📋 初始化員工基本資料'); // ⭐ 改這裡
         
         const token = localStorage.getItem('sessionToken');
         if (!token) {
-            Logger.log('⚠️ 未登入，跳過載入');
+            console.log('⚠️ 未登入，跳過載入'); // ⭐ 改這裡
             return;
         }
         
@@ -4308,7 +4307,7 @@ async function initEmployeeBasicInfo() {
         if (formEl) formEl.style.display = 'block';
         
         if (res.ok && res.data) {
-            Logger.log('✅ 載入成功，填入資料');
+            console.log('✅ 載入成功，填入資料'); // ⭐ 改這裡
             
             // 填入表單
             document.getElementById('employee-id-number').value = res.data.idNumber || '';
@@ -4328,11 +4327,64 @@ async function initEmployeeBasicInfo() {
                 }
             }
         } else {
-            Logger.log('ℹ️ 尚未填寫基本資料');
+            console.log('ℹ️ 尚未填寫基本資料'); // ⭐ 改這裡
         }
         
     } catch (error) {
-        Logger.log('❌ initEmployeeBasicInfo 錯誤: ' + error);
+        console.error('❌ initEmployeeBasicInfo 錯誤:', error); // ⭐ 改這裡
+    }
+}
+
+/**
+ * ✅ 初始化員工基本資料（自動載入）
+ */
+async function initEmployeeBasicInfo() {
+    try {
+        console.log('📋 初始化員工基本資料'); // ⭐ 改這裡
+        
+        const token = localStorage.getItem('sessionToken');
+        if (!token) {
+            console.log('⚠️ 未登入，跳過載入'); // ⭐ 改這裡
+            return;
+        }
+        
+        const loadingEl = document.getElementById('basic-info-loading');
+        const formEl = document.getElementById('basic-info-form');
+        
+        if (loadingEl) loadingEl.style.display = 'block';
+        if (formEl) formEl.style.display = 'none';
+        
+        const res = await callApifetch('getEmployeeBasicInfo');
+        
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (formEl) formEl.style.display = 'block';
+        
+        if (res.ok && res.data) {
+            console.log('✅ 載入成功，填入資料'); // ⭐ 改這裡
+            
+            // 填入表單
+            document.getElementById('employee-id-number').value = res.data.idNumber || '';
+            document.getElementById('employee-address').value = res.data.address || '';
+            document.getElementById('employee-phone').value = res.data.phone || '';
+            document.getElementById('employee-birthdate').value = res.data.birthDate || '';
+            
+            // 顯示最後更新時間
+            if (res.data.updatedAt) {
+                const updateTimeEl = document.getElementById('basic-info-update-time');
+                const updateTimeText = document.getElementById('update-time-text');
+                
+                if (updateTimeEl && updateTimeText) {
+                    const date = new Date(res.data.updatedAt);
+                    updateTimeText.textContent = date.toLocaleString('zh-TW');
+                    updateTimeEl.style.display = 'block';
+                }
+            }
+        } else {
+            console.log('ℹ️ 尚未填寫基本資料'); // ⭐ 改這裡
+        }
+        
+    } catch (error) {
+        console.error('❌ initEmployeeBasicInfo 錯誤:', error); // ⭐ 改這裡
     }
 }
 
@@ -4341,7 +4393,7 @@ async function initEmployeeBasicInfo() {
  */
 async function saveEmployeeBasicInfo() {
     try {
-        Logger.log('💾 儲存員工基本資料');
+        console.log('💾 儲存員工基本資料'); // ⭐ 改這裡
         
         const saveBtn = document.getElementById('save-basic-info-btn');
         const loadingText = t('SAVING') || '儲存中...';
@@ -4392,7 +4444,7 @@ async function saveEmployeeBasicInfo() {
         }
         
     } catch (error) {
-        Logger.log('❌ saveEmployeeBasicInfo 錯誤: ' + error);
+        console.error('❌ saveEmployeeBasicInfo 錯誤:', error); // ⭐ 改這裡
         showNotification('儲存失敗', 'error');
         
     } finally {
