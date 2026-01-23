@@ -1290,6 +1290,134 @@
                         <!-- 用戶列表 -->
                         <div id="users-list" class="space-y-3"></div>
                     </div>
+                    <!-- 員工基本資料管理 -->
+                    <div class="card p-6 mt-6">
+                        <h2 data-i18n="EMPLOYEE_BASIC_INFO_TITLE" 
+                            class="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                        👤 員工基本資料管理
+                        </h2>
+                        <p data-i18n="EMPLOYEE_BASIC_INFO_DESC" 
+                        class="text-gray-500 dark:text-gray-400 mb-4">
+                        管理員工的基本資訊（身分證、地址、電話、生日）
+                        </p>
+                        
+                        <!-- 新增/編輯表單 -->
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+                        <h3 class="font-semibold text-gray-800 dark:text-white mb-3">
+                            <span id="employee-info-form-title">新增員工基本資料</span>
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <!-- 員工選擇 -->
+                            <div>
+                            <label for="emp-info-select" 
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                選擇員工 <span class="text-red-500">*</span>
+                            </label>
+                            <select id="emp-info-select" 
+                                    onchange="loadEmployeeInfoForEdit()"
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-600 dark:text-white">
+                                <option value="">-- 請選擇員工 --</option>
+                            </select>
+                            </div>
+                            
+                            <!-- 姓名 (唯讀，自動帶入) -->
+                            <div>
+                            <label for="emp-info-name" 
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                姓名
+                            </label>
+                            <input type="text" 
+                                    id="emp-info-name" 
+                                    readonly
+                                    placeholder="選擇員工後自動帶入"
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-600 dark:text-gray-400">
+                            </div>
+                            
+                            <!-- 身分證字號 -->
+                            <div>
+                            <label for="emp-info-id-number" 
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                身分證字號
+                            </label>
+                            <input type="text" 
+                                    id="emp-info-id-number" 
+                                    maxlength="10"
+                                    placeholder="例如：A123456789"
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-600 dark:text-white">
+                            </div>
+                            
+                            <!-- 地址 -->
+                            <div>
+                            <label for="emp-info-address" 
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                地址
+                            </label>
+                            <input type="text" 
+                                    id="emp-info-address" 
+                                    placeholder="例如：台北市信義區..."
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-600 dark:text-white">
+                            </div>
+                            
+                            <!-- 電話 -->
+                            <div>
+                            <label for="emp-info-phone" 
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                電話
+                            </label>
+                            <input type="tel" 
+                                    id="emp-info-phone" 
+                                    placeholder="例如：0912-345-678"
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-600 dark:text-white">
+                            </div>
+                            
+                            <!-- 生日 -->
+                            <div>
+                            <label for="emp-info-birthdate" 
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                生日
+                            </label>
+                            <input type="date" 
+                                    id="emp-info-birthdate" 
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-600 dark:text-white">
+                            </div>
+                            
+                            <!-- 按鈕 -->
+                            <div class="flex space-x-2">
+                            <button id="save-employee-info-btn" 
+                                    onclick="saveEmployeeBasicInfo()"
+                                    class="flex-1 py-2 px-4 rounded-lg font-bold btn-primary">
+                                💾 儲存資料
+                            </button>
+                            <button onclick="clearEmployeeInfoForm()"
+                                    class="px-4 py-2 rounded-lg font-bold bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200">
+                                🔄 清空
+                            </button>
+                            </div>
+                        </div>
+                        </div>
+                        
+                        <!-- 員工基本資料列表 -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                        <h3 class="font-semibold text-gray-800 dark:text-white mb-3">
+                            📋 員工基本資料列表
+                        </h3>
+                        
+                        <div id="employee-info-list-loading" 
+                            class="text-center text-gray-500 dark:text-gray-400 py-4" 
+                            style="display: none;">
+                            載入中...
+                        </div>
+                        
+                        <div id="employee-info-list-empty" 
+                            class="text-center text-gray-500 dark:text-gray-400 py-4" 
+                            style="display: none;">
+                            目前沒有員工基本資料
+                        </div>
+                        
+                        <div id="employee-info-list" class="space-y-2"></div>
+                        </div>
+                    </div>
                     <!-- 員工打卡分析區塊 -->
                     <div class="card p-6 mt-6">
                         <h2 data-i18n="ADMIN_PUNCH_ANALYSIS_TITLE" 
@@ -1469,7 +1597,7 @@
             </div>
             <footer class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
                 <p>
-                    <span data-i18n="APP_TITLE">出勤管家</span> v4.3.6 |
+                    <span data-i18n="APP_TITLE">出勤管家</span> v4.3.7 |
                     <span class="text-gray-400 dark:text-gray-500">
                     <a data-i18n="FOOTER_CREDITS" href="https://github.com/0rigind1865-bit/Attendance-System"
                         class="hover:underline hover:text-indigo-600 dark:hover:text-indigo-400">
