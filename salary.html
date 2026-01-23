@@ -1554,8 +1554,8 @@
             const pensionSelf = Math.round(insuredSalary * (pensionRate / 100));
                     
             let incomeTax = 0;
-            if (baseSalary > 34000) {
-                incomeTax = Math.round((baseSalary - 34000) * 0.05);
+            if (baseSalary > 35000) {  // 2026 年門檻可能調整
+                incomeTax = Math.round((baseSalary - 35000) * 0.05);
             }
             
             const hourlyRate = Math.round(baseSalary / 30 / 8);
@@ -2125,19 +2125,19 @@
                 return;
             }
             
-            // 取得投保薪資級距
+            // ⭐ 2026 年投保薪資級距
             const insuredSalary = getInsuredSalary(baseSalary);
             
-            // 計算法定扣款
+            // ⭐ 2026 年費率計算
             const laborFee = Math.round(insuredSalary * 0.115 * 0.2);
             const healthFee = Math.round(insuredSalary * 0.0517 * 0.3);
             const employmentFee = Math.round(insuredSalary * 0.01 * 0.2);
             const pensionSelf = Math.round(insuredSalary * (pensionRate / 100));
             
-            // 計算所得稅
+            // ⭐ 2026 年所得稅門檻
             let incomeTax = 0;
-            if (baseSalary > 34000) {
-                incomeTax = Math.round((baseSalary - 34000) * 0.05);
+            if (baseSalary > 35000) {
+                incomeTax = Math.round((baseSalary - 35000) * 0.05);
             }
             
             // 更新欄位
