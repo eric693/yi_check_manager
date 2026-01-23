@@ -470,6 +470,9 @@ async function ensureLogin()
           
           if (res.user.dept === "管理員") {
             document.getElementById('tab-admin-btn').style.display = 'block';
+            document.getElementById('tab-shift-btn').style.display = 'block';
+          } else {
+            document.getElementById('tab-shift-btn').style.display = 'none'; // 👈 新增這行
           }
           
           document.getElementById("user-name").textContent = res.user.name;
@@ -2516,7 +2519,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
 
     // 頁面切換事件
-    const tabShiftBtn = document.getElementById('tab-shift-btn');
+    const tabShiftBtn = document.getElementById('tab-shift-btn');÷
 
     // 在現有的分頁按鈕事件後面加入：
     tabShiftBtn.addEventListener('click', () => {switchTab('shift-view');});
