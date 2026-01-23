@@ -52,7 +52,7 @@
     "API_TEST_TITLE": "API 測試區",
     "API_TEST_DESCRIPTION": "點擊下方按鈕以測試新的 API 功能。",
     "API_TEST_BTN": "測試 API",
-    "FOOTER_VERSION": "出勤管家 v4.3.7",
+    "FOOTER_VERSION": "出勤管家 v4.3.6",
     "FOOTER_CREDITS_PREFIX": "由",
     "FOOTER_CREDITS_SUFFIX": "製作",
     "FOOTER_SPONSOR": "點此贊助此專案",
@@ -766,6 +766,16 @@
   "STATUS_REJECTED": "已拒絕",
   "_comment_common": "=== 通用按鈕與標籤 ===",
   "DELETE_FAILED": "刪除失敗",
-  "LOAD_FAILED": "載入失敗"
+  "LOAD_FAILED": "載入失敗",
+
+  "MY_BASIC_INFO_TITLE": "我的基本資料",
+  "MY_BASIC_INFO_DESC": "填寫或更新您的個人基本資料",
+  "ID_NUMBER_LABEL": "身分證字號",
+  "ADDRESS_LABEL": "地址",
+  "PHONE_LABEL": "電話",
+  "BIRTHDATE_LABEL": "生日",
+  "BTN_SAVE_BASIC_INFO": "儲存基本資料",
+  "SAVING": "儲存中...",
+  "SAVE_SUCCESS": "儲存成功！"
 
 }

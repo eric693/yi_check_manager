@@ -1631,6 +1631,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    initEmployeeBasicInfo();
+    // ⭐ 新增：綁定儲存按鈕
+    const saveBasicInfoBtn = document.getElementById('save-basic-info-btn');
+    if (saveBasicInfoBtn) {
+        saveBasicInfoBtn.addEventListener('click', saveEmployeeBasicInfo);
+    }
+
     let pendingRequests = []; // 新增：用於快取待審核的請求
     
     // 全域變數，用於儲存地圖實例
@@ -2122,8 +2129,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             displayAdminAnnouncements();
             initAdminAnalysis();
             loadAllUsers();
-            loadEmployeeSelectForBasicInfo();
-            loadEmployeeBasicInfoList();
         } else if (tabId === 'overtime-view') {
             initOvertimeTab();
         } else if (tabId === 'leave-view') {
@@ -4276,277 +4281,124 @@ async function deleteAnnouncement(id) {
     }
 }
 
-// ==================== 員工基本資料管理 ====================
+// ==================== 員工基本資料功能 ====================
 
 /**
- * 🔄 載入員工選單（用於基本資料管理）
+ * ✅ 初始化員工基本資料（自動載入）
  */
-async function loadEmployeeSelectForBasicInfo() {
+async function initEmployeeBasicInfo() {
     try {
-      const select = document.getElementById('emp-info-select');
-      
-      if (!select) return;
-      
-      const res = await callApifetch('getAllUsers');
-      
-      if (res.ok && res.users) {
-        select.innerHTML = '<option value="">-- 請選擇員工 --</option>';
+        Logger.log('📋 初始化員工基本資料');
         
-        res.users.forEach(user => {
-          const option = document.createElement('option');
-          option.value = user.userId;
-          option.textContent = `${user.name} (${user.dept || '未分類'})`;
-          option.dataset.name = user.name;
-          select.appendChild(option);
-        });
-      }
-      
-    } catch (error) {
-      console.error('載入員工選單失敗:', error);
-    }
-  }
-  
-  /**
-   * 📋 載入員工基本資料列表
-   */
-  async function loadEmployeeBasicInfoList() {
-    const listEl = document.getElementById('employee-info-list');
-    const loadingEl = document.getElementById('employee-info-list-loading');
-    const emptyEl = document.getElementById('employee-info-list-empty');
-    
-    if (!listEl) return;
-    
-    try {
-      if (loadingEl) loadingEl.style.display = 'block';
-      if (emptyEl) emptyEl.style.display = 'none';
-      listEl.innerHTML = '';
-      
-      const res = await callApifetch('getAllEmployeeBasicInfo');
-      
-      if (loadingEl) loadingEl.style.display = 'none';
-      
-      if (res.ok && res.data && res.data.length > 0) {
-        res.data.forEach(emp => {
-          const div = document.createElement('div');
-          div.className = 'bg-gray-50 dark:bg-gray-700 rounded-lg p-3 flex items-start justify-between';
-          
-          div.innerHTML = `
-            <div class="flex-1">
-              <p class="font-bold text-gray-800 dark:text-white mb-1">
-                ${emp.employeeName}
-              </p>
-              <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                ${emp.idNumber ? `<p>🪪 ${emp.idNumber}</p>` : ''}
-                ${emp.phone ? `<p>📞 ${emp.phone}</p>` : ''}
-                ${emp.birthDate ? `<p>🎂 ${emp.birthDate}</p>` : ''}
-                ${emp.address ? `<p>📍 ${emp.address}</p>` : ''}
-              </div>
-            </div>
+        const token = localStorage.getItem('sessionToken');
+        if (!token) {
+            Logger.log('⚠️ 未登入，跳過載入');
+            return;
+        }
+        
+        const loadingEl = document.getElementById('basic-info-loading');
+        const formEl = document.getElementById('basic-info-form');
+        
+        if (loadingEl) loadingEl.style.display = 'block';
+        if (formEl) formEl.style.display = 'none';
+        
+        const res = await callApifetch('getEmployeeBasicInfo');
+        
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (formEl) formEl.style.display = 'block';
+        
+        if (res.ok && res.data) {
+            Logger.log('✅ 載入成功，填入資料');
             
-            <div class="flex flex-col space-y-2 ml-4">
-              <button onclick="editEmployeeBasicInfo('${emp.employeeId}')"
-                      class="px-3 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded">
-                ✏️ 編輯
-              </button>
-              <button onclick="confirmDeleteEmployeeBasicInfo('${emp.employeeId}', '${emp.employeeName}')"
-                      class="px-3 py-1 text-xs bg-red-500 hover:bg-red-600 text-white rounded">
-                🗑️ 刪除
-              </button>
-            </div>
-          `;
-          
-          listEl.appendChild(div);
-        });
+            // 填入表單
+            document.getElementById('employee-id-number').value = res.data.idNumber || '';
+            document.getElementById('employee-address').value = res.data.address || '';
+            document.getElementById('employee-phone').value = res.data.phone || '';
+            document.getElementById('employee-birthdate').value = res.data.birthDate || '';
+            
+            // 顯示最後更新時間
+            if (res.data.updatedAt) {
+                const updateTimeEl = document.getElementById('basic-info-update-time');
+                const updateTimeText = document.getElementById('update-time-text');
+                
+                if (updateTimeEl && updateTimeText) {
+                    const date = new Date(res.data.updatedAt);
+                    updateTimeText.textContent = date.toLocaleString('zh-TW');
+                    updateTimeEl.style.display = 'block';
+                }
+            }
+        } else {
+            Logger.log('ℹ️ 尚未填寫基本資料');
+        }
         
-      } else {
-        if (emptyEl) emptyEl.style.display = 'block';
-      }
-      
     } catch (error) {
-      console.error('載入員工基本資料失敗:', error);
-      if (loadingEl) loadingEl.style.display = 'none';
-      if (emptyEl) emptyEl.style.display = 'block';
+        Logger.log('❌ initEmployeeBasicInfo 錯誤: ' + error);
     }
-  }
-  
-  /**
-   * 💾 儲存員工基本資料
-   */
-  async function saveEmployeeBasicInfo() {
-    const btn = document.getElementById('save-employee-info-btn');
-    const employeeId = document.getElementById('emp-info-select').value;
-    const employeeName = document.getElementById('emp-info-name').value.trim();
-    const idNumber = document.getElementById('emp-info-id-number').value.trim();
-    const address = document.getElementById('emp-info-address').value.trim();
-    const phone = document.getElementById('emp-info-phone').value.trim();
-    const birthDate = document.getElementById('emp-info-birthdate').value;
-    
-    if (!employeeId) {
-      showNotification('請選擇員工', 'error');
-      return;
-    }
-    
-    if (!employeeName) {
-      showNotification('員工姓名不能為空', 'error');
-      return;
-    }
-    
+}
+
+/**
+ * ✅ 儲存員工基本資料
+ */
+async function saveEmployeeBasicInfo() {
     try {
-      generalButtonState(btn, 'processing', '儲存中...');
-      
-      const res = await callApifetch(
-        `setEmployeeBasicInfo&employeeId=${encodeURIComponent(employeeId)}&employeeName=${encodeURIComponent(employeeName)}&idNumber=${encodeURIComponent(idNumber)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&birthDate=${encodeURIComponent(birthDate)}`
-      );
-      
-      if (res.ok) {
-        showNotification('✅ ' + res.msg, 'success');
-        clearEmployeeInfoForm();
-        await loadEmployeeBasicInfoList();
-      } else {
-        showNotification('❌ ' + (res.msg || '儲存失敗'), 'error');
-      }
-      
+        Logger.log('💾 儲存員工基本資料');
+        
+        const saveBtn = document.getElementById('save-basic-info-btn');
+        const loadingText = t('SAVING') || '儲存中...';
+        
+        // 取得表單資料
+        const idNumber = document.getElementById('employee-id-number').value.trim();
+        const address = document.getElementById('employee-address').value.trim();
+        const phone = document.getElementById('employee-phone').value.trim();
+        const birthDate = document.getElementById('employee-birthdate').value;
+        
+        // 驗證必填欄位
+        if (!idNumber) {
+            showNotification('請填寫身分證字號', 'error');
+            return;
+        }
+        
+        // 驗證身分證格式（台灣身分證）
+        const idPattern = /^[A-Z][12]\d{8}$/;
+        if (!idPattern.test(idNumber)) {
+            showNotification('身分證字號格式不正確（例：A123456789）', 'error');
+            return;
+        }
+        
+        // 按鈕進入處理中狀態
+        if (saveBtn) {
+            generalButtonState(saveBtn, 'processing', loadingText);
+        }
+        
+        // 呼叫 API
+        const res = await callApifetch(
+            `setEmployeeBasicInfo&idNumber=${encodeURIComponent(idNumber)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&birthDate=${encodeURIComponent(birthDate)}`
+        );
+        
+        if (res.ok) {
+            showNotification(t('SAVE_SUCCESS') || '儲存成功！', 'success');
+            
+            // 更新最後更新時間
+            const updateTimeEl = document.getElementById('basic-info-update-time');
+            const updateTimeText = document.getElementById('update-time-text');
+            
+            if (updateTimeEl && updateTimeText) {
+                const now = new Date();
+                updateTimeText.textContent = now.toLocaleString('zh-TW');
+                updateTimeEl.style.display = 'block';
+            }
+        } else {
+            showNotification(res.msg || '儲存失敗', 'error');
+        }
+        
     } catch (error) {
-      console.error('儲存失敗:', error);
-      showNotification('儲存失敗', 'error');
-      
+        Logger.log('❌ saveEmployeeBasicInfo 錯誤: ' + error);
+        showNotification('儲存失敗', 'error');
+        
     } finally {
-      generalButtonState(btn, 'idle');
+        const saveBtn = document.getElementById('save-basic-info-btn');
+        if (saveBtn) {
+            generalButtonState(saveBtn, 'idle');
+        }
     }
-  }
-  
-  /**
-   * ✏️ 編輯員工基本資料
-   */
-  async function editEmployeeBasicInfo(employeeId) {
-    try {
-      const res = await callApifetch(`getEmployeeBasicInfo&employeeId=${encodeURIComponent(employeeId)}`);
-      
-      if (res.ok && res.data) {
-        const emp = res.data;
-        
-        // 設定選單
-        const select = document.getElementById('emp-info-select');
-        select.value = emp.employeeId;
-        
-        // 填入資料
-        document.getElementById('emp-info-name').value = emp.employeeName;
-        document.getElementById('emp-info-id-number').value = emp.idNumber || '';
-        document.getElementById('emp-info-address').value = emp.address || '';
-        document.getElementById('emp-info-phone').value = emp.phone || '';
-        document.getElementById('emp-info-birthdate').value = emp.birthDate || '';
-        
-        // 更新標題
-        document.getElementById('employee-info-form-title').textContent = '編輯員工基本資料';
-        
-        // 滾動到表單
-        document.getElementById('employee-info-form-title').scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
-        });
-        
-      } else {
-        showNotification('載入失敗', 'error');
-      }
-      
-    } catch (error) {
-      console.error('載入失敗:', error);
-      showNotification('載入失敗', 'error');
-    }
-  }
-  
-  /**
-   * 🗑️ 確認刪除員工基本資料
-   */
-  function confirmDeleteEmployeeBasicInfo(employeeId, employeeName) {
-    if (!confirm(`確定要刪除「${employeeName}」的基本資料嗎？`)) {
-      return;
-    }
-    
-    deleteEmployeeBasicInfo(employeeId);
-  }
-  
-  /**
-   * 🗑️ 刪除員工基本資料
-   */
-  async function deleteEmployeeBasicInfo(employeeId) {
-    try {
-      showNotification('刪除中...', 'warning');
-      
-      const res = await callApifetch(`deleteEmployeeBasicInfo&employeeId=${encodeURIComponent(employeeId)}`);
-      
-      if (res.ok) {
-        showNotification('✅ ' + res.msg, 'success');
-        await loadEmployeeBasicInfoList();
-      } else {
-        showNotification('❌ ' + (res.msg || '刪除失敗'), 'error');
-      }
-      
-    } catch (error) {
-      console.error('刪除失敗:', error);
-      showNotification('刪除失敗', 'error');
-    }
-  }
-  
-  /**
-   * 🔄 清空表單
-   */
-  function clearEmployeeInfoForm() {
-    document.getElementById('emp-info-select').value = '';
-    document.getElementById('emp-info-name').value = '';
-    document.getElementById('emp-info-id-number').value = '';
-    document.getElementById('emp-info-address').value = '';
-    document.getElementById('emp-info-phone').value = '';
-    document.getElementById('emp-info-birthdate').value = '';
-    
-    document.getElementById('employee-info-form-title').textContent = '新增員工基本資料';
-  }
-  
-  /**
-   * 📝 當選擇員工時，自動帶入姓名
-   */
-  function loadEmployeeInfoForEdit() {
-    const select = document.getElementById('emp-info-select');
-    const nameInput = document.getElementById('emp-info-name');
-    
-    if (select.value) {
-      const selectedOption = select.options[select.selectedIndex];
-      nameInput.value = selectedOption.dataset.name || '';
-      
-      // 更新標題
-      document.getElementById('employee-info-form-title').textContent = '編輯員工基本資料';
-      
-      // 嘗試載入現有資料
-      loadExistingEmployeeBasicInfo(select.value);
-    } else {
-      nameInput.value = '';
-      clearEmployeeInfoForm();
-    }
-  }
-  
-  /**
-   * 📥 載入現有員工基本資料（如果有的話）
-   */
-  async function loadExistingEmployeeBasicInfo(employeeId) {
-    try {
-      const res = await callApifetch(`getEmployeeBasicInfo&employeeId=${encodeURIComponent(employeeId)}`);
-      
-      if (res.ok && res.data) {
-        const emp = res.data;
-        
-        document.getElementById('emp-info-id-number').value = emp.idNumber || '';
-        document.getElementById('emp-info-address').value = emp.address || '';
-        document.getElementById('emp-info-phone').value = emp.phone || '';
-        document.getElementById('emp-info-birthdate').value = emp.birthDate || '';
-      } else {
-        // 沒有現有資料，清空表單（保留姓名）
-        document.getElementById('emp-info-id-number').value = '';
-        document.getElementById('emp-info-address').value = '';
-        document.getElementById('emp-info-phone').value = '';
-        document.getElementById('emp-info-birthdate').value = '';
-      }
-      
-    } catch (error) {
-      console.error('載入現有資料失敗:', error);
-    }
-  }
+}
