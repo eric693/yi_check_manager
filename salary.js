@@ -802,15 +802,22 @@ function showNoSalaryMessage(month) {
 
 // ==================== 管理員功能 ====================
 
-/**
- * 綁定表單事件
- */
 function bindSalaryEvents() {
     console.log('🔗 綁定薪資表單事件（完整版）');
     
     const configForm = document.getElementById('salary-config-form');
     if (configForm) {
-        configForm.addEventListener('submit', handleSalaryConfigSubmit);
+        // ⭐⭐⭐ 修正：移除舊的監聽器，避免重複綁定
+        configForm.removeEventListener('submit', handleSalaryConfigSubmit);
+        
+        // ⭐⭐⭐ 修正：使用 addEventListener 而不是 onsubmit
+        configForm.addEventListener('submit', async (e) => {
+            e.preventDefault();  // ← 立即阻止預設行為
+            e.stopPropagation(); // ← 阻止事件冒泡
+            
+            await handleSalaryConfigSubmit(e);
+        });
+        
         console.log('✅ 薪資設定表單已綁定');
     }
     
