@@ -210,13 +210,10 @@ async function loadDailyOvertimeDetails(yearMonth) {
     }
 }
 
-/**
- * ✅ 載入加班記錄卡片（月薪/時薪通用）
- */
 async function loadOvertimeRecordsCard(yearMonth, salaryData) {
     console.log('📊 載入加班記錄卡片');
     
-    // ⭐⭐⭐ 修正：兼容兩種格式（camelCase 和中文欄位）
+    // ⭐⭐⭐ 修正：讀取四種加班費
     const totalOvertimeHours = parseFloat(
         salaryData.totalOvertimeHours !== undefined 
             ? salaryData.totalOvertimeHours 
@@ -235,29 +232,35 @@ async function loadOvertimeRecordsCard(yearMonth, salaryData) {
             : salaryData['休息日加班費']
     ) || 0;
     
+    const sundayOvertimePay = parseFloat(
+        salaryData.sundayOvertimePay !== undefined 
+            ? salaryData.sundayOvertimePay 
+            : salaryData['例假日加班費']
+    ) || 0;
+    
     const holidayOvertimePay = parseFloat(
         salaryData.holidayOvertimePay !== undefined 
             ? salaryData.holidayOvertimePay 
             : salaryData['國定假日加班費']
     ) || 0;
     
-    const totalOvertimePay = weekdayOvertimePay + restdayOvertimePay + holidayOvertimePay;
+    const holidayWorkPay = parseFloat(
+        salaryData.holidayWorkPay !== undefined 
+            ? salaryData.holidayWorkPay 
+            : salaryData['國定假日出勤薪資']
+    ) || 0;
+    
+    const totalOvertimePay = weekdayOvertimePay + restdayOvertimePay + 
+                            sundayOvertimePay + holidayOvertimePay + holidayWorkPay;
     
     console.log(`⏰ 總加班: ${totalOvertimeHours}h`);
     console.log(`   平日: $${weekdayOvertimePay}`);
     console.log(`   休息日: $${restdayOvertimePay}`);
-    console.log(`   例假日: $${holidayOvertimePay}`);
+    console.log(`   例假日: $${sundayOvertimePay}`);
+    console.log(`   國定假日加班費: $${holidayOvertimePay}`);
+    console.log(`   國定假日出勤薪資: $${holidayWorkPay}`);
     
-    let overtimeCard = document.getElementById('overtime-records-card');
-    
-    if (!overtimeCard) {
-        overtimeCard = document.createElement('div');
-        overtimeCard.id = 'overtime-records-card';
-        overtimeCard.className = 'feature-box bg-orange-900/20 border-orange-700 mt-4';
-        
-        const detailsSection = document.getElementById('attendance-details-section');
-        detailsSection.appendChild(overtimeCard);
-    }
+    // ... 顯示邏輯 ...
     
     if (totalOvertimeHours > 0) {
         overtimeCard.style.display = 'block';
@@ -277,13 +280,13 @@ async function loadOvertimeRecordsCard(yearMonth, salaryData) {
                 </div>
                 <div class="text-center p-3 bg-orange-800/20 rounded-lg">
                     <p class="text-sm text-orange-300 mb-1">假日加班費</p>
-                    <p class="text-xl font-bold text-orange-200">${formatCurrency(restdayOvertimePay + holidayOvertimePay)}</p>
-                    <p class="text-xs text-orange-400 mt-1">(週六/日 ×1.34~2.67)</p>
+                    <p class="text-xl font-bold text-orange-200">${formatCurrency(restdayOvertimePay + sundayOvertimePay + holidayOvertimePay + holidayWorkPay)}</p>
+                    <p class="text-xs text-orange-400 mt-1">(週六/日/國定 ×1.34~2.67)</p>
                 </div>
             </div>
             
-            <!-- ⭐ 新增：詳細分類 -->
-            ${restdayOvertimePay > 0 || holidayOvertimePay > 0 ? `
+            <!-- ⭐ 詳細分類 -->
+            ${restdayOvertimePay > 0 || sundayOvertimePay > 0 || holidayOvertimePay > 0 || holidayWorkPay > 0 ? `
                 <div class="p-3 bg-orange-800/10 rounded-lg mb-3">
                     <div class="text-sm space-y-1">
                         ${restdayOvertimePay > 0 ? `
@@ -292,10 +295,22 @@ async function loadOvertimeRecordsCard(yearMonth, salaryData) {
                                 <span class="font-mono text-orange-200">${formatCurrency(restdayOvertimePay)}</span>
                             </div>
                         ` : ''}
+                        ${sundayOvertimePay > 0 ? `
+                            <div class="flex justify-between">
+                                <span class="text-orange-300">例假日（週日）×2.0</span>
+                                <span class="font-mono text-orange-200">${formatCurrency(sundayOvertimePay)}</span>
+                            </div>
+                        ` : ''}
+                        ${holidayWorkPay > 0 ? `
+                            <div class="flex justify-between border-t border-orange-700/30 pt-2">
+                                <span class="text-orange-300 font-semibold">國定假日出勤薪資</span>
+                                <span class="font-mono text-orange-200 font-bold">${formatCurrency(holidayWorkPay)}</span>
+                            </div>
+                        ` : ''}
                         ${holidayOvertimePay > 0 ? `
                             <div class="flex justify-between">
-                                <span class="text-orange-300">例假日（週日）</span>
-                                <span class="font-mono text-orange-200">${formatCurrency(holidayOvertimePay)}</span>
+                                <span class="text-orange-300 font-semibold">國定假日加班費 ×2.0</span>
+                                <span class="font-mono text-orange-200 font-bold">${formatCurrency(holidayOvertimePay)}</span>
                             </div>
                         ` : ''}
                     </div>
@@ -966,11 +981,12 @@ async function handleSalaryCalculation() {
 }
 
 /**
- * ✅ 顯示薪資計算結果（支援月薪/時薪區分）
+ * ✅ 顯示薪資計算結果（支援月薪/時薪區分 + 國定假日完整版）
  */
 function displaySalaryCalculation(data, container) {
     if (!container) return;
     
+    // 計算扣款總額
     const totalDeductions = 
         (parseFloat(data.laborFee) || 0) + 
         (parseFloat(data.healthFee) || 0) + 
@@ -985,9 +1001,10 @@ function displaySalaryCalculation(data, container) {
     
     const isHourly = data.salaryType === '時薪';
     
-    // ⭐ 修正：讀取三種加班費
+    // ⭐⭐⭐ 修正：讀取四種加班費 + 國定假日出勤薪資
     const weekdayOvertimePay = parseFloat(data.weekdayOvertimePay) || 0;
     const restdayOvertimePay = parseFloat(data.restdayOvertimePay) || 0;
+    const holidayWorkPay = parseFloat(data.holidayWorkPay) || 0;          // ⭐ 新增
     const holidayOvertimePay = parseFloat(data.holidayOvertimePay) || 0;
     const totalOvertimeHours = parseFloat(data.totalOvertimeHours) || 0;
     
@@ -996,7 +1013,6 @@ function displaySalaryCalculation(data, container) {
     const sickLeaveDeduction = parseFloat(data.sickLeaveDeduction) || 0;
     const personalLeaveDays = parseFloat(data.personalLeaveDays) || 0;
     const personalLeaveDeduction = parseFloat(data.personalLeaveDeduction) || 0;
-    const totalLeaveDeduction = parseFloat(data.leaveDeduction) || 0;
 
     container.innerHTML = `
         <div class="calculation-card">
@@ -1007,6 +1023,7 @@ function displaySalaryCalculation(data, container) {
                 </span>
             </h3>
             
+            <!-- 三大金額卡片 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div class="info-card" style="background: rgba(34, 197, 94, 0.1);">
                     <div class="info-label">應發總額</div>
@@ -1022,9 +1039,10 @@ function displaySalaryCalculation(data, container) {
                 </div>
             </div>
             
+            <!-- ⭐ 時薪工時統計區塊 -->
             ${isHourly ? `
                 <div class="bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-lg p-4 mb-6">
-                    <h4 class="font-semibold text-purple-800 dark:text-purple-300 mb-3">時薪工時統計</h4>
+                    <h4 class="font-semibold text-purple-800 dark:text-purple-300 mb-3">⏰ 時薪工時統計</h4>
                     <div class="grid grid-cols-3 gap-4 text-center">
                         <div>
                             <p class="text-sm text-purple-600 dark:text-purple-400">時薪</p>
@@ -1043,9 +1061,10 @@ function displaySalaryCalculation(data, container) {
                 </div>
             ` : ''}
             
+            <!-- ⭐⭐⭐ 加班統計區塊（完整版：含國定假日） -->
             ${totalOvertimeHours > 0 ? `
                 <div class="bg-orange-50 dark:bg-orange-900/20 border-2 border-orange-200 dark:border-orange-700 rounded-lg p-4 mb-6">
-                    <h4 class="font-semibold text-orange-800 dark:text-orange-300 mb-3">本月加班統計</h4>
+                    <h4 class="font-semibold text-orange-800 dark:text-orange-300 mb-3">⏰ 本月加班統計</h4>
                     
                     <!-- 總時數 -->
                     <div class="text-center p-3 bg-orange-100 dark:bg-orange-800/30 rounded-lg mb-3">
@@ -1054,9 +1073,9 @@ function displaySalaryCalculation(data, container) {
                     </div>
                     
                     <!-- 分類明細 -->
-                    <div class="grid grid-cols-1 gap-2">
+                    <div class="space-y-2">
                         ${weekdayOvertimePay > 0 ? `
-                            <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                            <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg border border-blue-300 dark:border-blue-700">
                                 <div class="flex justify-between items-center">
                                     <div>
                                         <span class="font-semibold text-blue-800 dark:text-blue-300">平日加班</span>
@@ -1069,7 +1088,7 @@ function displaySalaryCalculation(data, container) {
                         ` : ''}
                         
                         ${restdayOvertimePay > 0 ? `
-                            <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                            <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg border border-purple-300 dark:border-purple-700">
                                 <div class="flex justify-between items-center">
                                     <div>
                                         <span class="font-semibold text-purple-800 dark:text-purple-300">休息日加班</span>
@@ -1081,14 +1100,29 @@ function displaySalaryCalculation(data, container) {
                             </div>
                         ` : ''}
                         
-                        ${holidayOvertimePay > 0 ? `
-                            <div class="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                                <div class="flex justify-between items-center">
+                        ${holidayWorkPay > 0 || holidayOvertimePay > 0 ? `
+                            <div class="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg border border-red-300 dark:border-red-700">
+                                <div class="flex justify-between items-center mb-2">
                                     <div>
-                                        <span class="font-semibold text-red-800 dark:text-red-300">例假日加班</span>
-                                        <span class="text-xs text-red-600 dark:text-red-400 ml-2">（週日）×2.0</span>
+                                        <span class="font-semibold text-red-800 dark:text-red-300">🎊 國定假日出勤</span>
                                     </div>
-                                    <span class="text-lg font-bold text-red-800 dark:text-red-200">${formatCurrency(holidayOvertimePay)}</span>
+                                    <span class="text-lg font-bold text-red-800 dark:text-red-200">${formatCurrency(holidayWorkPay + holidayOvertimePay)}</span>
+                                </div>
+                                
+                                <!-- ⭐⭐⭐ 分開顯示正常薪資與加班費 -->
+                                <div class="text-xs space-y-1 mt-2 border-t border-red-700/30 pt-2">
+                                    ${holidayWorkPay > 0 ? `
+                                        <div class="flex justify-between">
+                                            <span class="text-red-600 dark:text-red-400">正常出勤薪資 ×1.0</span>
+                                            <span class="font-mono text-red-700 dark:text-red-300">${formatCurrency(holidayWorkPay)}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${holidayOvertimePay > 0 ? `
+                                        <div class="flex justify-between">
+                                            <span class="text-red-600 dark:text-red-400">加班費 ×2.0</span>
+                                            <span class="font-mono text-red-700 dark:text-red-300">${formatCurrency(holidayOvertimePay)}</span>
+                                        </div>
+                                    ` : ''}
                                 </div>
                             </div>
                         ` : ''}
@@ -1096,9 +1130,12 @@ function displaySalaryCalculation(data, container) {
                 </div>
             ` : ''}
             
+            <!-- 應發項目 vs 扣款項目 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 👈 應發項目 -->
                 <div class="calculation-detail">
-                    <h4 class="font-semibold mb-3 text-green-400">應發項目</h4>
+                    <h4 class="font-semibold mb-3 text-green-400">💰 應發項目</h4>
+                    
                     ${isHourly ? `
                         <div class="calculation-row">
                             <span>時薪</span>
@@ -1118,6 +1155,7 @@ function displaySalaryCalculation(data, container) {
                             <span class="font-mono">${formatCurrency(data.baseSalary)}</span>
                         </div>
                     `}
+                    
                     <div class="calculation-row">
                         <span>職務加給</span>
                         <span class="font-mono">${formatCurrency(data.positionAllowance || 0)}</span>
@@ -1138,32 +1176,45 @@ function displaySalaryCalculation(data, container) {
                         <span>業績獎金</span>
                         <span class="font-mono">${formatCurrency(data.performanceBonus || 0)}</span>
                     </div>
+                    
                     ${weekdayOvertimePay > 0 ? `
                         <div class="calculation-row">
                             <span>平日加班費</span>
                             <span class="font-mono">${formatCurrency(weekdayOvertimePay)}</span>
                         </div>
                     ` : ''}
+                    
                     ${restdayOvertimePay > 0 ? `
                         <div class="calculation-row">
                             <span>休息日加班費</span>
                             <span class="font-mono">${formatCurrency(restdayOvertimePay)}</span>
                         </div>
                     ` : ''}
+                    
+                    ${holidayWorkPay > 0 ? `
+                        <div class="calculation-row">
+                            <span>國定假日出勤薪資</span>
+                            <span class="font-mono">${formatCurrency(holidayWorkPay)}</span>
+                        </div>
+                    ` : ''}
+                    
                     ${holidayOvertimePay > 0 ? `
                         <div class="calculation-row">
-                            <span>例假日加班費</span>
+                            <span>國定假日加班費</span>
                             <span class="font-mono">${formatCurrency(holidayOvertimePay)}</span>
                         </div>
                     ` : ''}
+                    
                     <div class="calculation-row total">
                         <span>應發總額</span>
                         <span>${formatCurrency(data.grossSalary)}</span>
                     </div>
                 </div>
                 
+                <!-- 👈 扣款項目 -->
                 <div class="calculation-detail">
-                    <h4 class="font-semibold mb-3 text-red-400">扣款項目</h4>
+                    <h4 class="font-semibold mb-3 text-red-400">⚠️ 扣款項目</h4>
+                    
                     <div class="calculation-row">
                         <span>勞保費</span>
                         <span class="font-mono">${formatCurrency(data.laborFee)}</span>
@@ -1184,15 +1235,16 @@ function displaySalaryCalculation(data, container) {
                         <span>所得稅</span>
                         <span class="font-mono">${formatCurrency(data.incomeTax)}</span>
                     </div>
+                    
                     ${!isHourly && data.leaveDeduction > 0 ? `
                         <div class="calculation-row">
                             <span>請假扣款</span>
                             <span class="font-mono">${formatCurrency(data.leaveDeduction)}</span>
                         </div>
 
-                        <!-- ⭐⭐⭐ 病假明細 -->
+                        <!-- ⭐⭐⭐ 病假/事假明細 -->
                         ${sickLeaveDays > 0 || personalLeaveDays > 0 ? `
-                            <div class="p-2 bg-yellow-900/20 rounded-lg mt-2 mb-2">
+                            <div class="p-2 bg-yellow-900/20 rounded-lg mt-2 mb-2 border border-yellow-700/30">
                                 <div class="text-xs space-y-1">
                                     ${sickLeaveDays > 0 ? `
                                         <div class="flex justify-between">
@@ -1210,6 +1262,7 @@ function displaySalaryCalculation(data, container) {
                             </div>
                         ` : ''}
                     ` : ''}
+                    
                     <div class="calculation-row">
                         <span>福利金</span>
                         <span class="font-mono">${formatCurrency(data.welfareFee || 0)}</span>
@@ -1226,6 +1279,7 @@ function displaySalaryCalculation(data, container) {
                         <span>其他扣款</span>
                         <span class="font-mono">${formatCurrency(data.otherDeductions || 0)}</span>
                     </div>
+                    
                     <div class="calculation-row total">
                         <span>實發金額</span>
                         <span>${formatCurrency(data.netSalary)}</span>
@@ -1235,7 +1289,6 @@ function displaySalaryCalculation(data, container) {
         </div>
     `;
 }
-
 /**
  * ✅ 儲存薪資記錄（修正版 - 包含所有必要欄位）
  */
@@ -1545,7 +1598,7 @@ function displayWorkHoursFromCalculation(data) {
   }
 
 
-function displayOvertimeFromCalculation(data) {
+  function displayOvertimeFromCalculation(data) {
     const detailsSection = document.getElementById('attendance-details-section');
     if (!detailsSection) return;
     
@@ -1556,16 +1609,18 @@ function displayOvertimeFromCalculation(data) {
     overtimeCard.id = 'overtime-card';
     overtimeCard.className = 'feature-box bg-orange-900/20 border-orange-700 mt-4';
     
-    // ⭐⭐⭐ 修正：正確讀取三種加班費
+    // ⭐⭐⭐ 修正：正確讀取四種加班費 + 國定假日出勤薪資
     const totalOvertimeHours = Math.floor(data.totalOvertimeHours || 0);
     const weekdayOvertimePay = parseFloat(data.weekdayOvertimePay) || 0;
     const restdayOvertimePay = parseFloat(data.restdayOvertimePay) || 0;
+    const holidayWorkPay = parseFloat(data.holidayWorkPay) || 0;          // ⭐ 新增這行
     const holidayOvertimePay = parseFloat(data.holidayOvertimePay) || 0;
     
     console.log('🔍 displayOvertimeFromCalculation 讀取的加班費:');
     console.log('   平日:', weekdayOvertimePay);
     console.log('   休息日:', restdayOvertimePay);
-    console.log('   例假日:', holidayOvertimePay);
+    console.log('   國定假日出勤薪資:', holidayWorkPay);               // ⭐ 新增這行
+    console.log('   國定假日加班費:', holidayOvertimePay);
     
     overtimeCard.innerHTML = `
         <h4 class="font-semibold mb-3 text-orange-400">⏰ 本月加班統計</h4>
@@ -1604,14 +1659,29 @@ function displayOvertimeFromCalculation(data) {
                 </div>
             ` : ''}
             
-            ${holidayOvertimePay > 0 ? `
+            ${holidayWorkPay > 0 || holidayOvertimePay > 0 ? `
                 <div class="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg border border-red-300 dark:border-red-700">
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center mb-2">
                         <div>
-                            <span class="font-semibold text-red-800 dark:text-red-300">例假日加班</span>
-                            <span class="text-xs text-red-600 dark:text-red-400 ml-2">（週日）×2.0</span>
+                            <span class="font-semibold text-red-800 dark:text-red-300">國定假日出勤</span>
                         </div>
-                        <span class="text-lg font-bold text-red-800 dark:text-red-200">${formatCurrency(holidayOvertimePay)}</span>
+                        <span class="text-lg font-bold text-red-800 dark:text-red-200">${formatCurrency(holidayWorkPay + holidayOvertimePay)}</span>
+                    </div>
+                    
+                    <!-- ⭐⭐⭐ 分開顯示正常薪資與加班費 -->
+                    <div class="text-xs space-y-1 mt-2 border-t border-red-700/30 pt-2">
+                        ${holidayWorkPay > 0 ? `
+                            <div class="flex justify-between">
+                                <span class="text-red-600 dark:text-red-400">正常出勤薪資 ×1.0</span>
+                                <span class="font-mono text-red-700 dark:text-red-300">${formatCurrency(holidayWorkPay)}</span>
+                            </div>
+                        ` : ''}
+                        ${holidayOvertimePay > 0 ? `
+                            <div class="flex justify-between">
+                                <span class="text-red-600 dark:text-red-400">加班費 ×2.0</span>
+                                <span class="font-mono text-red-700 dark:text-red-300">${formatCurrency(holidayOvertimePay)}</span>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
             ` : ''}
