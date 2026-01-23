@@ -8,7 +8,7 @@ const API_CONFIG = {
   redirectUrl: "https://eric693.github.io/Greedy_check_manager/"
   // 你也可以在這裡加入其他設定，例如：
   // timeout: 5000,
-  // version: 'v4.3.7'
+  // version: 'v4.3.8'
 };
 // 👇 新增：為了兼容性，同時定義全域變數 apiUrl
 const apiUrl = API_CONFIG.apiUrl;
