@@ -1631,7 +1631,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    initEmployeeBasicInfo();
+    await initEmployeeBasicInfo();
     // ⭐ 新增：綁定儲存按鈕
     const saveBasicInfoBtn = document.getElementById('save-basic-info-btn');
     if (saveBasicInfoBtn) {
