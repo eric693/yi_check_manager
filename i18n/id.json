@@ -737,5 +737,8 @@
   "BIRTHDATE_LABEL": "Tanggal Lahir",
   "BTN_SAVE_BASIC_INFO": "Simpan Informasi Dasar",
   "SAVING": "Menyimpan...",
-  "SAVE_SUCCESS": "Berhasil disimpan!"
+  "SAVE_SUCCESS": "Berhasil disimpan!",
+
+  "STATS_WORK_HOURS": "Jam Kehadiran",
+  "STATS_NORMAL_HOURS": "Jam Absen Normal"
 }

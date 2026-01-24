@@ -776,6 +776,9 @@
   "BIRTHDATE_LABEL": "生日",
   "BTN_SAVE_BASIC_INFO": "儲存基本資料",
   "SAVING": "儲存中...",
-  "SAVE_SUCCESS": "儲存成功！"
+  "SAVE_SUCCESS": "儲存成功！",
+
+  "STATS_WORK_HOURS": "出勤時數",
+  "STATS_NORMAL_HOURS": "正常打卡時數"
 
 }

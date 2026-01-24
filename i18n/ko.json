@@ -737,5 +737,8 @@
   "BIRTHDATE_LABEL": "생년월일",
   "BTN_SAVE_BASIC_INFO": "기본 정보 저장",
   "SAVING": "저장 중...",
-  "SAVE_SUCCESS": "저장되었습니다!"
+  "SAVE_SUCCESS": "저장되었습니다!",
+
+  "STATS_WORK_HOURS": "출근 시간",
+  "STATS_NORMAL_HOURS": "정상 출퇴근 기록 시간"
 }

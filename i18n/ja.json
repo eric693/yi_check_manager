@@ -737,5 +737,8 @@
   "BIRTHDATE_LABEL": "生年月日",
   "BTN_SAVE_BASIC_INFO": "基本情報を保存",
   "SAVING": "保存中...",
-  "SAVE_SUCCESS": "保存しました！"
+  "SAVE_SUCCESS": "保存しました！",
+
+  "STATS_WORK_HOURS": "出勤時間",
+  "STATS_NORMAL_HOURS": "通常打刻時間"
 }

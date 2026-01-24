@@ -786,6 +786,9 @@
     "BIRTHDATE_LABEL": "วันเกิด",
     "BTN_SAVE_BASIC_INFO": "บันทึกข้อมูลพื้นฐาน",
     "SAVING": "กำลังบันทึก...",
-    "SAVE_SUCCESS": "บันทึกสำเร็จ!"
+    "SAVE_SUCCESS": "บันทึกสำเร็จ!",
+
+    "STATS_WORK_HOURS": "ชั่วโมงการเข้างาน",
+    "STATS_NORMAL_HOURS": "ชั่วโมงตอกบัตรปกติ"
 }
   

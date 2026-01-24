@@ -758,5 +758,8 @@
   "BIRTHDATE_LABEL": "Date of Birth",
   "BTN_SAVE_BASIC_INFO": "Save Basic Information",
   "SAVING": "Saving...",
-  "SAVE_SUCCESS": "Saved successfully!"
+  "SAVE_SUCCESS": "Saved successfully!",
+
+  "STATS_WORK_HOURS": "Attendance Hours",
+  "STATS_NORMAL_HOURS": "Regular Clock-in Hours"
 }

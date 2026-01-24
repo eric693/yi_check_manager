@@ -784,5 +784,8 @@
   "BIRTHDATE_LABEL": "Ngày sinh",
   "BTN_SAVE_BASIC_INFO": "Lưu thông tin cơ bản",
   "SAVING": "Đang lưu...",
-  "SAVE_SUCCESS": "Lưu thành công!"
+  "SAVE_SUCCESS": "Lưu thành công!",
+
+  "STATS_WORK_HOURS": "Giờ chấm công",
+  "STATS_NORMAL_HOURS": "Giờ chấm công bình thường"
 }
