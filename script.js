@@ -923,7 +923,7 @@ async function renderCalendar(date) {
 }
 
 /**
- * ✅ 更新本月出勤統計（已改為小時制）
+ * ✅ 更新本月出勤統計（修正小數問題）
  */
 async function updateMonthlyStats(records) {
     const workDaysEl = document.getElementById('stats-work-days-value');
@@ -936,14 +936,12 @@ async function updateMonthlyStats(records) {
         return;
     }
     
-    // ⭐ 統計數據全部使用前端計算
-    let totalWorkHours = 0;      // 改為總工時
+    let totalWorkHours = 0;
     let abnormalCount = 0;
-    let normalWorkHours = 0;     // 改為正常工時
+    let normalWorkHours = 0;
     let totalOvertimeHours = 0;
     
     records.forEach(record => {
-        // 計算工時
         const punchIn = record.record ? record.record.find(r => r.type === '上班') : null;
         const punchOut = record.record ? record.record.find(r => r.type === '下班') : null;
         
@@ -954,11 +952,16 @@ async function updateMonthlyStats(records) {
                 const inTime = new Date(`${record.date} ${punchIn.time}`);
                 const outTime = new Date(`${record.date} ${punchOut.time}`);
                 const diffMs = outTime - inTime;
-                const totalHoursRaw = diffMs / (1000 * 60 * 60);
+                let totalHoursRaw = diffMs / (1000 * 60 * 60);
                 
                 if (totalHoursRaw > 0) {
-                    const lunchBreak = 1;
+                    // ⭐⭐⭐ 修正：智能計算午休時間
+                    const lunchBreak = calculateLunchBreak(inTime, outTime);
                     dayWorkHours = Math.max(0, totalHoursRaw - lunchBreak);
+                    
+                    // ⭐⭐⭐ 修正：四捨五入到 0.5 小時
+                    dayWorkHours = Math.round(dayWorkHours * 2) / 2;
+                    
                     totalWorkHours += dayWorkHours;
                 }
             } catch (e) {
@@ -1000,19 +1003,68 @@ async function updateMonthlyStats(records) {
         if (abnormalReasons.includes(record.reason)) {
             abnormalCount++;
         } else if (record.reason === 'STATUS_PUNCH_NORMAL' || record.reason === 'STATUS_REPAIR_APPROVED') {
-            // 正常打卡累計工時
             normalWorkHours += dayWorkHours;
         }
     });
     
-    // 更新 DOM（顯示小時，保留一位小數）
-    workDaysEl.textContent = totalWorkHours > 0 ? totalWorkHours.toFixed(1) : '0';
+    // ⭐⭐⭐ 修正：顯示為整數（如果小數部分為 .0）
+    workDaysEl.textContent = formatHours(totalWorkHours);
     abnormalCountEl.textContent = abnormalCount;
-    normalDaysEl.textContent = normalWorkHours > 0 ? normalWorkHours.toFixed(1) : '0';
+    normalDaysEl.textContent = formatHours(normalWorkHours);
     
     if (overtimeHoursEl) {
-        overtimeHoursEl.textContent = totalOvertimeHours > 0 ? totalOvertimeHours.toFixed(1) : '0';
+        overtimeHoursEl.textContent = formatHours(totalOvertimeHours);
     }
+}
+
+/**
+ * ⭐ 新增：智能計算午休時間
+ */
+function calculateLunchBreak(inTime, outTime) {
+    const lunchStart = new Date(inTime);
+    lunchStart.setHours(12, 0, 0, 0);
+    
+    const lunchEnd = new Date(inTime);
+    lunchEnd.setHours(13, 0, 0, 0);
+    
+    // 如果工作時段完全不涵蓋午休時間，不扣除
+    if (outTime <= lunchStart || inTime >= lunchEnd) {
+        return 0;
+    }
+    
+    // 如果涵蓋完整午休時間，扣除 1 小時
+    if (inTime < lunchStart && outTime > lunchEnd) {
+        return 1;
+    }
+    
+    // 部分涵蓋午休時間，計算實際重疊時間
+    const overlapStart = inTime > lunchStart ? inTime : lunchStart;
+    const overlapEnd = outTime < lunchEnd ? outTime : lunchEnd;
+    const overlapMs = overlapEnd - overlapStart;
+    const overlapHours = overlapMs / (1000 * 60 * 60);
+    
+    return Math.max(0, overlapHours);
+}
+
+/**
+ * ⭐ 新增：格式化小時顯示
+ */
+function formatHours(hours) {
+    if (hours === 0) return '0';
+    
+    // 如果是整數，不顯示小數點
+    if (Number.isInteger(hours)) {
+        return hours.toString();
+    }
+    
+    // 如果小數部分是 .5，顯示一位小數
+    if (hours % 1 === 0.5) {
+        return hours.toFixed(1);
+    }
+    
+    // 其他情況四捨五入到最接近的 0.5
+    const rounded = Math.round(hours * 2) / 2;
+    return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(1);
 }
 
 async function submitAdjustPunch(date, type, note) {
