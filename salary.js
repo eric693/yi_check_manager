@@ -155,7 +155,7 @@ async function loadEmployeeSalaryByMonth() {
         if (calcResult.success && calcResult.data) {
             // ⭐ 步驟 2：儲存計算結果
             console.log('💾 儲存計算結果...');
-            await saveMonthlySalary(calcResult.data);
+            // await saveMonthlySalary(calcResult.data);
         }
         
         // ⭐ 步驟 3：讀取薪資資料（確保是最新的）
