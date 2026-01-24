@@ -413,15 +413,16 @@
                         <!-- 統計數據列表（四行垂直排列） -->
                         <div class="space-y-3">
                             
-                            <!-- 出勤天數 改為 出勤時數 -->
-                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20 rounded-lg border border-green-200 dark:border-green-700/50 transition-all hover:shadow-md">
+                            <!-- 👇 出勤時數 - 隱藏 -->
+                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20 rounded-lg border border-green-200 dark:border-green-700/50 transition-all hover:shadow-md" 
+                                    style="display: none;">
                                 <span data-i18n="STATS_WORK_HOURS" class="text-sm font-medium text-gray-700 dark:text-gray-300">出勤時數</span>
                                 <div class="flex items-baseline">
                                     <span id="stats-work-days-value" class="text-2xl font-bold text-green-600 dark:text-green-400">0</span>
                                     <span data-i18n="UNIT_HOURS" class="text-sm font-medium text-green-500 dark:text-green-400 ml-1">小時</span>
                                 </div>
                             </div>
-                            
+                           
                             <!-- 異常記錄 -->
                             <div class="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20 rounded-lg border border-red-200 dark:border-red-700/50 transition-all hover:shadow-md">
                                 <span data-i18n="STATS_ABNORMAL_COUNT" class="text-sm font-medium text-gray-700 dark:text-gray-300">異常記錄</span>
@@ -431,8 +432,9 @@
                                 </div>
                             </div>
                             
-                            <!-- 正常打卡 改為 正常打卡時數 -->
-                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 rounded-lg border border-blue-200 dark:border-blue-700/50 transition-all hover:shadow-md">
+                            <!-- 👇 正常打卡時數 - 隱藏 -->
+                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 rounded-lg border border-blue-200 dark:border-blue-700/50 transition-all hover:shadow-md" 
+                                    style="display: none;">
                                 <span data-i18n="STATS_NORMAL_HOURS" class="text-sm font-medium text-gray-700 dark:text-gray-300">正常打卡時數</span>
                                 <div class="flex items-baseline">
                                     <span id="stats-normal-days-value" class="text-2xl font-bold text-blue-600 dark:text-blue-400">0</span>
