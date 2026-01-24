@@ -2608,3 +2608,162 @@ function handleReviewReimbursement(params) {
     return { ok: false, msg: error.message };
   }
 }
+
+
+// ==================== 員工基本資料 Handler ====================
+
+/**
+ * ✅ 處理設定員工基本資料（員工自己填寫版）
+ */
+function handleSetEmployeeBasicInfo(params) {
+  try {
+    Logger.log('📝 處理設定員工基本資料請求（員工自填）');
+    
+    // ⭐ 驗證 Session（所有員工都可以使用）
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    // ⭐ 從 Session 取得當前使用者資訊
+    const session = checkSession_(params.token);
+    if (!session.ok || !session.user) {
+      return { ok: false, msg: '無法取得使用者資訊' };
+    }
+    
+    const currentUser = session.user;
+    
+    Logger.log('👤 當前使用者: ' + currentUser.name);
+    Logger.log('   userId: ' + currentUser.userId);
+    
+    // ⭐⭐⭐ 關鍵修正：使用當前使用者的 ID，不從前端接收
+    const employeeData = {
+      employeeId: currentUser.userId,        // 自動使用登入者的 ID
+      employeeName: currentUser.name,        // 自動使用登入者的姓名
+      idNumber: params.idNumber,             // 從前端接收
+      address: params.address,               // 從前端接收
+      phone: params.phone,                   // 從前端接收
+      birthDate: params.birthDate            // 從前端接收
+    };
+    
+    Logger.log('📋 準備儲存資料:');
+    Logger.log('   員工ID: ' + employeeData.employeeId);
+    Logger.log('   姓名: ' + employeeData.employeeName);
+    Logger.log('   身分證: ' + (employeeData.idNumber || '未填'));
+    Logger.log('   地址: ' + (employeeData.address || '未填'));
+    
+    const result = setEmployeeBasicInfo(employeeData);
+    
+    return {
+      ok: result.success,
+      msg: result.message
+    };
+    
+  } catch (error) {
+    Logger.log('❌ handleSetEmployeeBasicInfo 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+/**
+ * ✅ 處理取得員工基本資料（查詢自己的資料）
+ */
+function handleGetEmployeeBasicInfo(params) {
+  try {
+    Logger.log('🔍 處理查詢員工基本資料請求');
+    
+    // 驗證 Session
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    // ⭐ 從 Session 取得當前使用者
+    const session = checkSession_(params.token);
+    if (!session.ok || !session.user) {
+      return { ok: false, msg: '無法取得使用者資訊' };
+    }
+    
+    const currentUser = session.user;
+    
+    Logger.log('👤 查詢員工: ' + currentUser.name);
+    
+    // ⭐⭐⭐ 只能查詢自己的資料
+    const result = getEmployeeBasicInfo(currentUser.userId);
+    
+    return {
+      ok: result.success,
+      data: result.data,
+      msg: result.message
+    };
+    
+  } catch (error) {
+    Logger.log('❌ handleGetEmployeeBasicInfo 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+/**
+ * ✅ 處理取得所有員工基本資料
+ */
+function handleGetAllEmployeeBasicInfo(params) {
+  try {
+    Logger.log('📋 處理取得所有員工基本資料請求');
+    
+    // 驗證 Session
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    // 驗證管理員權限
+    const session = checkSession_(params.token);
+    if (!session.ok || !session.user || session.user.dept !== '管理員') {
+      return { ok: false, msg: '需要管理員權限' };
+    }
+    
+    const result = getAllEmployeeBasicInfo();
+    
+    return {
+      ok: result.success,
+      data: result.data,
+      total: result.total,
+      msg: result.message
+    };
+    
+  } catch (error) {
+    Logger.log('❌ handleGetAllEmployeeBasicInfo 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+/**
+ * ✅ 處理刪除員工基本資料
+ */
+function handleDeleteEmployeeBasicInfo(params) {
+  try {
+    Logger.log('🗑️ 處理刪除員工基本資料請求');
+    
+    // 驗證 Session
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: "未授權或 session 已過期" };
+    }
+    
+    // 驗證管理員權限
+    const session = checkSession_(params.token);
+    if (!session.ok || !session.user || session.user.dept !== '管理員') {
+      return { ok: false, msg: '需要管理員權限' };
+    }
+    
+    if (!params.employeeId) {
+      return { ok: false, msg: '缺少員工ID' };
+    }
+    
+    const result = deleteEmployeeBasicInfo(params.employeeId);
+    
+    return {
+      ok: result.success,
+      msg: result.message
+    };
+    
+  } catch (error) {
+    Logger.log('❌ handleDeleteEmployeeBasicInfo 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}

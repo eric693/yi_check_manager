@@ -47,6 +47,17 @@ function doGet(e) {
       case "getLocations":
         return respond1(handleGetLocation());
       
+      case "setEmployeeBasicInfo":
+        return respond1(handleSetEmployeeBasicInfo(e.parameter));
+
+      case "getEmployeeBasicInfo":
+        return respond1(handleGetEmployeeBasicInfo(e.parameter));
+
+      case "getAllEmployeeBasicInfo":
+        return respond1(handleGetAllEmployeeBasicInfo(e.parameter));
+
+      case "deleteEmployeeBasicInfo":
+        return respond1(handleDeleteEmployeeBasicInfo(e.parameter));
       // ==================== 員工管理 ====================
       case "getAllUsers":
         return respond1(handleGetAllUsers(e.parameter));
@@ -403,119 +414,7 @@ function doPost(e) {
     })).setMimeType(ContentService.MimeType.JSON);
   }
 }
-// function doPost(e) {
-//   try {
-//     Logger.log('═══════════════════════════════════════');
-//     Logger.log('📥 收到 LINE Webhook 請求');
-//     Logger.log('═══════════════════════════════════════');
-    
-//     // 檢查是否有 postData
-//     if (!e || !e.postData || !e.postData.contents) {
-//       Logger.log('⚠️ 缺少 postData');
-//       return ContentService.createTextOutput(JSON.stringify({
-//         status: 'error',
-//         message: 'No postData'
-//       })).setMimeType(ContentService.MimeType.JSON);
-//     }
-    
-//     Logger.log('📋 postData.contents: ' + e.postData.contents.substring(0, 200) + '...');
-    
-//     // 解析 JSON
-//     const json = JSON.parse(e.postData.contents);
-    
-//     Logger.log('📊 收到 ' + json.events.length + ' 個事件');
-    
-//     // ⚠️ 測試期間暫時停用 Signature 驗證
-//     // 正式上線後請啟用以下程式碼：
-//     /*
-//     const signature = e.parameter.signature || e.headers['X-Line-Signature'];
-//     if (!verifyLineSignature_(e.postData.contents, signature)) {
-//       Logger.log('❌ Signature 驗證失敗');
-//       return ContentService.createTextOutput(JSON.stringify({
-//         status: 'error',
-//         message: 'Invalid signature'
-//       })).setMimeType(ContentService.MimeType.JSON);
-//     }
-//     */
-    
-//     // 處理每個事件
-//     json.events.forEach((event, index) => {
-//       Logger.log('');
-//       Logger.log(`📌 處理事件 ${index + 1}/${json.events.length}`);
-//       Logger.log('   type: ' + event.type);
-      
-//       try {
-//         if (event.type === 'message') {
-//           if (event.message.type === 'text') {
-//             Logger.log('   message.type: text');
-//             Logger.log('   message.text: ' + event.message.text);
-//             handleLineMessage(event);
-//           } else if (event.message.type === 'location') {
-//             Logger.log('   message.type: location');
-//             Logger.log('   latitude: ' + event.message.latitude);
-//             Logger.log('   longitude: ' + event.message.longitude);
-//             handleLineLocation(event);
-//           }
-//         }
-//       } catch (eventError) {
-//         Logger.log('❌ 事件處理錯誤: ' + eventError);
-//         Logger.log('   錯誤堆疊: ' + eventError.stack);
-//       }
-//     });
-    
-//     Logger.log('');
-//     Logger.log('✅ Webhook 處理完成');
-//     Logger.log('═══════════════════════════════════════');
-    
-//     // ⭐⭐⭐ 關鍵：回傳 200 OK + JSON
-//     return ContentService.createTextOutput(JSON.stringify({
-//       status: 'ok'
-//     })).setMimeType(ContentService.MimeType.JSON);
-    
-//   } catch (error) {
-//     Logger.log('');
-//     Logger.log('❌ doPost 錯誤: ' + error);
-//     Logger.log('   錯誤訊息: ' + error.message);
-//     Logger.log('   錯誤堆疊: ' + error.stack);
-//     Logger.log('═══════════════════════════════════════');
-    
-//     // 即使錯誤也回傳 200 OK（避免 LINE 重試）
-//     return ContentService.createTextOutput(JSON.stringify({
-//       status: 'error',
-//       message: error.message
-//     })).setMimeType(ContentService.MimeType.JSON);
-//   }
-// }
 
-// function doPost(e) {
-//   try {
-//     const json = JSON.parse(e.postData.contents);
-    
-//     // 驗證 LINE Signature（安全性）
-//     const signature = e.parameter.signature || e.headers['X-Line-Signature'];
-//     if (!verifyLineSignature_(e.postData.contents, signature)) {
-//       return ContentService.createTextOutput(JSON.stringify({ error: 'Invalid signature' }))
-//         .setMimeType(ContentService.MimeType.JSON);
-//     }
-    
-//     // 處理 LINE 事件
-//     json.events.forEach(event => {
-//       if (event.type === 'message' && event.message.type === 'text') {
-//         handleLineMessage(event);
-//       } else if (event.type === 'message' && event.message.type === 'location') {
-//         handleLineLocation(event);
-//       }
-//     });
-    
-//     return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
-//       .setMimeType(ContentService.MimeType.JSON);
-      
-//   } catch (error) {
-//     Logger.log('❌ Webhook 錯誤: ' + error);
-//     return ContentService.createTextOutput(JSON.stringify({ error: error.message }))
-//       .setMimeType(ContentService.MimeType.JSON);
-//   }
-// }
 
 /**
  * 驗證 LINE Signature（測試模式：暫時停用）

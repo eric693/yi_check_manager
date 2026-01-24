@@ -366,7 +366,7 @@ function getLeaveRecordsSheet() {
 }
 
 /**
- * ✅ 取得假期餘額（適配新結構）
+ * ✅ 修正：取得假期餘額（適配 18 欄結構）
  */
 function getLeaveBalance(sessionToken) {
   try {
@@ -399,27 +399,27 @@ function getLeaveBalance(sessionToken) {
       if (values[i][0] === user.userId) {
         Logger.log('✅ 找到員工資料');
         
-        // ⭐ 修改：欄位索引往後移一位（因為新增了姓名欄位）
+        // ⭐⭐⭐ 修正：所有索引 +1（因為 B 欄是姓名）
         const balance = {
-          employeeName: values[i][1] || user.name,   // B: 姓名 ⭐ 新增
-          ANNUAL_LEAVE: values[i][2] || 0,           // C
-          SICK_LEAVE: values[i][3] || 0,             // D
-          PERSONAL_LEAVE: values[i][4] || 0,         // E
-          BEREAVEMENT_LEAVE: values[i][5] || 0,      // F
-          MARRIAGE_LEAVE: values[i][6] || 0,         // G
-          MATERNITY_LEAVE: values[i][7] || 0,        // H
-          PATERNITY_LEAVE: values[i][8] || 0,        // I
-          HOSPITALIZATION_LEAVE: values[i][9] || 0,  // J
-          MENSTRUAL_LEAVE: values[i][10] || 0,       // K
-          FAMILY_CARE_LEAVE: values[i][11] || 0,     // L
-          OFFICIAL_LEAVE: values[i][12] || 0,        // M
-          WORK_INJURY_LEAVE: values[i][13] || 0,     // N
-          NATURAL_DISASTER_LEAVE: values[i][14] || 0,// O
-          COMP_TIME_OFF: values[i][15] || 0,         // P
-          ABSENCE_WITHOUT_LEAVE: values[i][16] || 0  // Q
+          employeeName: values[i][1] || user.name,  // B: 姓名 ⭐
+          ANNUAL_LEAVE: values[i][2] || 0,          // C: 特休假 ⭐
+          SICK_LEAVE: values[i][3] || 0,            // D: 未住院病假 ⭐
+          PERSONAL_LEAVE: values[i][4] || 0,        // E: 事假 ⭐
+          BEREAVEMENT_LEAVE: values[i][5] || 0,     // F: 喪假 ⭐
+          MARRIAGE_LEAVE: values[i][6] || 0,        // G: 婚假 ⭐
+          MATERNITY_LEAVE: values[i][7] || 0,       // H: 產假 ⭐
+          PATERNITY_LEAVE: values[i][8] || 0,       // I: 陪產檢及陪產假 ⭐
+          HOSPITALIZATION_LEAVE: values[i][9] || 0, // J: 住院病假 ⭐
+          MENSTRUAL_LEAVE: values[i][10] || 0,      // K: 生理假 ⭐
+          FAMILY_CARE_LEAVE: values[i][11] || 0,    // L: 家庭照顧假 ⭐
+          OFFICIAL_LEAVE: values[i][12] || 0,       // M: 公假 ⭐
+          WORK_INJURY_LEAVE: values[i][13] || 0,    // N: 公傷假 ⭐
+          NATURAL_DISASTER_LEAVE: values[i][14] || 0, // O: 天然災害停班 ⭐
+          COMP_TIME_OFF: values[i][15] || 0,        // P: 加班補休假 ⭐
+          ABSENCE_WITHOUT_LEAVE: values[i][16] || 0 // Q: 曠工 ⭐
         };
         
-        Logger.log('📋 假期餘額:');
+        Logger.log('📋 假期餘額（小時）:');
         Logger.log(JSON.stringify(balance, null, 2));
         
         return {
@@ -543,7 +543,7 @@ function testGetLeaveBalance() {
 }
 
 /**
- * ✅ 初始化員工假期（新增姓名欄位）
+ * ✅ 修正：初始化假期餘額（改為小時制）
  */
 function initializeEmployeeLeave(sessionToken) {
   try {
@@ -571,21 +571,21 @@ function initializeEmployeeLeave(sessionToken) {
       }
     }
     
-    // ⭐ 修改：新增姓名欄位（18個欄位）
+    // ⭐⭐⭐ 修正：改為小時制（天數 × 8）
     const defaultBalance = [
       user.userId,        // A: 員工ID
-      user.name,          // B: 姓名 ⭐ 新增
-      7,                  // C: 特休假（天）- 依年資調整
-      30,                 // D: 未住院病假（天/年）
-      14,                 // E: 事假（天/年）
-      5,                  // F: 喪假（天）- 依親等不同
-      8,                  // G: 婚假（天）
-      56,                 // H: 產假（天）- 8週
-      7,                  // I: 陪產檢及陪產假（天）
-      30,                 // J: 住院病假（天/年）
-      12,                 // K: 生理假（天/年）- 每月1天
-      7,                  // L: 家庭照顧假（天/年）
-      0,                  // M: 公假（含兵役假）（無上限）
+      user.name,          // B: 姓名 ⭐ 這裡有寫
+      56,                 // C: 特休假（7天 × 8 = 56小時）⭐
+      240,                // D: 未住院病假（30天 × 8 = 240小時）⭐
+      112,                // E: 事假（14天 × 8 = 112小時）⭐
+      40,                 // F: 喪假（5天 × 8 = 40小時）⭐
+      64,                 // G: 婚假（8天 × 8 = 64小時）⭐
+      448,                // H: 產假（56天 × 8 = 448小時）⭐
+      56,                 // I: 陪產檢及陪產假（7天 × 8 = 56小時）⭐
+      240,                // J: 住院病假（30天 × 8 = 240小時）⭐
+      96,                 // K: 生理假（12天 × 8 = 96小時）⭐
+      56,                 // L: 家庭照顧假（7天 × 8 = 56小時）⭐
+      0,                  // M: 公假（無上限，顯示為 "無上限"）
       0,                  // N: 公傷假（無上限）
       0,                  // O: 天然災害停班（無上限）
       0,                  // P: 加班補休假（初始0）
@@ -595,11 +595,11 @@ function initializeEmployeeLeave(sessionToken) {
     
     sheet.appendRow(defaultBalance);
     
-    Logger.log('✅ 已為員工 ' + user.name + ' 初始化假期餘額（含姓名）');
+    Logger.log('✅ 已為員工 ' + user.name + ' 初始化假期餘額（小時制）');
     
     return {
       ok: true,
-      msg: "假期餘額已初始化"
+      msg: "假期餘額已初始化（小時制）"
     };
     
   } catch (error) {
@@ -1061,77 +1061,36 @@ function reviewLeaveRequest(sessionToken, rowNumber, reviewAction, comment) {
     const sheet = getLeaveRecordsSheet();
     const record = sheet.getRange(rowNumber, 1, 1, 14).getValues()[0];
     
+    
     const userId = record[1];           // B: 員工ID
     const employeeName = record[2];     // C: 姓名
     const leaveType = record[4];        // E: 假別
-    const startDateTime = record[5];    // F: 開始時間
-    const endDateTime = record[6];      // G: 結束時間
-    const oldWorkHours = record[7];     // H: 舊的工作時數
-    const oldDays = record[8];          // I: 舊的天數
+    const workHours = record[7];        // H: 工作時數 ⭐
+    const days = record[8];             // I: 天數
     
-    Logger.log('📋 請假資料（審核前）:');
+    Logger.log('📋 請假資料:');
     Logger.log(`   員工: ${employeeName} (${userId})`);
     Logger.log(`   假別: ${leaveType}`);
-    Logger.log(`   開始時間: ${startDateTime}`);
-    Logger.log(`   結束時間: ${endDateTime}`);
-    Logger.log(`   舊時數: ${oldWorkHours} 小時`);
-    Logger.log(`   舊天數: ${oldDays} 天`);
+    Logger.log(`   時數: ${workHours} 小時`);
+    Logger.log(`   天數: ${days} 天`);
     Logger.log('');
     
-    // ⭐⭐⭐ 關鍵：重新計算正確的工時
-    Logger.log('💡 重新計算正確工時...');
-    
-    let correctWorkHours = 0;
-    let correctDays = 0;
-    
-    try {
-      const start = new Date(startDateTime);
-      const end = new Date(endDateTime);
-      
-      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-        const result = calculateWorkHoursAndDays(start, end);
-        correctWorkHours = result.workHours;
-        correctDays = result.days;
-        
-        Logger.log(`✅ 計算成功:`);
-        Logger.log(`   新時數: ${correctWorkHours} 小時`);
-        Logger.log(`   新天數: ${correctDays} 天`);
-      } else {
-        Logger.log('⚠️ 日期無效，使用原始值');
-        correctWorkHours = oldWorkHours;
-        correctDays = oldDays;
-      }
-    } catch (err) {
-      Logger.log('⚠️ 計算失敗，使用原始值: ' + err);
-      correctWorkHours = oldWorkHours;
-      correctDays = oldDays;
-    }
-    
-    Logger.log('');
-    
-    // ⭐⭐⭐ 核心修正：更新 Sheet 中的工時資料
-    Logger.log('📝 更新 Sheet 中的工時資料...');
-    sheet.getRange(rowNumber, 8).setValue(correctWorkHours);  // H 欄：工作時數
-    sheet.getRange(rowNumber, 9).setValue(correctDays);       // I 欄：天數
-    Logger.log('✅ Sheet 已更新');
-    Logger.log('');
-    
-    // 更新審核狀態
+    // 更新狀態
     const status = (reviewAction === 'approve') ? 'APPROVED' : 'REJECTED';
     
-    sheet.getRange(rowNumber, 11).setValue(status);             // K: 狀態
-    sheet.getRange(rowNumber, 12).setValue(employee.user.name); // L: 審核人
-    sheet.getRange(rowNumber, 13).setValue(new Date());         // M: 審核時間
-    sheet.getRange(rowNumber, 14).setValue(comment || '');      // N: 審核意見
+    sheet.getRange(rowNumber, 11).setValue(status);
+    sheet.getRange(rowNumber, 12).setValue(employee.user.name);
+    sheet.getRange(rowNumber, 13).setValue(new Date());
+    sheet.getRange(rowNumber, 14).setValue(comment || '');
     
     Logger.log(`✅ 審核狀態已更新: ${status}`);
     Logger.log('');
     
-    // 如果是核准，扣除假期餘額
     if (reviewAction === 'approve') {
       Logger.log('💰 開始扣除假期餘額...');
       
-      const deductResult = deductLeaveBalance(userId, leaveType, correctDays);
+      // ⭐ 傳入小時數（不是天數）
+      const deductResult = deductLeaveBalance(userId, leaveType, workHours);
       
       if (!deductResult.ok) {
         Logger.log('❌ 扣除餘額失敗: ' + deductResult.msg);
@@ -1147,8 +1106,8 @@ function reviewLeaveRequest(sessionToken, rowNumber, reviewAction, comment) {
       }
       
       Logger.log('✅ 假期餘額扣除成功');
-      Logger.log(`   ${leaveType}: 扣除 ${correctDays} 天 (${correctWorkHours} 小時)`);
-      Logger.log(`   剩餘: ${deductResult.remaining} 天`);
+      Logger.log(`   ${leaveType}: 扣除 ${workHours} 小時`);  // ⭐
+      Logger.log(`   剩餘: ${deductResult.remaining} 小時`);  // ⭐
     }
     
     Logger.log('');
@@ -1496,37 +1455,34 @@ function getApprovedLeaveRecords(monthParam, userIdParam) {
     return [];
   }
 }
-/**
- * ✅ 扣除假期餘額（適配新結構）
- */
-function deductLeaveBalance(userId, leaveType, days) {
+function deductLeaveBalance(userId, leaveType, hours) {
   try {
     Logger.log('📊 扣除假期餘額');
     Logger.log(`   員工ID: ${userId}`);
     Logger.log(`   假別: ${leaveType}`);
-    Logger.log(`   天數: ${days}`);
+    Logger.log(`   小時數: ${hours}`);
     Logger.log('');
     
     const sheet = getLeaveBalanceSheet();
     const values = sheet.getDataRange().getValues();
     
-    // ⭐ 修改：假別欄位對應表（所有索引+1）
+    // ⭐⭐⭐ 修正：所有欄位 +1
     const leaveTypeColumnMap = {
-      'ANNUAL_LEAVE': 3,              // C 欄
-      'SICK_LEAVE': 4,                // D 欄
-      'PERSONAL_LEAVE': 5,            // E 欄
-      'BEREAVEMENT_LEAVE': 6,         // F 欄
-      'MARRIAGE_LEAVE': 7,            // G 欄
-      'MATERNITY_LEAVE': 8,           // H 欄
-      'PATERNITY_LEAVE': 9,           // I 欄
-      'HOSPITALIZATION_LEAVE': 10,    // J 欄
-      'MENSTRUAL_LEAVE': 11,          // K 欄
-      'FAMILY_CARE_LEAVE': 12,        // L 欄
-      'OFFICIAL_LEAVE': 13,           // M 欄
-      'WORK_INJURY_LEAVE': 14,        // N 欄
-      'NATURAL_DISASTER_LEAVE': 15,   // O 欄
-      'COMP_TIME_OFF': 16,            // P 欄
-      'ABSENCE_WITHOUT_LEAVE': 17     // Q 欄
+      'ANNUAL_LEAVE': 3,              // C 欄（索引 +1）⭐
+      'SICK_LEAVE': 4,                // D 欄 ⭐
+      'PERSONAL_LEAVE': 5,            // E 欄 ⭐
+      'BEREAVEMENT_LEAVE': 6,         // F 欄 ⭐
+      'MARRIAGE_LEAVE': 7,            // G 欄 ⭐
+      'MATERNITY_LEAVE': 8,           // H 欄 ⭐
+      'PATERNITY_LEAVE': 9,           // I 欄 ⭐
+      'HOSPITALIZATION_LEAVE': 10,    // J 欄 ⭐
+      'MENSTRUAL_LEAVE': 11,          // K 欄 ⭐
+      'FAMILY_CARE_LEAVE': 12,        // L 欄 ⭐
+      'OFFICIAL_LEAVE': 13,           // M 欄 ⭐
+      'WORK_INJURY_LEAVE': 14,        // N 欄 ⭐
+      'NATURAL_DISASTER_LEAVE': 15,   // O 欄 ⭐
+      'COMP_TIME_OFF': 16,            // P 欄 ⭐
+      'ABSENCE_WITHOUT_LEAVE': 17     // Q 欄 ⭐
     };
     
     const columnIndex = leaveTypeColumnMap[leaveType];
@@ -1547,24 +1503,24 @@ function deductLeaveBalance(userId, leaveType, days) {
         
         const currentBalance = values[i][columnIndex - 1]; // 因為陣列從 0 開始
         
-        Logger.log(`   目前餘額: ${currentBalance} 天`);
+        Logger.log(`   目前餘額: ${currentBalance} 小時`);
         
         // 檢查餘額是否足夠
-        if (currentBalance < days) {
-          Logger.log(`   ⚠️ 餘額不足：需要 ${days} 天，只剩 ${currentBalance} 天`);
+        if (currentBalance < hours) {
+          Logger.log(`   ⚠️ 餘額不足：需要 ${hours} 小時，只剩 ${currentBalance} 小時`);
           return {
             ok: false,
-            msg: `${leaveType} 餘額不足（需要 ${days} 天，只剩 ${currentBalance} 天）`
+            msg: `${leaveType} 餘額不足（需要 ${hours} 小時，只剩 ${currentBalance} 小時）`
           };
         }
         
         // 扣除餘額
-        const newBalance = currentBalance - days;
+        const newBalance = currentBalance - hours;
         
-        Logger.log(`   扣除 ${days} 天後: ${newBalance} 天`);
+        Logger.log(`   扣除 ${hours} 小時後: ${newBalance} 小時`);
         
         sheet.getRange(i + 1, columnIndex).setValue(newBalance);
-        sheet.getRange(i + 1, 18).setValue(new Date()); // R 欄: 更新時間（索引+1）
+        sheet.getRange(i + 1, 18).setValue(new Date()); // R 欄: 更新時間（索引 +1）⭐
         
         Logger.log('✅ 餘額已更新');
         
@@ -1589,7 +1545,6 @@ function deductLeaveBalance(userId, leaveType, days) {
     };
   }
 }
-
 /**
  * 🧪 測試扣除餘額功能
  */
@@ -1889,4 +1844,85 @@ function checkLeaveRecordInSheet() {
     Logger.log(`   狀態: ${row[10]}`);
     Logger.log('');
   }
+}
+
+
+/**
+ * 🔄 遷移腳本：將現有的天數資料轉換為小時數
+ */
+function migrateLeaveBalanceToHours() {
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('🔄 開始遷移假期餘額：天數 → 小時');
+  Logger.log('═══════════════════════════════════════');
+  
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('假期餘額');
+  
+  if (!sheet) {
+    Logger.log('❌ 找不到「假期餘額」工作表');
+    return;
+  }
+  
+  const data = sheet.getDataRange().getValues();
+  
+  Logger.log(`📊 找到 ${data.length - 1} 筆員工資料`);
+  Logger.log('');
+  
+  // 從第 2 行開始（跳過標題）
+  for (let i = 1; i < data.length; i++) {
+    const employeeId = data[i][0];
+    
+    Logger.log(`🔄 處理員工: ${employeeId}`);
+    
+    // B-P 欄（索引 1-15）：將天數 × 8 轉換為小時
+    for (let col = 1; col <= 15; col++) {
+      const days = parseFloat(data[i][col]) || 0;
+      const hours = days * 8;
+      
+      sheet.getRange(i + 1, col + 1).setValue(hours);
+      
+      if (col === 1) {  // 只記錄第一個欄位（特休假）
+        Logger.log(`   特休假: ${days} 天 → ${hours} 小時`);
+      }
+    }
+    
+    // 更新時間
+    sheet.getRange(i + 1, 17).setValue(new Date());
+    
+    Logger.log(`   ✅ 完成`);
+  }
+  
+  Logger.log('');
+  Logger.log('═══════════════════════════════════════');
+  Logger.log('✅ 遷移完成！');
+  Logger.log('═══════════════════════════════════════');
+  
+  Browser.msgBox(
+    '✅ 遷移完成！',
+    `已成功將 ${data.length - 1} 筆員工的假期餘額從天數轉換為小時數！\n\n` +
+    '請重新載入前端頁面以查看結果。',
+    Browser.Buttons.OK
+  );
+}
+
+function checkLeaveBalanceStructure() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('假期餘額');
+  
+  if (!sheet) {
+    Logger.log('❌ 找不到工作表');
+    return;
+  }
+  
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  
+  Logger.log('📊 假期餘額工作表結構:');
+  Logger.log(`   總欄位數: ${headers.length}`);
+  Logger.log('');
+  Logger.log('欄位列表:');
+  
+  headers.forEach((header, index) => {
+    const columnLetter = String.fromCharCode(65 + index); // A, B, C...
+    Logger.log(`   ${columnLetter} 欄: ${header}`);
+  });
 }
