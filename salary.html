@@ -1064,10 +1064,7 @@
                                     <span data-i18n="PREVIEW_INSURED_SALARY">投保薪資級距:</span>
                                     <span id="preview-insured-salary" class="font-mono">NT$ 0</span>
                                 </div>
-                                <div class="salary-preview-item">
-                                    <span data-i18n="PREVIEW_HOURLY_RATE">平日時薪:</span>
-                                    <span id="preview-hourly-rate" class="font-mono">NT$ 0</span>
-                                </div>
+
                             </div>
                             
                             <div>
@@ -1583,8 +1580,7 @@
             if (baseSalary > 35000) {  // 2026 年門檻可能調整
                 incomeTax = Math.round((baseSalary - 35000) * 0.05);
             }
-            
-            const hourlyRate = Math.round(baseSalary / 30 / 8);
+           
             const legalDeductions = laborFee + healthFee + employmentFee + pensionSelf + incomeTax;
             const otherDeductionsTotal = welfareFee + dormitoryFee + groupInsurance + otherDeductions;
             const totalDeductions = legalDeductions + otherDeductionsTotal;
@@ -1597,7 +1593,6 @@
                 pensionSelf, 
                 incomeTax,
                 insuredSalary,
-                hourlyRate,
                 legalDeductions,
                 otherDeductionsTotal,
                 netSalary,
@@ -1640,7 +1635,6 @@
             pensionSelf, 
             incomeTax,
             insuredSalary = 0,
-            hourlyRate = 0,
             legalDeductions = 0,
             otherDeductionsTotal = 0,
             netSalary = 0,
@@ -1660,7 +1654,6 @@
             if (incomeTaxEl) incomeTaxEl.value = incomeTax;
             
             const insuredSalaryEl = document.getElementById('preview-insured-salary');
-            const hourlyRateEl = document.getElementById('preview-hourly-rate');
             const legalDeductionsEl = document.getElementById('preview-legal-deductions');
             const otherDeductionsTotalEl = document.getElementById('preview-other-deductions-total');
             const netSalaryEl = document.getElementById('preview-net-salary');
@@ -1668,7 +1661,6 @@
             const allowancesTotalEl = document.getElementById('preview-allowances-total');
             
             if (insuredSalaryEl) insuredSalaryEl.textContent = `NT$ ${insuredSalary.toLocaleString('zh-TW')}`;
-            if (hourlyRateEl) hourlyRateEl.textContent = `NT$ ${hourlyRate.toLocaleString('zh-TW')}`;
             if (legalDeductionsEl) legalDeductionsEl.textContent = `NT$ ${legalDeductions.toLocaleString('zh-TW')}`;
             if (otherDeductionsTotalEl) otherDeductionsTotalEl.textContent = `NT$ ${otherDeductionsTotal.toLocaleString('zh-TW')}`;
             if (netSalaryEl) netSalaryEl.textContent = `NT$ ${netSalary.toLocaleString('zh-TW')}`;
@@ -2220,7 +2212,6 @@
                 'preview-base-salary': baseSalary,
                 'preview-allowances-total': allowancesTotal,
                 'preview-insured-salary': insuredSalary,
-                'preview-hourly-rate': hourlyRate,
                 'preview-legal-deductions': legalDeductions,
                 'preview-other-deductions-total': otherDeductionsTotal,
                 'preview-net-salary': netSalary
