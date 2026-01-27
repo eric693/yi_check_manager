@@ -10,6 +10,18 @@ const ADMIN_LIST = [
   "U69d37ae1b9a878ba9408527026bd5b44"
 ];
 
+const USER_ROLES = {
+  ADMIN: '管理員',
+  SCHEDULER: '排班人員',  // ⭐ 新增
+  EMPLOYEE: '員工'
+};
+
+// 角色層級定義
+const ROLE_LEVELS = {
+  '管理員': 3,
+  '排班人員': 2,  // ⭐ 新增
+  '員工': 1
+};
 // DbOperations.gs - 修正後的 writeEmployee_ 函數
 
 /**
@@ -1400,9 +1412,6 @@ function updateReviewStatus(rowNumber, status, note) {
 
 // ==================== 用戶角色管理 ====================
 
-/**
- * ✅ 更新用戶角色
- */
 function updateUserRole(userId, newRole) {
   try {
     Logger.log('📝 開始更新用戶角色');
@@ -1421,23 +1430,35 @@ function updateUserRole(userId, newRole) {
     const data = sheet.getDataRange().getValues();
     
     // 檢查是否為最後一個管理員
-    if (newRole === 'employee') {
+    if (newRole === 'employee' || newRole === 'scheduler') {  // ⭐ 新增 scheduler 檢查
       const adminCount = data.filter((row, index) => 
         index > 0 && row[5] === '管理員'  // F 欄: 部門
       ).length;
       
       if (adminCount <= 1) {
-        return {
-          ok: false,
-          msg: '至少需要保留一位管理員'
-        };
+        const currentRole = data.find((row, index) => index > 0 && row[0] === userId)?.[5];
+        if (currentRole === '管理員') {
+          return {
+            ok: false,
+            msg: '至少需要保留一位管理員'
+          };
+        }
       }
     }
     
     // 尋找用戶並更新
     for (let i = 1; i < data.length; i++) {
       if (data[i][0] === userId) {  // A 欄: userId
-        const newDept = newRole === 'admin' ? '管理員' : '員工';
+        // ⭐ 支援三種角色
+        let newDept;
+        if (newRole === 'admin') {
+          newDept = '管理員';
+        } else if (newRole === 'scheduler') {
+          newDept = '排班人員';  // ⭐ 新增
+        } else {
+          newDept = '員工';
+        }
+        
         sheet.getRange(i + 1, 6).setValue(newDept);  // F 欄: 部門
         
         Logger.log('✅ 已更新角色為: ' + newDept);

@@ -380,15 +380,22 @@ function handleGetAllUsers(params) {
   try {
     Logger.log('📋 處理取得所有用戶請求');
     
-    // 驗證 Session
+    // ⭐ 修正：排班人員也可以查詢員工列表
     if (!params.token || !validateSession(params.token)) {
       return { ok: false, msg: "未授權或 session 已過期" };
     }
     
-    // 驗證管理員權限
+    // ⭐ 檢查是否有排班或管理權限
     const session = checkSession_(params.token);
-    if (!session.ok || !session.user || session.user.dept !== '管理員') {
-      return { ok: false, msg: '需要管理員權限' };
+    if (!session.ok || !session.user) {
+      return { ok: false, msg: '無法取得使用者資訊' };
+    }
+    
+    const userRole = session.user.dept;
+    
+    // ⭐ 管理員、排班人員都可以查詢
+    if (userRole !== '管理員' && userRole !== '排班人員') {
+      return { ok: false, msg: '需要管理員或排班人員權限' };
     }
     
     const result = getAllUsers();
@@ -573,8 +580,10 @@ function handleInitializeEmployeeLeave(params) {
 
 function handleAddShift(params) {
   try {
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
+    // ⭐ 使用新的權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;  // 直接返回錯誤訊息
     }
     
     Logger.log('📝 收到新增排班請求');
@@ -610,8 +619,10 @@ function handleAddShift(params) {
 
 function handleBatchAddShifts(params) {
   try {
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
+    // ⭐ 使用新的權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;
     }
     
     Logger.log('📦 收到批量新增排班請求');
@@ -664,12 +675,10 @@ function handleBatchAddShifts(params) {
 
 function handleUpdateShift(params) {
   try {
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
-    }
-    
-    if (!params.shiftId) {
-      return { ok: false, msg: "缺少 shiftId 參數" };
+    // ⭐ 使用新的權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;
     }
     
     Logger.log('✏️ 更新排班: ' + params.shiftId);
@@ -698,12 +707,10 @@ function handleUpdateShift(params) {
 
 function handleDeleteShift(params) {
   try {
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
-    }
-    
-    if (!params.shiftId) {
-      return { ok: false, msg: "缺少 shiftId 參數" };
+    // ⭐ 使用新的權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;
     }
     
     Logger.log('🗑️ 刪除排班: ' + params.shiftId);
@@ -726,7 +733,6 @@ function handleGetShifts(params) {
     if (!params.token || !validateSession(params.token)) {
       return { ok: false, msg: "未授權或 session 已過期" };
     }
-    
     Logger.log('🔍 收到查詢排班請求');
     
     const filters = {
@@ -754,6 +760,7 @@ function handleGetShifts(params) {
 
 function handleGetShiftById(params) {
   try {
+
     if (!params.token || !validateSession(params.token)) {
       return { ok: false, msg: "未授權或 session 已過期" };
     }
@@ -829,8 +836,10 @@ function handleGetWeeklyShiftStats(params) {
 
 function handleExportShifts(params) {
   try {
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
+    // ⭐ 使用新的權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;
     }
     
     Logger.log('📥 匯出排班資料');
@@ -2764,6 +2773,34 @@ function handleDeleteEmployeeBasicInfo(params) {
     
   } catch (error) {
     Logger.log('❌ handleDeleteEmployeeBasicInfo 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+// ==================== 2. 新增權限檢查函數 ====================
+
+/**
+ * 檢查是否有排班權限（管理員或排班人員）
+ */
+function checkSchedulingPermission(token) {
+  try {
+    const session = checkSession_(token);
+    
+    if (!session.ok || !session.user) {
+      return { ok: false, msg: '未授權或 session 已過期' };
+    }
+    
+    const userRole = session.user.dept;  // 從部門欄位取得角色
+    
+    // 允許管理員和排班人員
+    if (userRole === '管理員' || userRole === '排班人員') {
+      return { ok: true, user: session.user };
+    }
+    
+    return { ok: false, msg: '權限不足：需要管理員或排班人員權限' };
+    
+  } catch (error) {
+    Logger.log('❌ checkSchedulingPermission 錯誤: ' + error);
     return { ok: false, msg: error.message };
   }
 }

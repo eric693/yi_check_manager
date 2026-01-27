@@ -492,15 +492,20 @@ function verifyLineSignature_(body, signature) {
 
 // ==================== 排班系統 Handler 函數 ====================
 
+// ==================== 排班系統 Handler 函數（修正版）====================
+
 /**
- * 處理新增排班
+ * 處理新增排班（⭐ 支援排班人員權限）
  */
 function handleAddShift(params) {
   try {
-    // 驗證 session
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
+    // ⭐ 修正：使用排班權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;  // 返回權限錯誤
     }
+    
+    Logger.log('📝 收到新增排班請求（by ' + permCheck.user.name + '）');
     
     const shiftData = {
       employeeId: params.employeeId,
@@ -513,54 +518,70 @@ function handleAddShift(params) {
       note: params.note
     };
     
+    if (!shiftData.employeeId || !shiftData.date || !shiftData.shiftType) {
+      return { ok: false, msg: "缺少必填欄位" };
+    }
+    
     const result = addShift(shiftData);
-    return { ok: result.success, data: result, msg: result.message };
+    return { 
+      ok: result.success, 
+      data: result, 
+      msg: result.message 
+    };
     
   } catch (error) {
-    Logger.log('handleAddShift 錯誤: ' + error);
+    Logger.log('❌ handleAddShift 錯誤: ' + error);
     return { ok: false, msg: error.message };
   }
 }
 
 /**
- * 處理批量新增排班
+ * 處理批量新增排班（⭐ 支援排班人員權限）
  */
 function handleBatchAddShifts(params) {
   try {
-    // 驗證 session
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
+    // ⭐ 修正：使用排班權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;
     }
+    
+    Logger.log('📦 收到批量新增排班請求（by ' + permCheck.user.name + '）');
     
     // ✅ 從 URL 參數取得資料
     let shiftsArray;
     
     if (params.shiftsArray) {
       try {
-        // 解碼並解析 JSON
         if (typeof params.shiftsArray === 'string') {
           const decoded = decodeURIComponent(params.shiftsArray);
           shiftsArray = JSON.parse(decoded);
+          Logger.log('✅ 成功解析 shiftsArray: ' + shiftsArray.length + ' 筆');
         } else {
           shiftsArray = params.shiftsArray;
         }
       } catch (parseError) {
         Logger.log('❌ 解析失敗: ' + parseError);
-        return { ok: false, msg: "資料格式錯誤" };
+        return { ok: false, msg: "資料格式錯誤: 無法解析 JSON" };
       }
     } else {
+      Logger.log('❌ 缺少 shiftsArray 參數');
       return { ok: false, msg: "缺少 shiftsArray 參數" };
     }
     
-    // 驗證資料
-    if (!Array.isArray(shiftsArray) || shiftsArray.length === 0) {
-      return { ok: false, msg: "資料格式錯誤或為空" };
+    if (!Array.isArray(shiftsArray)) {
+      return { ok: false, msg: "shiftsArray 必須是陣列" };
     }
     
-    Logger.log('📊 批量新增: ' + shiftsArray.length + ' 筆');
+    if (shiftsArray.length === 0) {
+      return { ok: false, msg: "批量資料不能為空" };
+    }
     
-    // 呼叫核心函數
+    Logger.log('📊 準備批量新增: ' + shiftsArray.length + ' 筆排班');
+    
     const result = batchAddShifts(shiftsArray);
+    
+    Logger.log('✅ 批量新增結果: ' + JSON.stringify(result));
     
     return { 
       ok: result.success, 
@@ -569,20 +590,22 @@ function handleBatchAddShifts(params) {
     };
     
   } catch (error) {
-    Logger.log('❌ 錯誤: ' + error);
-    return { ok: false, msg: error.message };
+    Logger.log('❌ handleBatchAddShifts 錯誤: ' + error);
+    return { ok: false, msg: "批量新增失敗: " + error.message };
   }
 }
 
 /**
- * 處理查詢排班
+ * 處理查詢排班（所有人都可以查看）
  */
 function handleGetShifts(params) {
   try {
-    // 驗證 session
+    // ⭐ 查詢排班：只需要基本的 session 驗證
     if (!params.token || !validateSession(params.token)) {
       return { ok: false, msg: "未授權或 session 已過期" };
     }
+    
+    Logger.log('🔍 收到查詢排班請求');
     
     const filters = {
       employeeId: params.employeeId,
@@ -593,42 +616,63 @@ function handleGetShifts(params) {
     };
     
     const result = getShifts(filters);
-    return { ok: result.success, data: result.data, count: result.count, msg: result.message };
+    return { 
+      ok: result.success, 
+      data: result.data, 
+      count: result.count, 
+      msg: result.message 
+    };
     
   } catch (error) {
-    Logger.log('handleGetShifts 錯誤: ' + error);
+    Logger.log('❌ handleGetShifts 錯誤: ' + error);
     return { ok: false, msg: error.message };
   }
 }
 
 /**
- * 處理取得單一排班詳情
+ * 處理取得單一排班詳情（所有人都可以查看）
  */
 function handleGetShiftById(params) {
   try {
-    // 驗證 session
     if (!params.token || !validateSession(params.token)) {
       return { ok: false, msg: "未授權或 session 已過期" };
     }
     
+    if (!params.shiftId) {
+      return { ok: false, msg: "缺少 shiftId 參數" };
+    }
+    
+    Logger.log('🔍 查詢排班詳情: ' + params.shiftId);
+    
     const result = getShiftById(params.shiftId);
-    return { ok: result.success, data: result.data, msg: result.message };
+    return { 
+      ok: result.success, 
+      data: result.data, 
+      msg: result.message 
+    };
     
   } catch (error) {
-    Logger.log('handleGetShiftById 錯誤: ' + error);
+    Logger.log('❌ handleGetShiftById 錯誤: ' + error);
     return { ok: false, msg: error.message };
   }
 }
 
 /**
- * 處理更新排班
+ * 處理更新排班（⭐ 支援排班人員權限）
  */
 function handleUpdateShift(params) {
   try {
-    // 驗證 session
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
+    // ⭐ 修正：使用排班權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;
     }
+    
+    if (!params.shiftId) {
+      return { ok: false, msg: "缺少 shiftId 參數" };
+    }
+    
+    Logger.log('✏️ 更新排班: ' + params.shiftId + '（by ' + permCheck.user.name + '）');
     
     const updateData = {
       date: params.date,
@@ -640,42 +684,60 @@ function handleUpdateShift(params) {
     };
     
     const result = updateShift(params.shiftId, updateData);
-    return { ok: result.success, msg: result.message };
+    return { 
+      ok: result.success, 
+      msg: result.message 
+    };
     
   } catch (error) {
-    Logger.log('handleUpdateShift 錯誤: ' + error);
+    Logger.log('❌ handleUpdateShift 錯誤: ' + error);
     return { ok: false, msg: error.message };
   }
 }
 
 /**
- * 處理刪除排班
+ * 處理刪除排班（⭐ 支援排班人員權限）
  */
 function handleDeleteShift(params) {
   try {
-    // 驗證 session
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
+    // ⭐ 修正：使用排班權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;
     }
     
+    if (!params.shiftId) {
+      return { ok: false, msg: "缺少 shiftId 參數" };
+    }
+    
+    Logger.log('🗑️ 刪除排班: ' + params.shiftId + '（by ' + permCheck.user.name + '）');
+    
     const result = deleteShift(params.shiftId);
-    return { ok: result.success, msg: result.message };
+    return { 
+      ok: result.success, 
+      msg: result.message 
+    };
     
   } catch (error) {
-    Logger.log('handleDeleteShift 錯誤: ' + error);
+    Logger.log('❌ handleDeleteShift 錯誤: ' + error);
     return { ok: false, msg: error.message };
   }
 }
 
 /**
- * 處理取得員工當日排班（用於打卡驗證）
+ * 處理取得員工當日排班（用於打卡驗證，所有人都可查）
  */
 function handleGetEmployeeShiftForDate(params) {
   try {
-    // 驗證 session
     if (!params.token || !validateSession(params.token)) {
       return { ok: false, msg: "未授權或 session 已過期" };
     }
+    
+    if (!params.employeeId || !params.date) {
+      return { ok: false, msg: "缺少必要參數" };
+    }
+    
+    Logger.log('📅 查詢員工排班: ' + params.employeeId + ', 日期: ' + params.date);
     
     const result = getEmployeeShiftForDate(params.employeeId, params.date);
     return { 
@@ -686,39 +748,47 @@ function handleGetEmployeeShiftForDate(params) {
     };
     
   } catch (error) {
-    Logger.log('handleGetEmployeeShiftForDate 錯誤: ' + error);
+    Logger.log('❌ handleGetEmployeeShiftForDate 錯誤: ' + error);
     return { ok: false, msg: error.message };
   }
 }
 
 /**
- * 處理取得本週排班統計
+ * 處理取得本週排班統計（所有人都可查）
  */
 function handleGetWeeklyShiftStats(params) {
   try {
-    // 驗證 session
     if (!params.token || !validateSession(params.token)) {
       return { ok: false, msg: "未授權或 session 已過期" };
     }
     
+    Logger.log('📊 查詢本週排班統計');
+    
     const result = getWeeklyShiftStats();
-    return { ok: result.success, data: result.data, msg: result.message };
+    return { 
+      ok: result.success, 
+      data: result.data, 
+      msg: result.message 
+    };
     
   } catch (error) {
-    Logger.log('handleGetWeeklyShiftStats 錯誤: ' + error);
+    Logger.log('❌ handleGetWeeklyShiftStats 錯誤: ' + error);
     return { ok: false, msg: error.message };
   }
 }
 
 /**
- * 處理匯出排班資料
+ * 處理匯出排班資料（⭐ 支援排班人員權限）
  */
 function handleExportShifts(params) {
   try {
-    // 驗證 session
-    if (!params.token || !validateSession(params.token)) {
-      return { ok: false, msg: "未授權或 session 已過期" };
+    // ⭐ 修正：使用排班權限檢查
+    const permCheck = checkSchedulingPermission(params.token);
+    if (!permCheck.ok) {
+      return permCheck;
     }
+    
+    Logger.log('📥 匯出排班資料（by ' + permCheck.user.name + '）');
     
     const filters = {
       employeeId: params.employeeId,
@@ -728,10 +798,15 @@ function handleExportShifts(params) {
     };
     
     const result = exportShifts(filters);
-    return { ok: result.success, data: result.data, filename: result.filename, msg: result.message };
+    return { 
+      ok: result.success, 
+      data: result.data, 
+      filename: result.filename, 
+      msg: result.message 
+    };
     
   } catch (error) {
-    Logger.log('handleExportShifts 錯誤: ' + error);
+    Logger.log('❌ handleExportShifts 錯誤: ' + error);
     return { ok: false, msg: error.message };
   }
 }
