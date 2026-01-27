@@ -538,13 +538,19 @@ function displayEmployeeSalary(data) {
     // ⭐ 工時統計資訊
     const totalWorkHours = parseFloat(data.totalWorkHours) || 0;
     const totalOvertimeHours = parseFloat(data.totalOvertimeHours) || 0;
-    
+
     const weekdayOvertimeEl = document.getElementById('detail-weekday-overtime');
     if (weekdayOvertimeEl && weekdayOvertimeEl.parentElement) {
+        // ⭐⭐⭐ 修正：先移除舊的工時統計區塊
         const oldWorkHoursInfo = weekdayOvertimeEl.parentElement.querySelector('.work-hours-summary');
         if (oldWorkHoursInfo) {
             oldWorkHoursInfo.remove();
         }
+        
+        // ⭐⭐⭐ 新增：檢查是否已存在工時統計區塊（在父容器層級）
+        const container = weekdayOvertimeEl.closest('.space-y-2') || weekdayOvertimeEl.parentElement.parentElement;
+        const existingSummaries = container.querySelectorAll('.work-hours-summary');
+        existingSummaries.forEach(summary => summary.remove());
         
         if (totalWorkHours > 0 || totalOvertimeHours > 0) {
             const workHoursSummary = document.createElement('div');
@@ -572,13 +578,14 @@ function displayEmployeeSalary(data) {
             
             workHoursSummary.innerHTML = summaryHTML;
             
+            // ⭐⭐⭐ 修正：只插入一次
             weekdayOvertimeEl.parentElement.parentElement.insertBefore(
                 workHoursSummary,
                 weekdayOvertimeEl.parentElement
             );
         }
     }
-    
+        
     // 其他津貼
     safeSet('detail-position-allowance', formatCurrency(data.positionAllowance || 0));
     safeSet('detail-meal-allowance', formatCurrency(data.mealAllowance || 0));
