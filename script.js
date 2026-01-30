@@ -3792,8 +3792,8 @@ async function doPunch(type) {
                     'info'
                 );
                 
-                const now = new Date();
-                const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                // const now = new Date();
+                // const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
                 
                 if (shift.startTime) {
                     const timeDiff = getTimeDifference(currentTime, shift.startTime);
@@ -3828,8 +3828,8 @@ async function doPunch(type) {
         const lng = pos.coords.longitude;
         
         const now = new Date();
-        const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-        const roundedTime = roundPunchTime(currentTime);
+        // const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        // const roundedTime = roundPunchTime(currentTime);
         
         // 組合完整的日期時間
         const today = now.toISOString().split('T')[0];
