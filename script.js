@@ -2393,6 +2393,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         return minutes1 - minutes2;
     }
 
+    /**
+     * ⭐ 新增：將打卡時間進位到最近的 15 分鐘
+     */
+    function roundPunchTime(timeString) {
+        const [hours, minutes] = timeString.split(':').map(Number);
+        
+        let roundedMinutes = Math.ceil(minutes / 15) * 15;
+        let roundedHours = hours;
+        
+        if (roundedMinutes === 60) {
+        roundedMinutes = 0;
+        roundedHours = (hours + 1) % 24;
+        }
+        
+        return `${String(roundedHours).padStart(2, '0')}:${String(roundedMinutes).padStart(2, '0')}`;
+    }
+
     punchInBtn.addEventListener('click', () => doPunch("上班"));
     punchOutBtn.addEventListener('click', () => doPunch("下班"));
 
@@ -3856,6 +3873,22 @@ function getTimeDifference(time1, time2) {
     return minutes1 - minutes2;
 }
 
+/**
+ * ⭐ 新增：將打卡時間進位到最近的 15 分鐘
+ */
+function roundPunchTime(timeString) {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    
+    let roundedMinutes = Math.ceil(minutes / 15) * 15;
+    let roundedHours = hours;
+    
+    if (roundedMinutes === 60) {
+      roundedMinutes = 0;
+      roundedHours = (hours + 1) % 24;
+    }
+    
+    return `${String(roundedHours).padStart(2, '0')}:${String(roundedMinutes).padStart(2, '0')}`;
+  }
 // ==================== 用戶管理用戶管理功能 ====================
 
 let allUsersCache = []; // 快取所有用戶
