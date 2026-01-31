@@ -180,23 +180,59 @@ function addShift(shiftData) {
 /**
  * 檢查重複排班
  */
+/**
+ * ✅ 修正版：檢查重複排班
+ */
 function checkDuplicateShift(employeeId, date) {
-  const sheet = getShiftSheet();
-  const data = sheet.getDataRange().getValues();
-  const targetDate = formatDateOnly(date);
-  
-  for (let i = 1; i < data.length; i++) {
-    const shiftDate = formatDateOnly(data[i][3]);
-    if (data[i][1] === employeeId && shiftDate === targetDate && data[i][13] !== '已刪除') {
-      return true;
+  try {
+    const sheet = getShiftSheet();
+    const data = sheet.getDataRange().getValues();
+    
+    // ⭐ 格式化目標日期
+    const targetDate = formatDateOnly(date);
+    
+    console.log(`🔍 檢查重複: ${employeeId} - ${targetDate}`);
+    
+    for (let i = 1; i < data.length; i++) {
+      // 跳過已刪除的記錄
+      if (data[i][13] === '已刪除') continue;
+      
+      // ⭐ 格式化工作表中的日期
+      const shiftDate = formatDateOnly(data[i][3]);
+      
+      // ⭐ 比較員工ID和日期
+      if (data[i][1] === employeeId && shiftDate === targetDate) {
+        console.log(`⚠️ 發現重複: Row ${i + 1}`);
+        return true;
+      }
     }
+    
+    console.log(`✅ 無重複`);
+    return false;
+    
+  } catch (error) {
+    Logger.log('❌ checkDuplicateShift 錯誤: ' + error);
+    return false; // ⭐ 錯誤時允許新增
   }
-  
-  return false;
 }
+// function checkDuplicateShift(employeeId, date) {
+//   const sheet = getShiftSheet();
+//   const data = sheet.getDataRange().getValues();
+//   const targetDate = formatDateOnly(date);
+  
+//   for (let i = 1; i < data.length; i++) {
+//     const shiftDate = formatDateOnly(data[i][3]);
+//     if (data[i][1] === employeeId && shiftDate === targetDate && data[i][13] !== '已刪除') {
+//       return true;
+//     }
+//   }
+  
+//   return false;
+// }
 
 /**
- * 批量新增排班 (⭐ 已修正 - 使用格式化函數)
+ * ✅ 批量新增排班（精細重複檢查版）
+ * 重複定義：同一員工 + 同一日期 + 同一班別
  */
 function batchAddShifts(shiftsArray) {
   try {
@@ -209,23 +245,79 @@ function batchAddShifts(shiftsArray) {
       errors: []
     };
     
+    Logger.log('═══════════════════════════════════════');
+    Logger.log('📦 開始批量新增（精細重複檢查）');
+    Logger.log('   總筆數: ' + shiftsArray.length);
+    Logger.log('   重複定義: 員工ID + 日期 + 班別');
+    Logger.log('═══════════════════════════════════════');
+    
+    // ⭐⭐⭐ 關鍵修改：檢查鍵改為「員工ID_日期_班別」
+    const processedInBatch = new Set();
+    
+    // ⭐ 預先載入工作表中已存在的排班
+    const existingShifts = new Set();
+    const existingData = sheet.getDataRange().getValues();
+    
+    for (let i = 1; i < existingData.length; i++) {
+      if (existingData[i][13] !== '已刪除') {
+        // ⭐⭐⭐ 檢查鍵：員工ID + 日期 + 班別
+        const existingKey = `${existingData[i][1]}_${formatDateOnly(existingData[i][3])}_${existingData[i][4]}`;
+        existingShifts.add(existingKey);
+      }
+    }
+    
+    Logger.log('📊 工作表中已有 ' + existingShifts.size + ' 個排班');
+    Logger.log('');
+    
+    // 處理每筆資料
     shiftsArray.forEach((shiftData, index) => {
       try {
-        // 檢查重複
-        if (checkDuplicateShift(shiftData.employeeId, shiftData.date)) {
+        Logger.log(`📝 處理第 ${index + 1}/${shiftsArray.length} 筆`);
+        Logger.log(`   員工: ${shiftData.employeeName}`);
+        Logger.log(`   日期: ${shiftData.date}`);
+        Logger.log(`   班別: ${shiftData.shiftType}`);
+        
+        // ⭐ 格式化日期
+        const formattedDate = formatDateOnly(shiftData.date);
+        
+        // ⭐⭐⭐ 檢查鍵：員工ID + 日期 + 班別
+        const key = `${shiftData.employeeId}_${formattedDate}_${shiftData.shiftType}`;
+        
+        Logger.log(`   檢查鍵: ${key}`);
+        
+        // ⭐ 檢查 1：本批次中是否已處理過
+        if (processedInBatch.has(key)) {
+          Logger.log(`   ❌ 批次內重複（同員工、同日期、同班別）`);
           results.failed++;
-          results.errors.push(`第 ${index + 1} 筆: 該員工在此日期已有排班`);
+          results.errors.push(
+            `第 ${index + 1} 筆 (${shiftData.employeeName} ${formattedDate} ${shiftData.shiftType}): ` +
+            `批次中已有相同的排班`
+          );
           return;
         }
         
+        // ⭐ 檢查 2：工作表中是否已存在
+        if (existingShifts.has(key)) {
+          Logger.log(`   ❌ 工作表中已存在（同員工、同日期、同班別）`);
+          results.failed++;
+          results.errors.push(
+            `第 ${index + 1} 筆 (${shiftData.employeeName} ${formattedDate} ${shiftData.shiftType}): ` +
+            `該員工在此日期已有此班別`
+          );
+          return;
+        }
+        
+        // ⭐ 標記為已處理
+        processedInBatch.add(key);
+        
+        // ⭐ 新增到工作表
         const shiftId = 'SHIFT-' + Utilities.getUuid();
         
-        // ✅ 使用格式化函數
         const rowData = [
           shiftId,
           shiftData.employeeId,
           shiftData.employeeName || '',
-          formatDateOnly(shiftData.date),
+          formattedDate,
           shiftData.shiftType,
           formatTimeOnly(shiftData.startTime),
           formatTimeOnly(shiftData.endTime),
@@ -241,11 +333,30 @@ function batchAddShifts(shiftsArray) {
         sheet.appendRow(rowData);
         results.success++;
         
+        Logger.log(`   ✅ 新增成功 (ID: ${shiftId.substring(0, 13)}...)`);
+        
       } catch (e) {
+        Logger.log(`   ❌ 例外錯誤: ${e.message}`);
         results.failed++;
         results.errors.push(`第 ${index + 1} 筆: ${e.message}`);
       }
     });
+    
+    Logger.log('');
+    Logger.log('═══════════════════════════════════════');
+    Logger.log('📊 批量新增完成');
+    Logger.log(`   ✅ 成功: ${results.success} 筆`);
+    Logger.log(`   ❌ 失敗: ${results.failed} 筆`);
+    if (results.errors.length > 0) {
+      Logger.log('   錯誤列表:');
+      results.errors.slice(0, 5).forEach(err => {
+        Logger.log(`     - ${err}`);
+      });
+      if (results.errors.length > 5) {
+        Logger.log(`     ... 還有 ${results.errors.length - 5} 個錯誤`);
+      }
+    }
+    Logger.log('═══════════════════════════════════════');
     
     return {
       success: true,
@@ -254,13 +365,77 @@ function batchAddShifts(shiftsArray) {
     };
     
   } catch (error) {
-    Logger.log('批量新增排班錯誤: ' + error);
+    Logger.log('❌ batchAddShifts 整體錯誤: ' + error);
+    Logger.log('   錯誤堆疊: ' + error.stack);
     return {
       success: false,
       message: '批量新增失敗: ' + error.message
     };
   }
 }
+// function batchAddShifts(shiftsArray) {
+//   try {
+//     const sheet = getShiftSheet();
+//     const userId = Session.getActiveUser().getEmail();
+//     const timestamp = formatDateTime(new Date());
+//     const results = {
+//       success: 0,
+//       failed: 0,
+//       errors: []
+//     };
+    
+//     shiftsArray.forEach((shiftData, index) => {
+//       try {
+//         // 檢查重複
+//         if (checkDuplicateShift(shiftData.employeeId, shiftData.date)) {
+//           results.failed++;
+//           results.errors.push(`第 ${index + 1} 筆: 該員工在此日期已有排班`);
+//           return;
+//         }
+        
+//         const shiftId = 'SHIFT-' + Utilities.getUuid();
+        
+//         // ✅ 使用格式化函數
+//         const rowData = [
+//           shiftId,
+//           shiftData.employeeId,
+//           shiftData.employeeName || '',
+//           formatDateOnly(shiftData.date),
+//           shiftData.shiftType,
+//           formatTimeOnly(shiftData.startTime),
+//           formatTimeOnly(shiftData.endTime),
+//           shiftData.location || '',
+//           shiftData.note || '',
+//           timestamp,
+//           userId,
+//           timestamp,
+//           userId,
+//           '正常'
+//         ];
+        
+//         sheet.appendRow(rowData);
+//         results.success++;
+        
+//       } catch (e) {
+//         results.failed++;
+//         results.errors.push(`第 ${index + 1} 筆: ${e.message}`);
+//       }
+//     });
+    
+//     return {
+//       success: true,
+//       message: `批量新增完成: 成功 ${results.success} 筆, 失敗 ${results.failed} 筆`,
+//       results: results
+//     };
+    
+//   } catch (error) {
+//     Logger.log('批量新增排班錯誤: ' + error);
+//     return {
+//       success: false,
+//       message: '批量新增失敗: ' + error.message
+//     };
+//   }
+// }
 
 /**
  * 查詢排班 (⭐ 已修正 - 格式化回傳資料)
@@ -672,4 +847,37 @@ function testShiftSystem() {
   
   const queryResult = getShifts({ employeeId: 'TEST001' });
   Logger.log('查詢結果: ' + JSON.stringify(queryResult));
+}
+
+
+function testSingleShift() {
+  const testData = {
+    employeeId: 'Ue76b65367821240ac26387d2972a5adf',
+    employeeName: '測試員工',
+    date: '2026-02-20',
+    shiftType: '廚房A班',
+    startTime: '11:00',
+    endTime: '20:00',
+    location: '總公司',
+    note: '測試'
+  };
+  
+  Logger.log('測試單筆新增');
+  const result = addShift(testData);
+  Logger.log('結果: ' + JSON.stringify(result));
+}
+
+function checkExistingShifts() {
+  const sheet = getShiftSheet();
+  const data = sheet.getDataRange().getValues();
+  
+  Logger.log('現有排班數量: ' + (data.length - 1));
+  
+  // 檢查日期格式
+  for (let i = 1; i <= Math.min(5, data.length - 1); i++) {
+    Logger.log(`Row ${i + 1}:`);
+    Logger.log(`  日期原始: ${data[i][3]}`);
+    Logger.log(`  日期類型: ${typeof data[i][3]}`);
+    Logger.log(`  格式化後: ${formatDateOnly(data[i][3])}`);
+  }
 }

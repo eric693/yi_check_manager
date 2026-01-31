@@ -334,71 +334,158 @@ function doGet(e) {
 
 // Main.gs - 新增 LINE Bot Webhook 處理
 
-/**
- * 處理 LINE Webhook 請求
- */
 function doPost(e) {
   try {
     Logger.log('═══════════════════════════════════════');
-    Logger.log('📥 收到 LINE Webhook 請求');
+    Logger.log('📥 收到 POST 請求');
     Logger.log('═══════════════════════════════════════');
     
-    if (!e || !e.postData || !e.postData.contents) {
-      Logger.log('⚠️ 缺少 postData');
-      return ContentService.createTextOutput(JSON.stringify({
-        status: 'error',
-        message: 'No postData'
-      })).setMimeType(ContentService.MimeType.JSON);
+    // ✅ 先嘗試從 parameter 讀取（FormData）
+    if (e.parameter && e.parameter.action) {
+      Logger.log('🔧 識別為 Form Data 請求');
+      
+      const action = e.parameter.action;
+      const token = e.parameter.token;
+      
+      Logger.log('   action: ' + action);
+      Logger.log('   token: ' + (token ? '有' : '無'));
+      
+      // ========== 處理批量上傳排班 ==========
+      if (action === 'batchAddShifts') {
+        Logger.log('📦 處理批量上傳排班');
+        
+        // 驗證 token
+        if (!token || !validateSession(token)) {
+          Logger.log('❌ Token 驗證失敗');
+          return ContentService.createTextOutput(JSON.stringify({
+            ok: false,
+            msg: '未授權或 session 已過期'
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        Logger.log('✅ Token 驗證成功');
+        
+        // 檢查權限
+        const permCheck = checkSchedulingPermission(token);
+        if (!permCheck.ok) {
+          Logger.log('❌ 權限檢查失敗');
+          return ContentService.createTextOutput(JSON.stringify(permCheck))
+            .setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        Logger.log('✅ 權限驗證通過（by ' + permCheck.user.name + '）');
+        
+        // ✅ 從 Form Data 解析 shiftsArray
+        let shiftsArray;
+        try {
+          shiftsArray = JSON.parse(e.parameter.shiftsArray);
+          Logger.log('✅ 成功解析 shiftsArray: ' + shiftsArray.length + ' 筆');
+        } catch (parseError) {
+          Logger.log('❌ 解析 shiftsArray 失敗: ' + parseError);
+          return ContentService.createTextOutput(JSON.stringify({
+            ok: false,
+            msg: '資料格式錯誤'
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        if (!Array.isArray(shiftsArray)) {
+          Logger.log('❌ shiftsArray 不是陣列');
+          return ContentService.createTextOutput(JSON.stringify({
+            ok: false,
+            msg: 'shiftsArray 必須是陣列'
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        if (shiftsArray.length === 0) {
+          Logger.log('❌ shiftsArray 是空的');
+          return ContentService.createTextOutput(JSON.stringify({
+            ok: false,
+            msg: '批量資料不能為空'
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        Logger.log('📊 準備批量新增: ' + shiftsArray.length + ' 筆排班');
+        
+        // 呼叫核心函數
+        const result = batchAddShifts(shiftsArray);
+        
+        Logger.log('');
+        Logger.log('📊 批量新增結果:');
+        Logger.log('   成功: ' + result.results.success + ' 筆');
+        Logger.log('   失敗: ' + result.results.failed + ' 筆');
+        Logger.log('═══════════════════════════════════════');
+        
+        return ContentService.createTextOutput(JSON.stringify({
+          ok: result.success,
+          msg: result.message,
+          results: result.results
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
     }
     
-    Logger.log('📋 postData.contents: ' + e.postData.contents.substring(0, 200) + '...');
-    
-    const json = JSON.parse(e.postData.contents);
-    
-    Logger.log('📊 收到 ' + json.events.length + ' 個事件');
-    
-    // 🔧 修改：處理每個事件（加入去重機制）
-    json.events.forEach((event, index) => {
-      Logger.log('');
-      Logger.log(`📌 處理事件 ${index + 1}/${json.events.length}`);
-      Logger.log('   type: ' + event.type);
+    // ✅ 如果不是 Form Data，嘗試解析 JSON（LINE Webhook）
+    if (e.postData && e.postData.contents) {
+      Logger.log('📋 postData.contents: ' + e.postData.contents.substring(0, 200) + '...');
       
-      // ⭐⭐⭐ 新增：生成事件 ID 並檢查是否已處理
-      const eventId = event.webhookEventId || 
-                     `${event.timestamp}_${event.source.userId}_${event.type}`;
+      const postData = JSON.parse(e.postData.contents);
       
-      Logger.log('   eventId: ' + eventId);
-      
-      if (isEventProcessed_(eventId)) {
-        Logger.log('⏭️ 跳過已處理的事件');
-        return;  // 跳過這個事件
-      }
-      
-      try {
-        if (event.type === 'message') {
-          if (event.message.type === 'text') {
-            Logger.log('   message.type: text');
-            Logger.log('   message.text: ' + event.message.text);
-            handleLineMessage(event);
-          } else if (event.message.type === 'location') {
-            Logger.log('   message.type: location');
-            Logger.log('   latitude: ' + event.message.latitude);
-            Logger.log('   longitude: ' + event.message.longitude);
-            handleLineLocation(event);
+      // LINE Webhook（有 events 屬性）
+      if (postData.events && Array.isArray(postData.events)) {
+        Logger.log('📱 識別為 LINE Webhook 請求');
+        Logger.log('📊 收到 ' + postData.events.length + ' 個事件');
+        
+        // 處理每個事件
+        postData.events.forEach((event, index) => {
+          Logger.log('');
+          Logger.log(`📌 處理事件 ${index + 1}/${postData.events.length}`);
+          Logger.log('   type: ' + event.type);
+          
+          const eventId = event.webhookEventId || 
+                         `${event.timestamp}_${event.source.userId}_${event.type}`;
+          
+          Logger.log('   eventId: ' + eventId);
+          
+          if (isEventProcessed_(eventId)) {
+            Logger.log('⏭️ 跳過已處理的事件');
+            return;
           }
-        }
-      } catch (eventError) {
-        Logger.log('❌ 事件處理錯誤: ' + eventError);
-        Logger.log('   錯誤堆疊: ' + eventError.stack);
+          
+          try {
+            if (event.type === 'message') {
+              if (event.message.type === 'text') {
+                Logger.log('   message.type: text');
+                Logger.log('   message.text: ' + event.message.text);
+                handleLineMessage(event);
+              } else if (event.message.type === 'location') {
+                Logger.log('   message.type: location');
+                Logger.log('   latitude: ' + event.message.latitude);
+                Logger.log('   longitude: ' + event.message.longitude);
+                handleLineLocation(event);
+              }
+            }
+          } catch (eventError) {
+            Logger.log('❌ 事件處理錯誤: ' + eventError);
+            Logger.log('   錯誤堆疊: ' + eventError.stack);
+          }
+        });
+        
+        Logger.log('');
+        Logger.log('✅ LINE Webhook 處理完成');
+        Logger.log('═══════════════════════════════════════');
+        
+        return ContentService.createTextOutput(JSON.stringify({
+          status: 'ok'
+        })).setMimeType(ContentService.MimeType.JSON);
       }
-    });
+    }
     
-    Logger.log('');
-    Logger.log('✅ Webhook 處理完成');
+    // 未知的請求類型
+    Logger.log('⚠️ 無法識別的請求類型');
     Logger.log('═══════════════════════════════════════');
     
     return ContentService.createTextOutput(JSON.stringify({
-      status: 'ok'
+      status: 'error',
+      message: '無法識別的請求類型'
     })).setMimeType(ContentService.MimeType.JSON);
     
   } catch (error) {
@@ -413,6 +500,36 @@ function doPost(e) {
       message: error.message
     })).setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function isEventProcessed_(eventId) {
+  const cache = CacheService.getScriptCache();
+  const key = 'event_' + eventId;
+  
+  const cached = cache.get(key);
+  if (cached) {
+    return true;
+  }
+  
+  cache.put(key, 'processed', 3600);
+  return false;
+}
+/**
+ * ✅ 檢查事件是否已處理（去重機制）
+ */
+function isEventProcessed_(eventId) {
+  const cache = CacheService.getScriptCache();
+  const key = 'event_' + eventId;
+  
+  // 檢查快取中是否有這個事件
+  const cached = cache.get(key);
+  if (cached) {
+    return true;  // 已處理過
+  }
+  
+  // 標記為已處理（有效期 1 小時）
+  cache.put(key, 'processed', 3600);
+  return false;  // 第一次處理
 }
 
 
