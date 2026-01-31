@@ -1239,57 +1239,66 @@ async function confirmBatchUpload() {
         const token = localStorage.getItem('sessionToken');
         
         console.log('📤 準備上傳批量資料:', batchData.length, '筆');
+        console.log('📋 前 3 筆資料預覽:', batchData.slice(0, 3));
         
-        // ⭐ 改用 GET 請求避免 CORS 問題
-        // 將資料轉成 JSON 字串並編碼
-        const shiftsJson = encodeURIComponent(JSON.stringify(batchData));
-        
-        const url = `${apiUrl}?action=batchAddShifts&token=${token}&shiftsArray=${shiftsJson}`;
-        
-        // 使用 JSONP 方式呼叫
-        const callbackName = 'batchUploadCallback_' + Date.now();
-        
-        return new Promise((resolve, reject) => {
-            // 建立回調函數
-            window[callbackName] = function(data) {
-                console.log('📥 批量上傳回應:', data);
-                
-                // 清理
-                delete window[callbackName];
-                document.body.removeChild(script);
-                
-                if (data.ok) {
-                    showMessage(data.msg || data.message || t('SHIFT_BATCH_UPLOAD_SUCCESS'), 'success');
-                    cancelBatchUpload();
-                    switchTab('view');
-                    loadShifts();
-                    resolve(data);
-                } else {
-                    showMessage(data.msg || data.message || t('SHIFT_BATCH_UPLOAD_FAILED'), 'error');
-                    reject(new Error(data.msg));
-                }
-            };
-            
-            // 建立 script 標籤
-            const script = document.createElement('script');
-            script.src = url + `&callback=${callbackName}`;
-            script.onerror = function() {
-                console.error('❌ 批量上傳失敗: 無法載入腳本');
-                delete window[callbackName];
-                document.body.removeChild(script);
-                showMessage(t('SHIFT_BATCH_NETWORK_ERROR'), 'error');
-                reject(new Error('Network error'));
-            };
-            
-            document.body.appendChild(script);
+        // ✅ 方法 1: 使用 POST 方式（建議）
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'batchAddShifts',
+                token: token,
+                shiftsArray: JSON.stringify(batchData)
+            })
         });
+        
+        console.log('📡 HTTP 狀態:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP 錯誤: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        console.log('📥 批量上傳回應:', data);
+        
+        if (data.ok || data.success) {
+            showMessage(data.msg || data.message || '批量上傳成功！', 'success');
+            cancelBatchUpload();
+            switchTab('view');
+            loadShifts();
+        } else {
+            // 顯示詳細錯誤訊息
+            let errorMsg = data.msg || data.message || '批量上傳失敗';
+            
+            if (data.results && data.results.errors && data.results.errors.length > 0) {
+                errorMsg += '\n\n錯誤詳情：\n' + data.results.errors.slice(0, 5).join('\n');
+                if (data.results.errors.length > 5) {
+                    errorMsg += `\n...還有 ${data.results.errors.length - 5} 個錯誤`;
+                }
+            }
+            
+            showMessage(errorMsg, 'error');
+        }
         
     } catch (error) {
         console.error('❌ 批量上傳失敗:', error);
-        showMessage(t('SHIFT_BATCH_UPLOAD_ERROR') + ': ' + error.message, 'error');
+        console.error('錯誤堆疊:', error.stack);
+        
+        // 顯示友善的錯誤訊息
+        let errorMsg = '批量上傳失敗：' + error.message;
+        
+        if (error.message.includes('Failed to fetch')) {
+            errorMsg = '網路連線失敗，請檢查：\n1. 網路連線是否正常\n2. API 網址是否正確\n3. 伺服器是否運作中';
+        } else if (error.message.includes('NetworkError')) {
+            errorMsg = '網路錯誤，請檢查 CORS 設定或網路連線';
+        }
+        
+        showMessage(errorMsg, 'error');
     }
 }
-
 function cancelBatchUpload() {
     batchData = [];
     const previewDiv = document.getElementById('batch-preview');
