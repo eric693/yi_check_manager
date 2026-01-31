@@ -1267,7 +1267,16 @@ async function confirmBatchUpload() {
         const data = await response.json();
         
         console.log('📥 批量上傳回應:', data);
-        
+        console.log('📊 詳細結果:');
+        console.log('   成功:', data.results?.success || 0);
+        console.log('   失敗:', data.results?.failed || 0);
+        if (data.results?.errors && data.results.errors.length > 0) {
+            console.log('   錯誤列表:');
+            data.results.errors.forEach((err, i) => {
+                console.log(`     ${i + 1}. ${err}`);
+            });
+        }
+       
         if (data.ok || data.success) {
             showMessage(data.msg || data.message || '批量上傳成功！', 'success');
             cancelBatchUpload();
