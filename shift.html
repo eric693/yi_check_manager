@@ -254,41 +254,54 @@
             margin-left: 8px;
         }
 
-        .badge-morning {
-            background: #fff3e0;
-            color: #e65100;
+        /* 廚房班別 */
+        .badge-kitchen-a { background: #fff3e0; color: #e65100; }
+        .badge-kitchen-b { background: #ffe0b2; color: #ef6c00; }
+        .badge-kitchen-c { background: #ffccbc; color: #d84315; }
+        .badge-kitchen-d { background: #ffab91; color: #bf360c; }
+        .badge-kitchen-e { background: #ff8a65; color: #a63030; }
+        .badge-kitchen-f { background: #ff7043; color: #902020; }
+        .badge-kitchen-g { background: #fff8e1; color: #f57f17; }
+        .badge-kitchen-h { background: #ffe082; color: #f9a825; }
+        .badge-kitchen-i { background: #ffd54f; color: #f57c00; }
+
+        /* 外場班別 */
+        .badge-floor-a1 { background: #e3f2fd; color: #0d47a1; }
+        .badge-floor-a2 { background: #bbdefb; color: #1565c0; }
+        .badge-floor-a3 { background: #90caf9; color: #1976d2; }
+        .badge-floor-b1 { background: #64b5f6; color: #1e88e5; }
+        .badge-floor-b2 { background: #42a5f5; color: #2196f3; }
+        .badge-floor-b3 { background: #2196f3; color: #fff; }
+        .badge-floor-b4 { background: #1e88e5; color: #fff; }
+
+        /* 假別 */
+        .badge-annual-leave { background: #e8f5e9; color: #2e7d32; }
+        .badge-cny-leave { background: #ffebee; color: #c62828; }
+        .badge-dayoff { background: #f5f5f5; color: #757575; }
+        .badge-custom { background: #fff9c4; color: #f57f17; }
+
+        /* 對應的排班項目樣式 */
+        .shift-kitchen-a, .shift-kitchen-b, .shift-kitchen-c, 
+        .shift-kitchen-d, .shift-kitchen-e, .shift-kitchen-f,
+        .shift-kitchen-g, .shift-kitchen-h, .shift-kitchen-i {
+            background: #fff8e1;
+            border-left-color: #ff9800;
         }
 
-        .badge-afternoon {
+        .shift-floor-a1, .shift-floor-a2, .shift-floor-a3,
+        .shift-floor-b1, .shift-floor-b2, .shift-floor-b3, .shift-floor-b4 {
             background: #e3f2fd;
-            color: #0d47a1;
+            border-left-color: #2196f3;
         }
 
-        .badge-night {
-            background: #f3e5f5;
-            color: #4a148c;
-        }
-
-        .badge-full {
+        .shift-annual-leave {
             background: #e8f5e9;
-            color: #1b5e20;
+            border-left-color: #4caf50;
         }
 
-        .badge-custom {
-            background: #fff9c4;
-            color: #f57f17;
-        }
-
-        .shift-custom {
-            background: #fff9c4;
-            border-left-color: #fbc02d;
-            color: #f57f17;
-        }
-
-        /* 排休樣式 */
-        .badge-dayoff {
-            background: #f5f5f5;
-            color: #757575;
+        .shift-cny-leave {
+            background: #ffebee;
+            border-left-color: #f44336;
         }
 
         .shift-dayoff {
@@ -297,17 +310,9 @@
             color: #757575;
         }
 
-        /* 排休日曆顯示 */
-        .calendar-day.has-dayoff {
-            background: #fafafa;
-            border-color: #e0e0e0;
-        }
-
-        .shift-item-mini.shift-dayoff {
-            background: #f5f5f5;
-            border-left-color: #9e9e9e;
-            color: #757575;
-            font-style: italic;
+        .shift-custom {
+            background: #fff9c4;
+            border-left-color: #fbc02d;
         }
 
         .loading {
@@ -363,11 +368,7 @@
             background: #e3f2fd;
         }
 
-        /* ========================================
-           月曆樣式
-           ======================================== */
-
-        /* 月份選擇器 */
+        /* 月曆樣式 */
         .calendar-header {
             background: white;
             border-radius: 12px;
@@ -425,7 +426,6 @@
             background: #e0e0e0;
         }
 
-        /* 月曆容器 */
         .calendar-container {
             background: white;
             border-radius: 12px;
@@ -543,30 +543,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
 
-        .shift-morning {
-            background: #fff3e0;
-            border-left-color: #ff9800;
-            color: #e65100;
-        }
-
-        .shift-afternoon {
-            background: #e3f2fd;
-            border-left-color: #2196f3;
-            color: #0d47a1;
-        }
-
-        .shift-night {
-            background: #f3e5f5;
-            border-left-color: #9c27b0;
-            color: #4a148c;
-        }
-
-        .shift-full {
-            background: #e8f5e9;
-            border-left-color: #4caf50;
-            color: #1b5e20;
-        }
-
         .shift-item-name {
             font-weight: 600;
             white-space: nowrap;
@@ -593,7 +569,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* 分布圖表 */
         .distribution-section {
             background: white;
             border-radius: 12px;
@@ -818,11 +793,31 @@
                         <label data-i18n="SHIFT_TYPE_LABEL">班別</label>
                         <select id="filter-shift-type">
                             <option value="" data-i18n-option="OPTION_ALL">全部</option>
-                            <option value="早班" data-i18n-option="SHIFT_TYPE_MORNING">早班</option>
-                            <option value="中班" data-i18n-option="SHIFT_TYPE_AFTERNOON">中班</option>
-                            <option value="晚班" data-i18n-option="SHIFT_TYPE_NIGHT">晚班</option>
-                            <option value="全日班" data-i18n-option="SHIFT_TYPE_FULL">全日班</option>
-                            <option value="排休" data-i18n-option="SHIFT_TYPE_DAYOFF">排休</option>
+                            <optgroup label="廚房班別">
+                                <option value="廚房A班">廚房A班 (11:00-20:00)</option>
+                                <option value="廚房B班">廚房B班 (11:30-20:30)</option>
+                                <option value="廚房C班">廚房C班 (12:00-21:00)</option>
+                                <option value="廚房D班">廚房D班 (13:00-22:00)</option>
+                                <option value="廚房E班">廚房E班 (14:00-23:00)</option>
+                                <option value="廚房F班">廚房F班 (15:00-00:00)</option>
+                                <option value="廚房G班">廚房G班 (11:30-15:00)</option>
+                                <option value="廚房H班">廚房H班 (18:00-23:00)</option>
+                                <option value="廚房I班">廚房I班 (18:00-00:00)</option>
+                            </optgroup>
+                            <optgroup label="外場班別">
+                                <option value="外場A1班">外場A1班 (11:00-20:00)</option>
+                                <option value="外場A2班">外場A2班 (11:30-16:30)</option>
+                                <option value="外場A3班">外場A3班 (11:30-17:00)</option>
+                                <option value="外場B1班">外場B1班 (16:00-01:00)</option>
+                                <option value="外場B2班">外場B2班 (17:00-01:00)</option>
+                                <option value="外場B3班">外場B3班 (18:00-01:00)</option>
+                                <option value="外場B4班">外場B4班 (19:00-01:00)</option>
+                            </optgroup>
+                            <optgroup label="假別">
+                                <option value="年假" data-i18n-option="SHIFT_TYPE_ANNUAL_LEAVE">年假(特休)</option>
+                                <option value="過年假" data-i18n-option="SHIFT_TYPE_CNY_LEAVE">過年假</option>
+                                <option value="排休" data-i18n-option="SHIFT_TYPE_DAYOFF">排休</option>
+                            </optgroup>
                             <option value="自訂" data-i18n-option="SHIFT_TYPE_CUSTOM">自訂</option>
                         </select>
                     </div>
@@ -868,12 +863,32 @@
                             <label class="required" data-i18n="SHIFT_TYPE_LABEL">班別</label>
                             <select id="shift-type" required>
                                 <option value="" data-i18n-option="SHIFT_SELECT_TYPE">請選擇班別</option>
-                                <option value="早班" data-i18n-option="SHIFT_MORNING_DESC">早班 (08:00-16:00)</option>
-                                <option value="中班" data-i18n-option="SHIFT_AFTERNOON_DESC">中班 (12:00-20:00)</option>
-                                <option value="晚班" data-i18n-option="SHIFT_NIGHT_DESC">晚班 (16:00-24:00)</option>
-                                <option value="全日班" data-i18n-option="SHIFT_FULL_DESC">全日班 (09:00-18:00)</option>
-                                <option value="排休" data-i18n-option="SHIFT_DAYOFF_DESC">排休 (休假日)</option>
-                                <option value="自訂" data-i18n-option="SHIFT_CUSTOM_DESC">自訂時間</option>
+                                <optgroup label="廚房班別">
+                                    <option value="廚房A班">廚房A班 (11:00-20:00)</option>
+                                    <option value="廚房B班">廚房B班 (11:30-20:30)</option>
+                                    <option value="廚房C班">廚房C班 (12:00-21:00)</option>
+                                    <option value="廚房D班">廚房D班 (13:00-22:00)</option>
+                                    <option value="廚房E班">廚房E班 (14:00-23:00)</option>
+                                    <option value="廚房F班">廚房F班 (15:00-00:00)</option>
+                                    <option value="廚房G班">廚房G班 (11:30-15:00)</option>
+                                    <option value="廚房H班">廚房H班 (18:00-23:00)</option>
+                                    <option value="廚房I班">廚房I班 (18:00-00:00)</option>
+                                </optgroup>
+                                <optgroup label="外場班別">
+                                    <option value="外場A1班">外場A1班 (11:00-20:00)</option>
+                                    <option value="外場A2班">外場A2班 (11:30-16:30)</option>
+                                    <option value="外場A3班">外場A3班 (11:30-17:00)</option>
+                                    <option value="外場B1班">外場B1班 (16:00-01:00)</option>
+                                    <option value="外場B2班">外場B2班 (17:00-01:00)</option>
+                                    <option value="外場B3班">外場B3班 (18:00-01:00)</option>
+                                    <option value="外場B4班">外場B4班 (19:00-01:00)</option>
+                                </optgroup>
+                                <optgroup label="假別">
+                                    <option value="年假" data-i18n-option="SHIFT_TYPE_ANNUAL_LEAVE">年假(特休)</option>
+                                    <option value="過年假" data-i18n-option="SHIFT_TYPE_CNY_LEAVE">過年假</option>
+                                    <option value="排休" data-i18n-option="SHIFT_TYPE_DAYOFF">排休</option>
+                                </optgroup>
+                                <option value="自訂" data-i18n-option="SHIFT_TYPE_CUSTOM">自訂時間</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -940,12 +955,10 @@
 
         <!-- 統計分析 -->
         <div id="stats-tab" class="tab-content">
-            <!-- 統計卡片 -->
             <div id="stats-grid" class="stats-grid">
                 <div class="loading" data-i18n="SHIFT_STATS_LOADING">載入統計資料中</div>
             </div>
 
-            <!-- 月份選擇器 -->
             <div class="calendar-header">
                 <div class="month-selector">
                     <button class="month-btn" onclick="previousMonth()" data-i18n="BTN_PREV_MONTH">◀ 上個月</button>
@@ -955,7 +968,6 @@
                 <button class="today-btn" onclick="goToToday()" data-i18n="BTN_TODAY">回到今天</button>
             </div>
 
-            <!-- 完整月曆 -->
             <div class="calendar-container">
                 <div class="calendar-weekdays">
                     <div class="calendar-weekday" data-i18n="WEEK_SUNDAY">日</div>
@@ -971,10 +983,7 @@
                 </div>
             </div>
 
-            <!-- 排班分布 -->
-            <div id="shift-distribution">
-                <!-- 動態載入 -->
-            </div>
+            <div id="shift-distribution"></div>
         </div>
     </div>
 

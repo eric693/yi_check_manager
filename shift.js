@@ -261,38 +261,58 @@ function checkSchedulingPermission(actionName) {
 }
 function autoFillShiftTime(shiftType) {
     const times = {
-        '早班': ['08:00', '16:00'],
-        '中班': ['12:00', '20:00'],
-        '晚班': ['16:00', '00:00'],
-        '全日班': ['09:00', '18:00'],
-        '排休': ['00:00', '00:00'] 
+        // 廚房班別
+        '廚房A班': ['11:00', '20:00'],
+        '廚房B班': ['11:30', '20:30'],
+        '廚房C班': ['12:00', '21:00'],
+        '廚房D班': ['13:00', '22:00'],
+        '廚房E班': ['14:00', '23:00'],
+        '廚房F班': ['15:00', '00:00'],
+        '廚房G班': ['11:30', '15:00'],
+        '廚房H班': ['18:00', '23:00'],
+        '廚房I班': ['18:00', '00:00'],
+        
+        // 外場班別
+        '外場A1班': ['11:00', '20:00'],
+        '外場A2班': ['11:30', '16:30'],
+        '外場A3班': ['11:30', '17:00'],
+        '外場B1班': ['16:00', '01:00'],
+        '外場B2班': ['17:00', '01:00'],
+        '外場B3班': ['18:00', '01:00'],
+        '外場B4班': ['19:00', '01:00'],
+        
+        // 假別
+        '年假': ['00:00', '00:00'],
+        '過年假': ['00:00', '00:00'],
+        '排休': ['00:00', '00:00']
     };
     
     const startTimeInput = document.getElementById('start-time');
     const endTimeInput = document.getElementById('end-time');
     
-    if (shiftType === '排休') {
-        // 排休時禁用時間選擇
+    // 假別處理
+    if (shiftType === '年假' || shiftType === '過年假' || shiftType === '排休') {
         startTimeInput.value = '00:00';
         endTimeInput.value = '00:00';
         startTimeInput.disabled = true;
         endTimeInput.disabled = true;
-    } else if (shiftType === '自訂') {
-        // 選擇「自訂」時,清空時間並啟用輸入
+    } 
+    // 自訂班別
+    else if (shiftType === '自訂') {
         startTimeInput.value = '';
         endTimeInput.value = '';
         startTimeInput.disabled = false;
         endTimeInput.disabled = false;
         startTimeInput.focus();
-    } else if (times[shiftType]) {
-        // 選擇預設班別時,自動填入時間並啟用
+    } 
+    // 預設班別
+    else if (times[shiftType]) {
         startTimeInput.value = times[shiftType][0];
         endTimeInput.value = times[shiftType][1];
         startTimeInput.disabled = false;
         endTimeInput.disabled = false;
     }
 }
-
 // ==================== 員工載入函式（完整除錯版） ====================
 
 /**
@@ -684,15 +704,35 @@ function createShiftItem(shift) {
     
     return div;
 }
+// 更新 getShiftTypeBadge 函數以支援新班別
 function getShiftTypeBadge(shiftType) {
     const badgeClass = {
-        '早班': 'badge-morning',
-        '中班': 'badge-afternoon',
-        '晚班': 'badge-night',
-        '全日班': 'badge-full',
+        // 廚房班別
+        '廚房A班': 'badge-kitchen-a',
+        '廚房B班': 'badge-kitchen-b',
+        '廚房C班': 'badge-kitchen-c',
+        '廚房D班': 'badge-kitchen-d',
+        '廚房E班': 'badge-kitchen-e',
+        '廚房F班': 'badge-kitchen-f',
+        '廚房G班': 'badge-kitchen-g',
+        '廚房H班': 'badge-kitchen-h',
+        '廚房I班': 'badge-kitchen-i',
+        
+        // 外場班別
+        '外場A1班': 'badge-floor-a1',
+        '外場A2班': 'badge-floor-a2',
+        '外場A3班': 'badge-floor-a3',
+        '外場B1班': 'badge-floor-b1',
+        '外場B2班': 'badge-floor-b2',
+        '外場B3班': 'badge-floor-b3',
+        '外場B4班': 'badge-floor-b4',
+        
+        // 假別
+        '年假': 'badge-annual-leave',
+        '過年假': 'badge-cny-leave',
         '排休': 'badge-dayoff',
         '自訂': 'badge-custom'
-    }[shiftType] || 'badge-morning';
+    }[shiftType] || 'badge-custom';
     
     return `<span class="badge ${badgeClass}">${shiftType}</span>`;
 }
@@ -1357,28 +1397,34 @@ async function loadMonthlyStats() {
     }
 }
 
+
+// 更新 displayMonthlyStats 函數以支援新班別統計
 function displayMonthlyStats(shifts) {
     const statsGrid = document.getElementById('stats-grid');
     if (!statsGrid) return;
     
     const stats = {
         total: shifts.length,
-        morning: 0,
-        afternoon: 0,
-        night: 0,
-        full: 0,
+        kitchenShifts: 0,
+        floorShifts: 0,
+        annualLeave: 0,
+        cnyLeave: 0,
         dayoff: 0,
         custom: 0
     };
     
     shifts.forEach(shift => {
-        switch(shift.shiftType) {
-            case '早班': stats.morning++; break;
-            case '中班': stats.afternoon++; break;
-            case '晚班': stats.night++; break;
-            case '全日班': stats.full++; break;
-            case '排休': stats.dayoff++; break;
-            case '自訂': stats.custom++; break;
+        if (shift.shiftType.startsWith('廚房')) {
+            stats.kitchenShifts++;
+        } else if (shift.shiftType.startsWith('外場')) {
+            stats.floorShifts++;
+        } else {
+            switch(shift.shiftType) {
+                case '年假': stats.annualLeave++; break;
+                case '過年假': stats.cnyLeave++; break;
+                case '排休': stats.dayoff++; break;
+                case '自訂': stats.custom++; break;
+            }
         }
     });
     
@@ -1388,19 +1434,23 @@ function displayMonthlyStats(shifts) {
             <div class="stat-value">${stats.total}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">${t('SHIFT_TYPE_MORNING')}</div>
-            <div class="stat-value" style="color: #ff9800;">${stats.morning}</div>
+            <div class="stat-label">廚房班別</div>
+            <div class="stat-value" style="color: #ff9800;">${stats.kitchenShifts}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">${t('SHIFT_TYPE_AFTERNOON')}</div>
-            <div class="stat-value" style="color: #2196f3;">${stats.afternoon}</div>
+            <div class="stat-label">外場班別</div>
+            <div class="stat-value" style="color: #2196f3;">${stats.floorShifts}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">${t('SHIFT_TYPE_NIGHT')}</div>
-            <div class="stat-value" style="color: #9c27b0;">${stats.night}</div>
+            <div class="stat-label">年假(特休)</div>
+            <div class="stat-value" style="color: #4caf50;">${stats.annualLeave}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">${t('SHIFT_TYPE_DAYOFF')}</div>
+            <div class="stat-label">過年假</div>
+            <div class="stat-value" style="color: #f44336;">${stats.cnyLeave}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">排休</div>
             <div class="stat-value" style="color: #757575;">${stats.dayoff}</div>
         </div>
         ${stats.custom > 0 ? `
@@ -1413,6 +1463,7 @@ function displayMonthlyStats(shifts) {
     
     statsGrid.innerHTML = html;
 }
+
 
 async function loadMonthlyShifts() {
     const calendarGrid = document.getElementById('calendar-grid');
@@ -1506,18 +1557,37 @@ function displayMonthCalendar(shifts) {
     calendarGrid.innerHTML = html;
 }
 
+// 更新 getShiftClass 函數
 function getShiftClass(shiftType) {
     const classMap = {
-        '早班': 'shift-morning',
-        '中班': 'shift-afternoon',
-        '晚班': 'shift-night',
-        '全日班': 'shift-full',
+        // 廚房班別
+        '廚房A班': 'shift-kitchen-a',
+        '廚房B班': 'shift-kitchen-b',
+        '廚房C班': 'shift-kitchen-c',
+        '廚房D班': 'shift-kitchen-d',
+        '廚房E班': 'shift-kitchen-e',
+        '廚房F班': 'shift-kitchen-f',
+        '廚房G班': 'shift-kitchen-g',
+        '廚房H班': 'shift-kitchen-h',
+        '廚房I班': 'shift-kitchen-i',
+        
+        // 外場班別
+        '外場A1班': 'shift-floor-a1',
+        '外場A2班': 'shift-floor-a2',
+        '外場A3班': 'shift-floor-a3',
+        '外場B1班': 'shift-floor-b1',
+        '外場B2班': 'shift-floor-b2',
+        '外場B3班': 'shift-floor-b3',
+        '外場B4班': 'shift-floor-b4',
+        
+        // 假別
+        '年假': 'shift-annual-leave',
+        '過年假': 'shift-cny-leave',
         '排休': 'shift-dayoff',
         '自訂': 'shift-custom'
     };
-    return classMap[shiftType] || 'shift-morning';
+    return classMap[shiftType] || 'shift-custom';
 }
-
 function showShiftDetail(shiftId) {
     const shift = allMonthShifts.find(s => s.shiftId === shiftId);
     if (shift) {
