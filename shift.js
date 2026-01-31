@@ -1187,35 +1187,42 @@ function displayBatchPreview(data) {
     
     if (!previewDiv || !tableDiv) return;
     
-    let html = '<table style="width: 100%; border-collapse: collapse;">';
+    let html = '<div style="overflow-x: auto;">'; // 加入水平捲動容器
+    html += '<table style="width: 100%; border-collapse: collapse; min-width: 1200px;">'; // 設定最小寬度
+    
+    // ✅ 表頭：顯示所有欄位
     html += '<tr style="background: #f5f5f5;">';
-    // ✅ 修正：移除"排班ID"列
-    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left;">員工ID</th>';
-    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left;">員工姓名</th>';
-    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left;">日期</th>';
-    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left;">班別</th>';
-    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left;">上班時間</th>';
-    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left;">下班時間</th>';
-    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left;">地點</th>';
+    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">員工ID</th>';
+    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">員工姓名</th>';
+    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">日期</th>';
+    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">班別</th>';
+    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">上班時間</th>';
+    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">下班時間</th>';
+    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">地點</th>';
+    html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left; min-width: 150px;">備註</th>'; // ✅ 新增備註欄
     html += '</tr>';
     
-    data.slice(0, 10).forEach((row, index) => {
+    // ✅ 資料列：顯示前 20 筆資料（增加顯示筆數）
+    data.slice(0, 20).forEach((row, index) => {
         html += '<tr style="border-bottom: 1px solid #eee;">';
-        html += `<td style="padding: 10px; border: 1px solid #ddd; font-size: 12px;">${row.employeeId}</td>`;
-        html += `<td style="padding: 10px; border: 1px solid #ddd;">${row.employeeName}</td>`;
-        html += `<td style="padding: 10px; border: 1px solid #ddd;">${row.date}</td>`;
-        html += `<td style="padding: 10px; border: 1px solid #ddd;">${row.shiftType}</td>`;
-        html += `<td style="padding: 10px; border: 1px solid #ddd;">${row.startTime}</td>`;
-        html += `<td style="padding: 10px; border: 1px solid #ddd;">${row.endTime}</td>`;
-        html += `<td style="padding: 10px; border: 1px solid #ddd;">${row.location}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #ddd; font-size: 12px; font-family: monospace;">${row.employeeId || ''}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #ddd;">${row.employeeName || ''}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">${row.date || ''}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">${row.shiftType || ''}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${row.startTime || ''}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${row.endTime || ''}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #ddd;">${row.location || ''}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #ddd; max-width: 200px; word-wrap: break-word;">${row.note || ''}</td>`; // ✅ 顯示備註
         html += '</tr>';
     });
     
-    if (data.length > 10) {
-        html += `<tr><td colspan="7" style="text-align: center; padding: 10px; color: #666;">還有 ${data.length - 10} 筆資料...</td></tr>`;
+    // ✅ 如果資料超過 20 筆，顯示提示
+    if (data.length > 20) {
+        html += `<tr><td colspan="8" style="text-align: center; padding: 10px; color: #666; background: #f9f9f9;">還有 ${data.length - 20} 筆資料...</td></tr>`;
     }
     
     html += '</table>';
+    html += '</div>'; // 結束捲動容器
     
     tableDiv.innerHTML = html;
     previewDiv.style.display = 'block';
