@@ -3777,6 +3777,9 @@ async function doPunch(type) {
         try {
             const userId = localStorage.getItem('sessionUserId');
             const today = new Date().toISOString().split('T')[0];
+
+            const now = new Date();
+            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             
             const shiftRes = await callApifetch(`getEmployeeShiftForDate&employeeId=${userId}&date=${today}`);
             
@@ -3835,7 +3838,6 @@ async function doPunch(type) {
         // const today = now.toISOString().split('T')[0];
         // const datetime = `${today}T${roundedTime}:00`;
         const datetime = now.toISOString(); 
-        // console.log(`原始時間: ${currentTime}, 進位後: ${roundedTime}`);
         
         const action = `punch&type=${encodeURIComponent(type)}&lat=${lat}&lng=${lng}&datetime=${encodeURIComponent(datetime)}&note=${encodeURIComponent(navigator.userAgent)}`;
         
