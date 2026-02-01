@@ -830,7 +830,7 @@ async function addShift() {
 }
 
 async function editShift(shiftId) {
-    if (!checkAdminPermission('編輯排班')) return;
+    if (!checkSchedulingPermission('編輯排班')) return; 
     const shift = currentShifts.find(s => s.shiftId === shiftId);
     if (!shift) return;
     
