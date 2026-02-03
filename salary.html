@@ -1657,11 +1657,12 @@
             
             for (const bracket of brackets) {
                 if (salary >= bracket.min && salary <= bracket.max) {
-                    return bracket.insured;
+                    return bracket;
                 }
             }
             
-            return 29500;
+            return brackets[0];
+
         }
 
         function setCalculatedValues(
