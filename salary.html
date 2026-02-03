@@ -1579,15 +1579,17 @@
                 laborFee = 277;   // ← 改這裡
                 healthFee = 458;  // ← 改這裡
                 console.log('✅ 時薪人員使用投保級距: $11,100');
+                console.log('   勞保費: $277 (固定)');
+                console.log('   健保費: $458 (固定)');
             } else {
                 // 月薪人員用級距表查詢
                 insuredSalary = getInsuredSalary(baseSalary);
+                const laborFee = Math.round(insuredSalary * 0.125 * 0.2);      // 勞保費率 12.5%，個人負擔20%
+                const healthFee = Math.round(insuredSalary * 0.0517 * 0.3 * 2.62);  // 健保費率 5.17%，個人負擔30%
                 console.log(`✅ 月薪人員投保級距: $${insuredSalary}`);
             }
             
             // 計算法定扣款
-            const laborFee = Math.round(insuredSalary * 0.125 * 0.2);      // 勞保費率 12.5%，個人負擔20%
-            const healthFee = Math.round(insuredSalary * 0.0517 * 0.3 * 2.62);  // 健保費率 5.17%，個人負擔30%
             const employmentFee = 0;
             const pensionSelf = Math.round(insuredSalary * (pensionRate / 100));
             
@@ -2176,12 +2178,16 @@
                 insuredSalary = 11100;
                 laborFee = 277;   // ← 改這裡
                 healthFee = 458;  // ← 改這裡
+                console.log('✅ 時薪人員使用投保級距: $11,100');
+                console.log('   勞保費: $277 (固定)');
+                console.log('   健保費: $458 (固定)');
             } else {
                 insuredSalary = getInsuredSalary(baseSalary);
+                const laborFee = Math.round(insuredSalary * 0.125 * 0.2);
+                const healthFee = Math.round(insuredSalary * 0.0517 * 0.3 * 2.62); 
             }
             
-            const laborFee = Math.round(insuredSalary * 0.125 * 0.2);
-            const healthFee = Math.round(insuredSalary * 0.0517 * 0.3 * 2.62); 
+
             const employmentFee = 0;
             const pensionSelf = Math.round(insuredSalary * (pensionRate / 100));
             
