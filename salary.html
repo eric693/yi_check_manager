@@ -2186,11 +2186,11 @@
             let healthFee;
             if (salaryType === '時薪') {
                 insuredSalary = 11100;
-                laborFee = 277;  
-                healthFee = 458;  // ⭐ 保持預設 458
+                laborFee = 277;   // ← 改這裡
+                healthFee = 458;  // ← 改這裡
                 console.log('✅ 時薪人員使用投保級距: $11,100');
                 console.log('   勞保費: $277 (固定)');
-                console.log('   健保費: $458 (預設，可手動調整為 0)');
+                console.log('   健保費: $458 (固定)');
             } else {
                 const insuranceInfo = getInsuredSalary(baseSalary);
                 insuredSalary = insuranceInfo.insured;
@@ -2198,6 +2198,7 @@
                 healthFee = insuranceInfo.health;
             }
             
+
             const employmentFee = 0;
             const pensionSelf = Math.round(insuredSalary * (pensionRate / 100));
             
@@ -2211,17 +2212,17 @@
                 }
             }
             
-            // ⭐⭐⭐ 更新欄位值（只有點擊「計算扣款」按鈕時才執行）
+            // 更新欄位
             document.getElementById('config-labor-fee').value = laborFee;
-            document.getElementById('config-health-fee').value = healthFee;  // ⭐ 會填入 458
+            document.getElementById('config-health-fee').value = healthFee;
             document.getElementById('config-employment-fee').value = employmentFee;
             document.getElementById('config-pension-self').value = pensionSelf;
             document.getElementById('config-income-tax').value = incomeTax;
             
-            // ⭐ 更新預覽
+            // 更新試算預覽
             updateSalaryPreview();
             
-            showNotification('✅ 扣款已計算完成（健保費可手動調整為 0）', 'success');
+            showNotification('✅ 扣款已計算完成', 'success');
         }
 
         /**
