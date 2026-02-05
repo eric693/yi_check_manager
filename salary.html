@@ -1539,28 +1539,9 @@
             inputs.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    // el.addEventListener('input', autoCalculateDeductions);
-                    el.addEventListener('input', updateSalaryPreview);  // ⭐ 只更新預覽
+                    el.addEventListener('input', autoCalculateDeductions);
                 }
             });
-
-            // ⭐⭐⭐ 新增：監聽扣款欄位的變化（但只更新預覽，不覆蓋值）
-            const deductionInputs = [
-            'config-labor-fee',
-            'config-health-fee',
-            'config-employment-fee',
-            'config-pension-self',
-            'config-income-tax'
-            ];
-
-            deductionInputs.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.addEventListener('input', updateSalaryPreview);  // ⭐ 只更新預覽
-                }
-            });
-
-            console.log('✅ 自動計算功能已綁定（只更新預覽，不覆蓋扣款欄位）');
             
             console.log('✅ 自動計算功能已綁定');
         }
