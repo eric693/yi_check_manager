@@ -608,13 +608,29 @@ function renderAbnormalRecords(records) {
             
             switch(record.reason) {
                 case 'STATUS_REPAIR_PENDING':
-                    reasonClass = 'text-yellow-600 dark:text-yellow-400';
-                    displayReason = translatePunchTypes(record.punchTypes);
-                    buttonHtml = `
-                        <span class="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
-                            ⏳ ${translatePunchTypes(record.punchTypes)}
-                        </span>
-                    `;
+                    // 👇 新增：判斷是否為當日修正
+                    const isToday = record.date === new Date().toISOString().split('T')[0];
+                    const isTodayAdjust = record.punchTypes && record.punchTypes.includes('當日修正');
+                    
+                    if (isTodayAdjust) {
+                        // 當日修正：橘色標示
+                        reasonClass = 'text-orange-600 dark:text-orange-400';
+                        displayReason = `🔧 ${translatePunchTypes(record.punchTypes)}（當日修正）`;
+                        buttonHtml = `
+                            <span class="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                                ⏳ ${displayReason}
+                            </span>
+                        `;
+                    } else {
+                        // 一般補打卡：黃色標示
+                        reasonClass = 'text-yellow-600 dark:text-yellow-400';
+                        displayReason = translatePunchTypes(record.punchTypes);
+                        buttonHtml = `
+                            <span class="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
+                                ⏳ ${displayReason}
+                            </span>
+                        `;
+                    }
                     break;
                     
                 case 'STATUS_REPAIR_APPROVED':
@@ -1673,6 +1689,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (refreshUsersBtn) {
         refreshUsersBtn.addEventListener('click', loadAllUsers);
     }
+    const adjustTodayBtn = document.getElementById('adjust-today-btn');
+    if (adjustTodayBtn) {
+        adjustTodayBtn.addEventListener('click', openAdjustTodayDialog);
+    }
 
     // 👇 新增：綁定搜尋功能
     const searchUsersInput = document.getElementById('search-users-input');
@@ -1703,6 +1723,169 @@ document.addEventListener('DOMContentLoaded', async () => {
     let locationMarkers = L.layerGroup();
     let locationCircles = L.layerGroup();
     
+    /**
+     * 🆕 打開當日異常修正對話框
+     */
+    function openAdjustTodayDialog() {
+        const dialog = document.createElement('div');
+        dialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        dialog.id = 'adjust-today-dialog';
+        
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        
+        dialog.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">
+                    🔧 當日異常修正
+                </h3>
+                
+                <p class="text-sm text-yellow-600 dark:text-yellow-400 mb-4">
+                    ⚠️ 此功能用於修正今天的打卡記錄。例如：忘記打上班卡、打錯類型等。
+                </p>
+                
+                <!-- 選擇要修正的類型 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        修正類型 <span class="text-red-500">*</span>
+                    </label>
+                    <select id="adjust-type-select" 
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                        <option value="上班">補打上班卡</option>
+                        <option value="下班">補打下班卡</option>
+                    </select>
+                </div>
+                
+                <!-- 選擇時間 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        實際打卡時間 <span class="text-red-500">*</span>
+                    </label>
+                    <input type="time" 
+                        id="adjust-time-input"
+                        value="${currentTime}"
+                        class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                </div>
+                
+                <!-- 修正理由 -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        修正理由 <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="adjust-reason-input" 
+                            rows="3" 
+                            required
+                            placeholder="例如：忘記打卡、系統延遲、打錯類型..."
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"></textarea>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button onclick="closeAdjustTodayDialog()"
+                            class="flex-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg font-semibold">
+                        取消
+                    </button>
+                    <button onclick="submitAdjustToday()"
+                            id="submit-adjust-today-btn"
+                            class="flex-1 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold">
+                        確認修正
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(dialog);
+        
+        // 點擊背景關閉
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                closeAdjustTodayDialog();
+            }
+        });
+    }
+
+    /**
+     * 🆕 關閉當日異常修正對話框
+     */
+    function closeAdjustTodayDialog() {
+        const dialog = document.getElementById('adjust-today-dialog');
+        if (dialog) {
+            dialog.remove();
+        }
+    }
+
+    /**
+     * 🆕 提交當日異常修正
+     */
+    async function submitAdjustToday() {
+        const typeSelect = document.getElementById('adjust-type-select');
+        const timeInput = document.getElementById('adjust-time-input');
+        const reasonInput = document.getElementById('adjust-reason-input');
+        const submitBtn = document.getElementById('submit-adjust-today-btn');
+        
+        const type = typeSelect.value;
+        const time = timeInput.value;
+        const reason = reasonInput.value.trim();
+        
+        // 驗證
+        if (!time) {
+            showNotification('請選擇時間', 'error');
+            return;
+        }
+        
+        if (!reason || reason.length < 2) {
+            showNotification('請填寫修正理由（至少 2 個字）', 'error');
+            return;
+        }
+        
+        const loadingText = t('LOADING') || '處理中...';
+        generalButtonState(submitBtn, 'processing', loadingText);
+        
+        try {
+            const sessionToken = localStorage.getItem("sessionToken");
+            
+            // 取得當前位置
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject);
+            });
+            
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            // 組合完整日期時間
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const datetime = `${today}T${time}:00`;
+            
+            const params = new URLSearchParams({
+                token: sessionToken,
+                type: type,
+                lat: lat,
+                lng: lng,
+                datetime: datetime,
+                note: `【當日修正】${reason}`
+            });
+            
+            const res = await callApifetch(`adjustPunch&${params.toString()}`);
+            
+            if (res.ok) {
+                showNotification('修正申請成功！等待管理員審核', 'success');
+                closeAdjustTodayDialog();
+                
+                // 重新載入異常記錄
+                await checkAbnormal();
+            } else {
+                showNotification(t(res.code) || '修正失敗', 'error');
+            }
+            
+        } catch (err) {
+            console.error('當日修正錯誤:', err);
+            showNotification('修正失敗', 'error');
+            
+        } finally {
+            generalButtonState(submitBtn, 'idle');
+        }
+    }
     /**
      * 取得並渲染所有待審核的請求。
      */
@@ -4598,3 +4781,5 @@ async function saveEmployeeBasicInfo() {
         }
     }
 }
+
+
