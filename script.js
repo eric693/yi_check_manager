@@ -608,9 +608,10 @@ function renderAbnormalRecords(records) {
             
             switch(record.reason) {
                 case 'STATUS_REPAIR_PENDING':
-                    // 👇 新增：判斷是否為當日修正
+                    // 👇 修改這段
                     const isToday = record.date === new Date().toISOString().split('T')[0];
                     const isTodayAdjust = record.punchTypes && record.punchTypes.includes('當日修正');
+                    const isHistoryAdjust = record.punchTypes && record.punchTypes.includes('歷史補打');
                     
                     if (isTodayAdjust) {
                         // 當日修正：橘色標示
@@ -621,8 +622,17 @@ function renderAbnormalRecords(records) {
                                 ⏳ ${displayReason}
                             </span>
                         `;
+                    } else if (isHistoryAdjust) {
+                        // 歷史補打：黃色標示
+                        reasonClass = 'text-yellow-600 dark:text-yellow-400';
+                        displayReason = `📅 ${translatePunchTypes(record.punchTypes)}（歷史補打）`;
+                        buttonHtml = `
+                            <span class="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
+                                ⏳ ${displayReason}
+                            </span>
+                        `;
                     } else {
-                        // 一般補打卡：黃色標示
+                        // 一般補打卡：保持原樣
                         reasonClass = 'text-yellow-600 dark:text-yellow-400';
                         displayReason = translatePunchTypes(record.punchTypes);
                         buttonHtml = `
@@ -1694,6 +1704,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         adjustTodayBtn.addEventListener('click', openAdjustTodayDialog);
     }
 
+    const historyAdjustBtn = document.getElementById('history-adjust-btn');
+    if (historyAdjustBtn) {
+        historyAdjustBtn.addEventListener('click', openHistoryAdjustDialog);
+    }
     // 👇 新增：綁定搜尋功能
     const searchUsersInput = document.getElementById('search-users-input');
     if (searchUsersInput) {
@@ -4784,3 +4798,251 @@ async function submitAdjustToday() {
     }
 }
 
+// ==================== 歷史補打卡功能 ====================
+
+/**
+ * 🆕 打開歷史補打卡對話框
+ */
+function openHistoryAdjustDialog() {
+    const dialog = document.createElement('div');
+    dialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    dialog.id = 'history-adjust-dialog';
+    
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+                        .toISOString().split('T')[0];
+    
+    dialog.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">
+                📅 歷史補打卡
+            </h3>
+            
+            <!-- 說明提示 -->
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 rounded p-3 mb-4">
+                <p class="text-sm text-yellow-800 dark:text-yellow-300">
+                    <strong>⚠️ 注意事項：</strong>
+                </p>
+                <ul class="text-xs text-yellow-700 dark:text-yellow-400 mt-2 space-y-1 list-disc list-inside">
+                    <li>只能補打<strong>本月</strong>的打卡記錄</li>
+                    <li>需要<strong>主管審核</strong>通過才會生效</li>
+                    <li>請詳細說明補打卡原因</li>
+                </ul>
+            </div>
+            
+            <!-- 選擇日期 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    補打日期 <span class="text-red-500">*</span>
+                </label>
+                <input type="date" 
+                       id="history-adjust-date"
+                       min="${monthStart}" 
+                       max="${today}"
+                       class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    📅 可選範圍：${monthStart} ~ ${today}
+                </p>
+            </div>
+            
+            <!-- 選擇類型 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    補打類型 <span class="text-red-500">*</span>
+                </label>
+                <select id="history-adjust-type" 
+                        class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                    <option value="">請選擇</option>
+                    <option value="上班">補打上班卡</option>
+                    <option value="下班">補打下班卡</option>
+                </select>
+            </div>
+            
+            <!-- 選擇時間 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    實際打卡時間 <span class="text-red-500">*</span>
+                </label>
+                <input type="time" 
+                       id="history-adjust-time"
+                       class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+            </div>
+            
+            <!-- 補打原因 -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    補打原因 <span class="text-red-500">*</span>
+                </label>
+                <textarea id="history-adjust-reason" 
+                          rows="4" 
+                          required
+                          placeholder="請詳細說明為什麼需要補打卡（至少 10 個字）&#10;例如：&#10;- 當天忘記打卡&#10;- 系統故障無法打卡&#10;- 外出洽公不在打卡範圍&#10;- 手機沒電無法打卡"
+                          class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent"></textarea>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    💡 理由越詳細，主管審核通過率越高
+                </p>
+            </div>
+            
+            <!-- 按鈕區 -->
+            <div class="flex space-x-3">
+                <button onclick="closeHistoryAdjustDialog()"
+                        class="flex-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg font-semibold transition-colors">
+                    取消
+                </button>
+                <button onclick="submitHistoryAdjust()"
+                        id="submit-history-adjust-btn"
+                        class="flex-1 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-semibold transition-colors">
+                    提交補打卡申請
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(dialog);
+    
+    // 點擊背景關閉
+    dialog.addEventListener('click', (e) => {
+        if (e.target === dialog) {
+            closeHistoryAdjustDialog();
+        }
+    });
+}
+
+/**
+ * 🆕 關閉歷史補打卡對話框
+ */
+function closeHistoryAdjustDialog() {
+    const dialog = document.getElementById('history-adjust-dialog');
+    if (dialog) {
+        dialog.remove();
+    }
+}
+
+/**
+ * 🆕 提交歷史補打卡申請
+ */
+async function submitHistoryAdjust() {
+    const dateInput = document.getElementById('history-adjust-date');
+    const typeInput = document.getElementById('history-adjust-type');
+    const timeInput = document.getElementById('history-adjust-time');
+    const reasonInput = document.getElementById('history-adjust-reason');
+    const submitBtn = document.getElementById('submit-history-adjust-btn');
+    
+    const date = dateInput.value;
+    const type = typeInput.value;
+    const time = timeInput.value;
+    const reason = reasonInput.value.trim();
+    
+    // ===== 驗證 =====
+    
+    // 1. 檢查日期
+    if (!date) {
+        showNotification('請選擇補打日期', 'error');
+        dateInput.focus();
+        return;
+    }
+    
+    // 2. 檢查類型
+    if (!type) {
+        showNotification('請選擇補打類型', 'error');
+        typeInput.focus();
+        return;
+    }
+    
+    // 3. 檢查時間
+    if (!time) {
+        showNotification('請選擇實際打卡時間', 'error');
+        timeInput.focus();
+        return;
+    }
+    
+    // 4. 檢查理由長度
+    if (reason.length < 10) {
+        showNotification('補打原因至少需要 10 個字，請詳細說明', 'error');
+        reasonInput.focus();
+        return;
+    }
+    
+    // 5. 驗證日期範圍（本月內且不能未來）
+    const selectedDate = new Date(date);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    if (selectedDate < monthStart) {
+        showNotification('只能補打本月的打卡記錄', 'error');
+        return;
+    }
+    
+    if (selectedDate > today) {
+        showNotification('不能補打未來的日期', 'error');
+        return;
+    }
+    
+    // 6. 檢查是否是今天（提示使用當日修正）
+    if (selectedDate.getTime() === today.getTime()) {
+        if (!confirm('您選擇的是今天的日期，建議使用「當日異常修正」功能更快速。\n\n確定要繼續使用歷史補打卡嗎？')) {
+            return;
+        }
+    }
+    
+    // ===== 提交 =====
+    
+    const loadingText = '提交中...';
+    generalButtonState(submitBtn, 'processing', loadingText);
+    
+    try {
+        const sessionToken = localStorage.getItem("sessionToken");
+        
+        // 取得當前位置
+        const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 10000,
+                enableHighAccuracy: true
+            });
+        });
+        
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        // 組合完整日期時間
+        const datetime = `${date}T${time}:00`;
+        
+        // ⭐ 加上特殊標記，讓後端知道這是「歷史補打」
+        const noteWithTag = `【歷史補打】${reason}`;
+        
+        const params = new URLSearchParams({
+            token: sessionToken,
+            type: type,
+            lat: lat,
+            lng: lng,
+            datetime: datetime,
+            note: noteWithTag  // 帶有【歷史補打】標記
+        });
+        
+        const res = await callApifetch(`adjustPunch&${params.toString()}`);
+        
+        if (res.ok) {
+            showNotification('✅ 歷史補打卡申請已提交！等待主管審核', 'success');
+            closeHistoryAdjustDialog();
+            
+            // 重新載入異常記錄
+            await checkAbnormal();
+        } else {
+            showNotification(t(res.code) || '提交失敗', 'error');
+        }
+        
+    } catch (err) {
+        console.error('歷史補打卡錯誤:', err);
+        
+        if (err.code === 1) {
+            showNotification('無法取得位置，請確認已開啟定位權限', 'error');
+        } else {
+            showNotification('提交失敗，請稍後再試', 'error');
+        }
+        
+    } finally {
+        generalButtonState(submitBtn, 'idle');
+    }
+}
