@@ -1177,19 +1177,21 @@ function handleBatchFile(file) {
         reader.readAsText(file, 'UTF-8');
         
     } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-        // Excel 處理（新增）
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
+                // ⭐ 加上 cellDates: true，讓日期保持 Date 物件
+                const workbook = XLSX.read(data, { type: 'array', cellDates: true });
                 
-                // 取第一個工作表
                 const sheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
                 
-                // 轉換為 CSV 字串，再用原有 parseBatchData 解析
-                const csv = XLSX.utils.sheet_to_csv(worksheet);
+                // ⭐ 指定日期格式為 YYYY-MM-DD
+                const csv = XLSX.utils.sheet_to_csv(worksheet, { 
+                    dateNF: 'yyyy-mm-dd' 
+                });
+                
                 parseBatchData(csv, file.name);
                 
             } catch (error) {
