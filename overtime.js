@@ -1,8 +1,11 @@
 // overtime.js - 加班功能前端邏輯
 
 // ==================== 初始化加班頁面 ====================
-let _pendingOvertimeLoading = false;
-let _employeeOvertimeLoading = false;
+
+// ✅ 使用 Promise 單例取代 boolean 鎖
+// boolean 鎖在 async/await 間有競態，Promise 單例才能真正防止重入
+let _pendingOvertimePromise = null;
+let _employeeOvertimePromise = null;
 /**
  * 初始化加班申請表單
  */
@@ -493,13 +496,30 @@ function showCompensatoryHoursInput(currentHours, requestHours, exceededHours) {
 // ==================== 管理員審核功能 ====================
 
 async function loadPendingOvertimeRequests() {
-    if (_pendingOvertimeLoading) return;  // 🔒 防重複
-    _pendingOvertimeLoading = true;
+    // ✅ Promise 單例：若已有進行中的請求，直接返回同一個 Promise（不重跑）
+    // boolean 鎖在 await 之前就被跳過了（JS 是單執行緒，但 await 讓出控制權時鎖已設好）
+    // 真正的問題是：兩次呼叫同時在事件循環佇列中，第一個 await 前鎖還沒設
+    // Promise 單例確保無論呼叫幾次，都只執行一次 API
+    if (_pendingOvertimePromise) {
+        console.log('⚠️ loadPendingOvertimeRequests 已在執行，跳過重複呼叫');
+        return _pendingOvertimePromise;
+    }
 
+    _pendingOvertimePromise = _doLoadPendingOvertime();
+    try {
+        await _pendingOvertimePromise;
+    } finally {
+        _pendingOvertimePromise = null;
+    }
+}
+
+async function _doLoadPendingOvertime() {
     const requestsList = document.getElementById('pending-overtime-list');
     const requestsEmpty = document.getElementById('overtime-requests-empty');
     const requestsLoading = document.getElementById('overtime-requests-loading');
-    
+
+    if (!requestsList || !requestsEmpty || !requestsLoading) return;
+
     requestsList.innerHTML = '';  // ✅ 強制清空
     requestsLoading.style.display = 'block';
     requestsEmpty.style.display = 'none';
@@ -515,8 +535,6 @@ async function loadPendingOvertimeRequests() {
     } catch (err) {
         requestsLoading.style.display = 'none';
         showNotification(t('ERROR_LOAD_OVERTIME') || '載入失敗', 'error');
-    } finally {
-        _pendingOvertimeLoading = false;  // 🔓 釋放鎖
     }
 }
 
