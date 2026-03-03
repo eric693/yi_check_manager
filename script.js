@@ -8,6 +8,7 @@ let monthDataCache = {}; // 新增：用於快取月份打卡資料
 let userId = localStorage.getItem("sessionUserId");
 let todayShiftCache = null; // 快取今日排班
 let weekShiftCache = null;  // 快取本週排班
+let _isPunching = false; 
 // 載入語系檔
 async function loadTranslations(lang) {
     try {
@@ -3797,6 +3798,14 @@ function resetBiometric() {
      * 執行打卡
      */
 async function doPunch(type) {
+
+    // 🔒 防止重複提交
+    if (_isPunching) {
+        showNotification('打卡處理中，請勿重複點擊', 'warning');
+        return;
+    }
+    _isPunching = true;
+    
     const punchButtonId = type === '上班' ? 'punch-in-btn' : 'punch-out-btn';
     
     const button = document.getElementById(punchButtonId);
@@ -3857,42 +3866,36 @@ async function doPunch(type) {
     if (!navigator.geolocation) {
         showNotification(t("ERROR_GEOLOCATION", { msg: "您的瀏覽器不支援地理位置功能。" }), "error");
         generalButtonState(button, 'idle');
+        _isPunching = false;
         return;
     }
-    
+
     navigator.geolocation.getCurrentPosition(async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
-        
         const now = new Date();
-        // const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-        // const roundedTime = roundPunchTime(currentTime);
-        
-        // 組合完整的日期時間
-        // const today = now.toISOString().split('T')[0];
-        // const datetime = `${today}T${roundedTime}:00`;
-        const datetime = now.toISOString(); 
-        
+        const datetime = now.toISOString();
+
         const action = `punch&type=${encodeURIComponent(type)}&lat=${lat}&lng=${lng}&datetime=${encodeURIComponent(datetime)}&note=${encodeURIComponent(navigator.userAgent)}`;
-        
+
         try {
             const res = await callApifetch(action);
             const msg = t(res.code || "UNKNOWN_ERROR", res.params || {});
             showNotification(msg, res.ok ? "success" : "error");
-            
+
             if (res.ok && type === '上班') {
                 clearShiftCache();
             }
-            
-            generalButtonState(button, 'idle');
         } catch (err) {
             console.error(err);
+        } finally {
             generalButtonState(button, 'idle');
+            _isPunching = false;  // 🔓 釋放鎖
         }
-        
     }, (err) => {
         showNotification(t("ERROR_GEOLOCATION", { msg: err.message }), "error");
         generalButtonState(button, 'idle');
+        _isPunching = false;  // 🔓 釋放鎖（定位失敗也要釋放）
     });
 }
 
@@ -4725,10 +4728,13 @@ function closeAdjustTodayDialog() {
     }
 }
 
+let _isSubmittingToday = false;
 /**
  * 🆕 提交當日異常修正
  */
 async function submitAdjustToday() {
+    if (_isSubmittingToday) { showNotification('處理中，請勿重複點擊', 'warning'); return; }
+    _isSubmittingToday = true;
     const typeSelect = document.getElementById('adjust-type-select');
     const timeInput = document.getElementById('adjust-time-input');
     const reasonInput = document.getElementById('adjust-reason-input');
@@ -4918,11 +4924,13 @@ function closeHistoryAdjustDialog() {
         dialog.remove();
     }
 }
-
+let _isSubmittingHistory = false;
 /**
  * 🆕 提交歷史補打卡申請
  */
 async function submitHistoryAdjust() {
+    if (_isSubmittingHistory) { showNotification('處理中，請勿重複點擊', 'warning'); return; }
+    _isSubmittingHistory = true;
     const dateInput = document.getElementById('history-adjust-date');
     const typeInput = document.getElementById('history-adjust-type');
     const timeInput = document.getElementById('history-adjust-time');

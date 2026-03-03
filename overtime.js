@@ -1,6 +1,8 @@
 // overtime.js - 加班功能前端邏輯
 
 // ==================== 初始化加班頁面 ====================
+let _pendingOvertimeLoading = false;
+let _employeeOvertimeLoading = false;
 /**
  * 初始化加班申請表單
  */
@@ -490,31 +492,31 @@ function showCompensatoryHoursInput(currentHours, requestHours, exceededHours) {
 
 // ==================== 管理員審核功能 ====================
 
-/**
- * 載入待審核的加班申請（管理員）
- */
 async function loadPendingOvertimeRequests() {
+    if (_pendingOvertimeLoading) return;  // 🔒 防重複
+    _pendingOvertimeLoading = true;
+
     const requestsList = document.getElementById('pending-overtime-list');
     const requestsEmpty = document.getElementById('overtime-requests-empty');
     const requestsLoading = document.getElementById('overtime-requests-loading');
     
+    requestsList.innerHTML = '';  // ✅ 強制清空
     requestsLoading.style.display = 'block';
-    requestsList.innerHTML = '';
     requestsEmpty.style.display = 'none';
     
     try {
         const res = await callApifetch('getPendingOvertime');
         requestsLoading.style.display = 'none';
-        
         if (res.ok && res.requests && res.requests.length > 0) {
             renderPendingOvertimeRequests(res.requests, requestsList);
         } else {
             requestsEmpty.style.display = 'block';
         }
     } catch (err) {
-        console.error(err);
         requestsLoading.style.display = 'none';
         showNotification(t('ERROR_LOAD_OVERTIME') || '載入失敗', 'error');
+    } finally {
+        _pendingOvertimeLoading = false;  // 🔓 釋放鎖
     }
 }
 
@@ -582,48 +584,64 @@ function renderPendingOvertimeRequests(requests, container) {
     });
 }
 
-/**
- * 處理審核動作
- * 🔧 修正：使用 reviewAction 而不是 action 避免衝突
- */
 async function handleOvertimeReview(button, action) {
     const rowNumber = button.dataset.row;
     const loadingText = t('LOADING') || '處理中...';
     
-    console.log(`審核動作: rowNumber=${rowNumber}, action=${action}`);
+    // ✅ 禁用同一列所有按鈕，防止重複點擊
+    const parentLi = button.closest('li');
+    const allBtnsInRow = parentLi ? parentLi.querySelectorAll('button') : [button];
+    allBtnsInRow.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+    });
     
-    // 詢問審核意見
+    generalButtonState(button, 'processing', loadingText);
+    
     let comment = '';
     if (action === 'reject') {
         comment = prompt(t('OVERTIME_REJECT_REASON_PROMPT') || '請輸入拒絕原因（選填）') || '';
     }
     
-    generalButtonState(button, 'processing', loadingText);
-    
     try {
-        // 🔧 關鍵修正：使用 reviewAction 而不是 action
         const res = await callApifetch(
             `reviewOvertime&rowNumber=${rowNumber}&reviewAction=${action}&comment=${encodeURIComponent(comment)}`
         );
-        
-        console.log(`審核結果:`, res);
         
         if (res.ok) {
             const successMsg = action === 'approve' 
                 ? (t('OVERTIME_APPROVED') || '已核准加班申請') 
                 : (t('OVERTIME_REJECTED') || '已拒絕加班申請');
-            
             showNotification(successMsg, 'success');
             
-            await new Promise(resolve => setTimeout(resolve, 500));
-            await loadPendingOvertimeRequests();
+            // ✅ 直接移除該列（不重新載入整個列表，避免競態重複）
+            if (parentLi) {
+                parentLi.style.transition = 'opacity 0.3s';
+                parentLi.style.opacity = '0';
+                setTimeout(() => {
+                    parentLi.remove();
+                    const requestsList = document.getElementById('pending-overtime-list');
+                    const requestsEmpty = document.getElementById('overtime-requests-empty');
+                    if (requestsList && requestsList.children.length === 0) {
+                        if (requestsEmpty) requestsEmpty.style.display = 'block';
+                    }
+                }, 300);
+            }
         } else {
-            showNotification(t(res.code) || res.msg || t('REVIEW_FAILED') || '審核失敗', 'error');
+            showNotification(t(res.code) || res.msg || '審核失敗', 'error');
+            allBtnsInRow.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
             generalButtonState(button, 'idle');
         }
     } catch (err) {
         console.error('審核錯誤:', err);
         showNotification(t('NETWORK_ERROR') || '網路錯誤', 'error');
+        allBtnsInRow.forEach(btn => {
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        });
         generalButtonState(button, 'idle');
     }
 }
