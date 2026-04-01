@@ -2,10 +2,10 @@
 
 const API_CONFIG = {
   // 正式環境的 API URL
-  apiUrl: "https://script.google.com/macros/s/AKfycbz-IwAkFG0SLibKVPMPZSRcIzFbY_KtN0WmxkRHTtGB1JKq_L9_qTw5e4goI6MyBsz-/exec",
+  apiUrl: "https://script.google.com/macros/s/AKfycbz8IrOon2I3K7wiB3rFwVrqJCLwpTNZ-MNbP3R6C6p3BOssHHfpDVMwwAflzfhqcvGl/exec",
   
   // 新增回呼網址
-  redirectUrl: "https://eric693.github.io/ch8331666_check_manager/"
+  redirectUrl: "https://eric693.github.io/yi_check_manager/"
   // 你也可以在這裡加入其他設定，例如：
   // timeout: 5000,
   // version: 'v4.6.0'
