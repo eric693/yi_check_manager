@@ -89,12 +89,13 @@ async function loadCurrentEmployeeSalary() {
         if (loadingEl) loadingEl.style.display = 'none';
         
         if (result.ok && result.data) {
-            console.log('✅ 成功載入薪資資料');
             displayEmployeeSalary(result.data);
             if (contentEl) contentEl.style.display = 'block';
-            await loadAttendanceDetails(currentMonth);
+            await Promise.all([
+                loadAttendanceDetails(currentMonth),
+                loadMonthlyLeaveStatus(currentMonth)
+            ]);
         } else {
-            console.log(`⚠️ 沒有 ${currentMonth} 的薪資記錄`);
             if (emptyEl) {
                 showNoSalaryMessage(currentMonth);
                 emptyEl.style.display = 'block';
@@ -166,13 +167,18 @@ async function loadEmployeeSalaryByMonth() {
             console.log(`✅ 找到 ${yearMonth} 的薪資記錄`);
             displayEmployeeSalary(res.data);
             contentEl.style.display = 'block';
-            await loadAttendanceDetails(yearMonth);
+            await Promise.all([
+                loadAttendanceDetails(yearMonth),
+                loadMonthlyLeaveStatus(yearMonth)
+            ]);
         } else {
             console.log(`⚠️ 沒有 ${yearMonth} 的薪資記錄`);
             showNoSalaryMessage(yearMonth);
             emptyEl.style.display = 'block';
             const detailsSection = document.getElementById('attendance-details-section');
             if (detailsSection) detailsSection.style.display = 'none';
+            const leaveSection = document.getElementById('leave-status-section');
+            if (leaveSection) leaveSection.style.display = 'none';
         }
         
     } catch (error) {
@@ -705,6 +711,138 @@ function displayEmployeeSalary(data) {
         refreshCurrencyDisplay();
     }
 }
+
+// ==================== 假勤狀況面板 ====================
+
+const LEAVE_TYPE_LABELS = {
+    SICK_LEAVE: '病假',
+    PERSONAL_LEAVE: '事假',
+    ANNUAL_LEAVE: '特休',
+    COMPENSATORY_LEAVE: '補休',
+    OFFICIAL_LEAVE: '公假',
+    MATERNITY_LEAVE: '產假',
+    PATERNITY_LEAVE: '陪產假',
+    FUNERAL_LEAVE: '喪假',
+};
+
+/**
+ * 載入並顯示本月假單狀況，讓員工了解哪些假已計入薪資
+ */
+async function loadMonthlyLeaveStatus(yearMonth) {
+    const section = document.getElementById('leave-status-section');
+    const loadingEl = document.getElementById('leave-status-loading');
+    const contentEl = document.getElementById('leave-status-content');
+    if (!section || !contentEl) return;
+
+    section.style.display = 'block';
+    loadingEl.style.display = 'block';
+    contentEl.innerHTML = '';
+
+    try {
+        const res = await callApifetch('getEmployeeLeaveRecords');
+        loadingEl.style.display = 'none';
+
+        if (!res.ok || !res.records) {
+            contentEl.innerHTML = '<p class="text-sm text-gray-400">無法載入假單資料</p>';
+            return;
+        }
+
+        // 篩選本月假單
+        const monthRecords = res.records.filter(r => {
+            const dt = r.startDateTime instanceof Date
+                ? r.startDateTime
+                : new Date(r.startDateTime);
+            const ym = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+            return ym === yearMonth;
+        });
+
+        if (monthRecords.length === 0) {
+            contentEl.innerHTML = '<p class="text-sm text-gray-400 py-2">本月無請假記錄</p>';
+            return;
+        }
+
+        // 分組
+        const approved = monthRecords.filter(r => r.status === 'APPROVED' || r.status === '核准');
+        const pending  = monthRecords.filter(r => r.status === 'PENDING'  || r.status === '待審核');
+        const rejected = monthRecords.filter(r => r.status === 'REJECTED' || r.status === '拒絕');
+
+        let html = '';
+
+        // ⚠️ 待審核警示
+        if (pending.length > 0) {
+            html += `
+            <div class="mb-3 p-3 rounded-lg border border-yellow-500/40" style="background:rgba(234,179,8,0.08);">
+                <div class="flex items-center gap-2 font-semibold text-yellow-300 mb-2">
+                    ⚠️ 待審核假單（尚未計入薪資，核准後將自動重新計算）
+                </div>
+                <div class="space-y-1">
+                ${pending.map(r => leaveRecordRow(r, 'text-yellow-200', '⏳')).join('')}
+                </div>
+            </div>`;
+        }
+
+        // ✅ 已核准（已計入扣款）
+        if (approved.length > 0) {
+            html += `
+            <div class="mb-3 p-3 rounded-lg border border-green-500/30" style="background:rgba(34,197,94,0.06);">
+                <div class="font-semibold text-green-400 mb-2">✅ 已核准（已計入薪資扣款）</div>
+                <div class="space-y-1">
+                ${approved.map(r => leaveRecordRow(r, 'text-green-200', '✅')).join('')}
+                </div>
+            </div>`;
+        }
+
+        // ❌ 已拒絕（不計入）
+        if (rejected.length > 0) {
+            html += `
+            <div class="p-3 rounded-lg border border-gray-600/30" style="background:rgba(100,116,139,0.06);">
+                <div class="font-semibold text-gray-400 mb-2">❌ 已拒絕（不計入扣款）</div>
+                <div class="space-y-1">
+                ${rejected.map(r => leaveRecordRow(r, 'text-gray-400', '❌')).join('')}
+                </div>
+            </div>`;
+        }
+
+        contentEl.innerHTML = html;
+
+    } catch (err) {
+        loadingEl.style.display = 'none';
+        contentEl.innerHTML = '<p class="text-sm text-red-400">載入失敗</p>';
+    }
+}
+
+function leaveRecordRow(r, colorClass, icon) {
+    const typeLabel = LEAVE_TYPE_LABELS[r.leaveType] || r.leaveType || '--';
+    const days = parseFloat(r.days) || 0;
+    const hours = parseFloat(r.workHours) || 0;
+    const startDt = r.startDateTime ? new Date(r.startDateTime) : null;
+    const dateStr = startDt ? startDt.toLocaleDateString('zh-TW') : '--';
+    return `
+        <div class="flex justify-between items-center text-sm py-1 border-b border-white/5 last:border-0">
+            <span class="${colorClass}">${icon} ${typeLabel}　${dateStr}</span>
+            <span class="font-mono ${colorClass}">${days > 0 ? days + '天' : ''}${hours > 0 ? ' / ' + hours + 'h' : ''}</span>
+        </div>`;
+}
+
+/**
+ * 重新計算薪資按鈕的 handler
+ */
+async function recalculateSalary() {
+    const btn = document.getElementById('recalc-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ 計算中...';
+    }
+    try {
+        await loadEmployeeSalaryByMonth();
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '🔄 重新計算';
+        }
+    }
+}
+
 /**
  * ✅ 載入薪資歷史
  */

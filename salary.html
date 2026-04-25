@@ -645,6 +645,11 @@
                     <label data-i18n="SALARY_QUERY_MONTH">📅 查詢月份：</label>
                     <input type="month" id="employee-salary-month" class="form-input">
                     <button onclick="loadEmployeeSalaryByMonth()" data-i18n="BTN_QUERY">🔍 查詢</button>
+                    <button id="recalc-btn" onclick="recalculateSalary()"
+                            style="background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.4); color:#93c5fd;"
+                            title="根據最新假單重新計算薪資">
+                        🔄 重新計算
+                    </button>
                 </div>
 
                 <div class="feature-box">
@@ -815,6 +820,13 @@
                         <!-- ⭐⭐⭐ 出勤明細區塊（由 JS 動態產生內容） -->
                         <div class="mt-6" id="attendance-details-section" style="display: none;">
                             <!-- JavaScript 會在這裡動態插入工時統計和加班統計 -->
+                        </div>
+
+                        <!-- 本月假勤狀況面板 -->
+                        <div id="leave-status-section" class="mt-6" style="display:none;">
+                            <div class="feature-title" style="font-size:1rem;">📋 本月假單狀況</div>
+                            <div id="leave-status-loading" class="text-sm text-gray-400 py-2">載入中...</div>
+                            <div id="leave-status-content"></div>
                         </div>
                     </div>
                 </div>
