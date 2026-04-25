@@ -4,6 +4,17 @@ if (typeof callApifetch !== 'function') {
     console.error('❌ callApifetch 函數未定義，請確認 script.js 已正確載入');
 }
 
+// ==================== 模組快取 ====================
+let _sessionCache = null;
+let _currentNetSalary = 0;
+
+async function getSession() {
+    if (_sessionCache) return _sessionCache;
+    const session = await callApifetch('checkSession');
+    if (session.ok && session.user) _sessionCache = session;
+    return session;
+}
+
 // ==================== 初始化薪資頁面 ====================
 
 /**
@@ -17,44 +28,32 @@ async function initSalaryTab() {
         await loadTranslations(currentLang);
         
         // 步驟 1：驗證 Session
-        console.log('📡 正在驗證 Session...');
-        const session = await callApifetch("checkSession");
-        
+        const session = await getSession();
+
         if (!session.ok || !session.user) {
-            console.error('❌ Session 驗證失敗:', session);
             showNotification(t('SALARY_LOGIN_REQUIRED'), 'error');
             return;
         }
-        
-        console.log('✅ Session 驗證成功');
-        console.log('👤 使用者:', session.user.name);
-        console.log('🔐 權限:', session.user.dept);
-        console.log('📌 員工ID:', session.user.userId);
-        
+
         // 步驟 2：設定當前月份
         const now = new Date();
         const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        console.log('📅 當前月份:', currentMonth);
-        
+
         const employeeSalaryMonth = document.getElementById('employee-salary-month');
         if (employeeSalaryMonth) {
             employeeSalaryMonth.value = currentMonth;
         }
-        
-        // 步驟 3：載入薪資資料
-        console.log('💰 開始載入薪資資料...');
-        await loadCurrentEmployeeSalary();
-        
-        console.log('📋 開始載入薪資歷史...');
-        await loadSalaryHistory();
-        
+
+        // 步驟 3：平行載入薪資資料與歷史
+        await Promise.all([
+            loadCurrentEmployeeSalary(),
+            loadSalaryHistory()
+        ]);
+
         // 步驟 4：綁定事件（管理員才需要）
         if (session.user.dept === "管理員") {
-            console.log('🔧 綁定管理員功能...');
             bindSalaryEvents();
         }
-        
-        console.log('✅ 薪資頁面初始化完成（完整版 v2.0 + 多語言）！');
         
     } catch (error) {
         console.error('❌ 初始化失敗:', error);
@@ -139,9 +138,7 @@ async function loadEmployeeSalaryByMonth() {
         emptyEl.style.display = 'none';
         contentEl.style.display = 'none';
         
-        // ⭐⭐⭐ 關鍵修正：先取得 session 以獲取 employeeId
-        const session = await callApifetch('checkSession');
-        
+        const session = await getSession();
         if (!session.ok || !session.user) {
             throw new Error('Session 驗證失敗');
         }
@@ -699,8 +696,14 @@ function displayEmployeeSalary(data) {
     
     safeSet('detail-bank-name', getBankName(bankCode));
     safeSet('detail-bank-account', bankAccount || '--');
-    
-    console.log('✅ 薪資明細顯示完成');
+
+    // 更新即時匯率換算面板
+    _currentNetSalary = parseFloat(data.netSalary) || 0;
+    const panel = document.getElementById('currency-converter-panel');
+    if (panel) {
+        panel.style.display = _currentNetSalary > 0 ? 'block' : 'none';
+        refreshCurrencyDisplay();
+    }
 }
 /**
  * ✅ 載入薪資歷史
@@ -1512,6 +1515,77 @@ function createAllSalaryItem(salary) {
     return div;
 }
 
+// ==================== 即時匯率換算 ====================
+
+const EXCHANGE_RATE_TTL = 3600000; // 1 小時快取
+
+async function fetchExchangeRates() {
+    const now = Date.now();
+    const cached = localStorage.getItem('_ex_rates');
+    const expiry = parseInt(localStorage.getItem('_ex_rates_exp') || '0');
+    if (cached && now < expiry) return JSON.parse(cached);
+
+    try {
+        const res = await fetch('https://open.er-api.com/v6/latest/TWD');
+        const data = await res.json();
+        if (data.result === 'success') {
+            localStorage.setItem('_ex_rates', JSON.stringify(data.rates));
+            localStorage.setItem('_ex_rates_exp', String(now + EXCHANGE_RATE_TTL));
+            localStorage.setItem('_ex_rates_time', new Date().toLocaleTimeString('zh-TW'));
+            return data.rates;
+        }
+    } catch (e) {
+        console.warn('匯率 API 無法連線，使用備用匯率', e);
+    }
+    // 備用匯率（近似值）
+    return { USD: 0.031, JPY: 4.65, EUR: 0.029, KRW: 41.5, HKD: 0.242, VND: 779, THB: 1.08 };
+}
+
+const CURRENCY_SYMBOLS = { USD: '$', JPY: '¥', EUR: '€', KRW: '₩', HKD: 'HK$', VND: '₫', THB: '฿' };
+const ZERO_DECIMAL_CURRENCIES = new Set(['JPY', 'KRW', 'VND']);
+
+function refreshCurrencyDisplay() {
+    const select = document.getElementById('currency-select');
+    if (!select || !_currentNetSalary) return;
+
+    const targetCurrency = select.value;
+    const rates = JSON.parse(localStorage.getItem('_ex_rates') || 'null');
+
+    if (rates) {
+        applyCurrencyConversion(_currentNetSalary, targetCurrency, rates);
+    } else {
+        fetchExchangeRates().then(r => applyCurrencyConversion(_currentNetSalary, targetCurrency, r));
+    }
+}
+
+function applyCurrencyConversion(twdAmount, targetCurrency, rates) {
+    const rate = rates[targetCurrency];
+    if (!rate) return;
+
+    const converted = twdAmount * rate;
+    const decimals = ZERO_DECIMAL_CURRENCIES.has(targetCurrency) ? 0 : 2;
+    const formatted = new Intl.NumberFormat('zh-TW', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: decimals
+    }).format(converted);
+
+    const symbol = CURRENCY_SYMBOLS[targetCurrency] || targetCurrency + ' ';
+    const resultEl = document.getElementById('currency-result');
+    if (resultEl) resultEl.textContent = symbol + formatted;
+
+    const rateEl = document.getElementById('exchange-rate-display');
+    if (rateEl) {
+        const rateStr = rate < 0.01 ? rate.toFixed(4) : rate < 1 ? rate.toFixed(4) : rate.toFixed(2);
+        rateEl.textContent = `1 TWD = ${rateStr} ${targetCurrency}`;
+    }
+
+    const timeEl = document.getElementById('exchange-rate-time');
+    if (timeEl) {
+        const t = localStorage.getItem('_ex_rates_time');
+        timeEl.textContent = t ? `更新時間 ${t}` : '';
+    }
+}
+
 // ==================== 工具函數 ====================
 
 /**
@@ -1583,9 +1657,7 @@ async function loadAttendanceDetails(yearMonth) {
         const detailsSection = document.getElementById('attendance-details-section');
         if (!detailsSection) return;
         
-        // ⭐⭐⭐ 改用跟時薪計算一樣的 API
-        // 先取得當前使用者的 session
-        const session = await callApifetch('checkSession');
+        const session = await getSession();
         if (!session.ok || !session.user) {
             detailsSection.style.display = 'none';
             return;
