@@ -165,7 +165,7 @@ function createForgotPunchNotification(employeeName, date, punchType) {
             action: {
               type: "uri",
               label: "立即補打卡",
-              uri: "https://eric693.github.io/an_check_manager/"
+              uri: "https://eric693.github.io/yi_check_manager/"
             },
             color: "#4CAF50"
           },
@@ -176,7 +176,7 @@ function createForgotPunchNotification(employeeName, date, punchType) {
             action: {
               type: "uri",
               label: "查看打卡記錄",
-              uri: "https://eric693.github.io/an_check_manager/"
+              uri: "https://eric693.github.io/yi_check_manager/"
             }
           }
         ],
@@ -347,7 +347,7 @@ function createPunchApprovedNotification(employeeName, date, time, punchType, re
             action: {
               type: "uri",
               label: "查看詳情",
-              uri: "https://eric693.github.io/an_check_manager/"
+              uri: "https://eric693.github.io/yi_check_manager/"
             },
             color: "#4CAF50"
           }
@@ -523,7 +523,7 @@ function createPunchRejectedNotification(employeeName, date, time, punchType, re
             action: {
               type: "uri",
               label: "查看詳情",
-              uri: "https://eric693.github.io/an_check_manager/"
+              uri: "https://eric693.github.io/yi_check_manager/"
             }
           }
         ],
@@ -707,7 +707,7 @@ function createLeaveApprovedNotification(employeeName, leaveType, startDate, end
             action: {
               type: "uri",
               label: "查看假期餘額",
-              uri: "https://eric693.github.io/an_check_manager/"
+              uri: "https://eric693.github.io/yi_check_manager/"
             },
             color: "#2196F3"
           }
@@ -882,7 +882,7 @@ function createLeaveRejectedNotification(employeeName, leaveType, startDate, end
             action: {
               type: "uri",
               label: "重新申請",
-              uri: "https://eric693.github.io/an_check_manager/"
+              uri: "https://eric693.github.io/yi_check_manager/"
             }
           }
         ],
@@ -1043,7 +1043,7 @@ function createOvertimeApprovedNotification(employeeName, date, hours, reviewer)
             action: {
               type: "uri",
               label: "查看詳情",
-              uri: "https://eric693.github.io/an_check_manager/"
+              uri: "https://eric693.github.io/yi_check_manager/"
             },
             color: "#FF9800"
           }
@@ -1217,7 +1217,7 @@ function createOvertimeRejectedNotification(employeeName, date, hours, reviewer,
             action: {
               type: "uri",
               label: "重新申請",
-              uri: "https://eric693.github.io/an_check_manager/"
+              uri: "https://eric693.github.io/yi_check_manager/"
             }
           }
         ],
@@ -1549,4 +1549,229 @@ function testAllNotifications() {
   testOvertimeRejectedNotification();
   
   Logger.log("\n========== 所有測試完成 ==========");
+}
+
+
+// ==================== 通知管理員：新申請 ====================
+
+/**
+ * 取得所有啟用中的管理員 LINE ID
+ */
+function getAdminUserIds_() {
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_EMPLOYEES);
+    if (!sheet) return [];
+
+    const values = sheet.getDataRange().getValues();
+    const adminIds = [];
+
+    for (let i = 1; i < values.length; i++) {
+      const userId = values[i][0];   // A欄: userId
+      const dept   = values[i][5];   // F欄: 部門/角色
+      const status = values[i][7];   // H欄: 狀態
+
+      if (dept === '管理員' && status === '啟用' && userId) {
+        adminIds.push(String(userId).trim());
+      }
+    }
+
+    Logger.log('👮 管理員清單: ' + JSON.stringify(adminIds));
+    return adminIds;
+  } catch (err) {
+    Logger.log('❌ getAdminUserIds_ 錯誤: ' + err.message);
+    return [];
+  }
+}
+
+/**
+ * 發送訊息給所有管理員
+ */
+function notifyAllAdmins_(message) {
+  const adminIds = getAdminUserIds_();
+  if (adminIds.length === 0) {
+    Logger.log('⚠️ 找不到任何管理員，略過通知');
+    return;
+  }
+  adminIds.forEach(adminId => {
+    try {
+      sendLineNotification_(adminId, message);
+      Logger.log('✅ 已通知管理員: ' + adminId);
+    } catch (err) {
+      Logger.log('⚠️ 通知管理員失敗 (' + adminId + '): ' + err.message);
+    }
+  });
+}
+
+/**
+ * 🔔 請假新申請通知（給管理員）
+ */
+function createNewLeaveRequestNotification_(employeeName, leaveType, startDateTime, endDateTime, workHours, reason) {
+  return {
+    type: "flex",
+    altText: `🔔 ${employeeName} 提出請假申請，請前往審核`,
+    contents: {
+      type: "bubble",
+      size: "mega",
+      header: {
+        type: "box",
+        layout: "vertical",
+        contents: [{
+          type: "text",
+          text: "🔔 新請假申請待審核",
+          weight: "bold",
+          size: "xl",
+          color: "#FFFFFF",
+          align: "center"
+        }],
+        backgroundColor: "#2196F3",
+        paddingAll: "20px"
+      },
+      body: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          { type: "text", text: "有新的請假申請等待您審核", size: "sm", color: "#666666", margin: "md" },
+          { type: "separator", margin: "lg" },
+          {
+            type: "box",
+            layout: "vertical",
+            margin: "lg",
+            spacing: "sm",
+            contents: [
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "申請人", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: employeeName, wrap: true, color: "#333333", size: "sm", flex: 5, weight: "bold" }
+              ]},
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "假別", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: leaveType, wrap: true, color: "#2196F3", size: "sm", flex: 5, weight: "bold" }
+              ]},
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "開始", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: String(startDateTime), wrap: true, color: "#333333", size: "sm", flex: 5 }
+              ]},
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "結束", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: String(endDateTime), wrap: true, color: "#333333", size: "sm", flex: 5 }
+              ]},
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "時數", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: workHours + " 小時", wrap: true, color: "#2196F3", size: "sm", flex: 5, weight: "bold" }
+              ]},
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "原因", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: reason || "未填寫", wrap: true, color: "#333333", size: "sm", flex: 5 }
+              ]}
+            ]
+          }
+        ]
+      },
+      footer: {
+        type: "box",
+        layout: "vertical",
+        contents: [{
+          type: "button",
+          style: "primary",
+          height: "sm",
+          action: { type: "uri", label: "前往審核", uri: "https://eric693.github.io/yi_check_manager/" },
+          color: "#2196F3"
+        }]
+      }
+    }
+  };
+}
+
+/**
+ * 🔔 加班新申請通知（給管理員）
+ */
+function createNewOvertimeRequestNotification_(employeeName, overtimeDate, startTime, endTime, hours, reason) {
+  return {
+    type: "flex",
+    altText: `🔔 ${employeeName} 提出加班申請，請前往審核`,
+    contents: {
+      type: "bubble",
+      size: "mega",
+      header: {
+        type: "box",
+        layout: "vertical",
+        contents: [{
+          type: "text",
+          text: "🔔 新加班申請待審核",
+          weight: "bold",
+          size: "xl",
+          color: "#FFFFFF",
+          align: "center"
+        }],
+        backgroundColor: "#FF9800",
+        paddingAll: "20px"
+      },
+      body: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          { type: "text", text: "有新的加班申請等待您審核", size: "sm", color: "#666666", margin: "md" },
+          { type: "separator", margin: "lg" },
+          {
+            type: "box",
+            layout: "vertical",
+            margin: "lg",
+            spacing: "sm",
+            contents: [
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "申請人", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: employeeName, wrap: true, color: "#333333", size: "sm", flex: 5, weight: "bold" }
+              ]},
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "日期", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: String(overtimeDate), wrap: true, color: "#333333", size: "sm", flex: 5, weight: "bold" }
+              ]},
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "時段", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: startTime + " ~ " + endTime, wrap: true, color: "#333333", size: "sm", flex: 5 }
+              ]},
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "時數", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: hours + " 小時", wrap: true, color: "#FF9800", size: "sm", flex: 5, weight: "bold" }
+              ]},
+              { type: "box", layout: "baseline", spacing: "sm", contents: [
+                { type: "text", text: "原因", color: "#999999", size: "sm", flex: 2 },
+                { type: "text", text: reason || "未填寫", wrap: true, color: "#333333", size: "sm", flex: 5 }
+              ]}
+            ]
+          }
+        ]
+      },
+      footer: {
+        type: "box",
+        layout: "vertical",
+        contents: [{
+          type: "button",
+          style: "primary",
+          height: "sm",
+          action: { type: "uri", label: "前往審核", uri: "https://eric693.github.io/yi_check_manager/" },
+          color: "#FF9800"
+        }]
+      }
+    }
+  };
+}
+
+/**
+ * 對外呼叫：通知管理員有新請假申請
+ */
+function notifyAdminsNewLeaveRequest(employeeName, leaveType, startDateTime, endDateTime, workHours, reason) {
+  const message = createNewLeaveRequestNotification_(
+    employeeName, leaveType, startDateTime, endDateTime, workHours, reason
+  );
+  notifyAllAdmins_(message);
+}
+
+/**
+ * 對外呼叫：通知管理員有新加班申請
+ */
+function notifyAdminsNewOvertimeRequest(employeeName, overtimeDate, startTime, endTime, hours, reason) {
+  const message = createNewOvertimeRequestNotification_(
+    employeeName, overtimeDate, startTime, endTime, hours, reason
+  );
+  notifyAllAdmins_(message);
 }

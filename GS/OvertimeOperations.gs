@@ -28,9 +28,6 @@ function initOvertimeSheet() {
   return sheet;
 }
 
-/**
- * 提交加班申請（修正版 - 加入防重複提交）
- */
 function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, hours, reason, compensatoryHours) {
   const employee = checkSession_(sessionToken);
   const user = employee.user;
@@ -38,7 +35,7 @@ function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, h
   
   const sheet = initOvertimeSheet();
   
-  // ✅ 防重複提交：檢查同一員工同一日期是否已有 pending 申請
+  // ✅ 防重複提交
   const values = sheet.getDataRange().getValues();
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
@@ -87,6 +84,21 @@ function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, h
   ];
   
   sheet.appendRow(row);
+
+  // ✅ 通知所有管理員
+  try {
+    notifyAdminsNewOvertimeRequest(
+      user.name,
+      overtimeDate,
+      startTime,
+      endTime,
+      parseFloat(hours),
+      reason
+    );
+    Logger.log(`✅ 已通知管理員：${user.name} 提交加班申請`);
+  } catch (notifyErr) {
+    Logger.log('⚠️ 通知管理員失敗（不影響申請結果）: ' + notifyErr.message);
+  }
   
   return { 
     ok: true, 

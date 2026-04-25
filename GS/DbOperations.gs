@@ -430,7 +430,7 @@ function testCheckSession() {
 // ==================== 打卡功能 ====================
 
 /**
- * 打卡功能
+ * 打卡功能（加入防重複：同一天同類型只能打一次）
  */
 function punch(sessionToken, type, lat, lng, note) {
   const employee = checkSession_(sessionToken);
@@ -439,20 +439,18 @@ function punch(sessionToken, type, lat, lng, note) {
 
   const shLoc = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_LOCATIONS);
   const lastRow = shLoc.getLastRow();
-  
+
   if (lastRow < 2) {
     return { ok: false, code: "ERR_NO_LOCATIONS" };
   }
-  
+
   const values = shLoc.getRange(2, 1, lastRow - 1, 5).getValues();
   let locationName = null;
   let minDistance = Infinity;
-  
+
   for (let [, name, locLat, locLng, radius] of values) {
     if (!name || !locLat || !locLng) continue;
-    
     const dist = getDistanceMeters_(lat, lng, Number(locLat), Number(locLng));
-    
     if (dist <= Number(radius) && dist < minDistance) {
       locationName = name;
       minDistance = dist;
@@ -463,14 +461,41 @@ function punch(sessionToken, type, lat, lng, note) {
     return { ok: false, code: "ERR_OUT_OF_RANGE" };
   }
 
+  // 防重複：同一天同類型（上班/下班）只能打一次
   const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_ATTENDANCE);
+  const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  const attendanceValues = sh.getDataRange().getValues();
+
+  for (let i = 1; i < attendanceValues.length; i++) {
+    const row = attendanceValues[i];
+    if (!row[0]) continue;
+
+    const rowDate = Utilities.formatDate(new Date(row[0]), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    const rowUserId = String(row[1]).trim();
+    const rowType = String(row[4]).trim();
+    const rowNote = String(row[7] || '').trim();
+
+    // 跳過補打卡記錄
+    if (rowNote === '補打卡') continue;
+
+    if (rowDate === today && rowUserId === user.userId && rowType === type) {
+      Logger.log('防重複: ' + user.name + ' 今天（' + today + '）已打 ' + type + ' 卡');
+      return {
+        ok: false,
+        code: "ERR_DUPLICATE_PUNCH",
+        msg: '今天已經打過' + type + '卡，請勿重複打卡'
+      };
+    }
+  }
+
+  // 寫入打卡記錄
   const row = [
     new Date(),
     user.userId,
     user.dept,
     user.name,
     type,
-    `(${lat},${lng})`,
+    '(' + lat + ',' + lng + ')',
     locationName,
     "",
     "",
@@ -478,94 +503,89 @@ function punch(sessionToken, type, lat, lng, note) {
   ];
   sh.getRange(sh.getLastRow() + 1, 1, 1, row.length).setValues([row]);
 
-  return { ok: true, code: `PUNCH_SUCCESS`, params: { type: type } };
+  Logger.log('打卡成功: ' + user.name + ' - ' + type);
+  return { ok: true, code: "PUNCH_SUCCESS", params: { type: type } };
 }
 
+
 /**
- * 補打卡功能
- */
-/**
- * ✅ 補打卡功能（修正版 - 寫入「補打卡申請」工作表）
+ * 補打卡功能（加入防重複：同一天同類型只能有一筆待審核）
  */
 function punchAdjusted(sessionToken, type, punchDate, lat, lng, note) {
   const employee = checkSession_(sessionToken);
   const user = employee.user;
-  
+
   if (!user) {
     return { ok: false, code: "ERR_SESSION_INVALID" };
   }
 
-  // ⭐ 修改：寫入「補打卡申請」工作表，而不是「出勤紀錄」
   const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_ADJUST_PUNCH);
-  
+
   if (!sh) {
-    Logger.log('❌ 找不到「補打卡申請」工作表');
+    Logger.log('找不到補打卡申請工作表');
     return { ok: false, code: "ERR_SHEET_NOT_FOUND" };
   }
 
-  // ⭐ 按照你的工作表欄位順序寫入
-  // A: 申請ID（自動生成）
-  // B: 用戶ID
-  // C: 姓名
-  // D: 日期
-  // E: 時間
-  // F: 類型（上班/下班）
-  // G: 原因（補打卡理由）
-  // H: 狀態（待審核）
-  // I: 申請時間
-  // J: 審核人
-  // K: 審核時間
-  
-  const applicationId = Utilities.getUuid().substring(0, 8).toUpperCase();
   const dateOnly = Utilities.formatDate(punchDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
   const timeOnly = Utilities.formatDate(punchDate, Session.getScriptTimeZone(), 'HH:mm');
-  
-  const row = [
-    applicationId,           // A: 申請ID
-    user.userId,             // B: 用戶ID
-    user.name,               // C: 姓名
-    dateOnly,                // D: 日期
-    timeOnly,                // E: 時間
-    type,                    // F: 類型
-    note || '',              // G: 原因
-    '待審核',                // H: 狀態
-    new Date(),              // I: 申請時間
-    '',                      // J: 審核人
-    ''                       // K: 審核時間
-  ];
-  
-  sh.appendRow(row);
-  
-  Logger.log(`✅ 補打卡申請已提交: ${user.name} - ${dateOnly} ${type}`);
-  Logger.log(`   理由: ${note}`);
 
-  return { 
-    ok: true, 
-    code: `ADJUST_PUNCH_SUCCESS`, 
-    params: { type: type } 
+  // 防重複：同一員工同一日期同一類型，只能有一筆「待審核」申請
+  const headers = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
+  const userIdCol = headers.indexOf('用戶ID');
+  const dateCol = headers.indexOf('日期');
+  const typeCol = headers.indexOf('類型');
+  const statusCol = headers.indexOf('狀態');
+
+  if (userIdCol >= 0 && dateCol >= 0 && typeCol >= 0 && statusCol >= 0) {
+    const allValues = sh.getDataRange().getValues();
+    for (let i = 1; i < allValues.length; i++) {
+      const row = allValues[i];
+      const rowUserId = String(row[userIdCol] || '').trim();
+      const rowDate = String(row[dateCol] || '').trim();
+      const rowType = String(row[typeCol] || '').trim();
+      const rowStatus = String(row[statusCol] || '').trim();
+
+      if (rowUserId === user.userId &&
+          rowDate === dateOnly &&
+          rowType === type &&
+          rowStatus === '待審核') {
+        Logger.log('防重複補打卡: ' + user.name + ' 在 ' + dateOnly + ' 已有待審核的補' + type + '卡申請');
+        return {
+          ok: false,
+          code: "ERR_DUPLICATE_ADJUST_PUNCH",
+          msg: dateOnly + ' 的補' + type + '卡申請已送出，請等待審核後再申請'
+        };
+      }
+    }
+  }
+
+  const applicationId = Utilities.getUuid().substring(0, 8).toUpperCase();
+
+  const row = [
+    applicationId,  // A: 申請ID
+    user.userId,    // B: 用戶ID
+    user.name,      // C: 姓名
+    dateOnly,       // D: 日期
+    timeOnly,       // E: 時間
+    type,           // F: 類型
+    note || '',     // G: 原因
+    '待審核',       // H: 狀態
+    new Date(),     // I: 申請時間
+    '',             // J: 審核人
+    ''              // K: 審核時間
+  ];
+
+  sh.appendRow(row);
+
+  Logger.log('補打卡申請已提交: ' + user.name + ' - ' + dateOnly + ' ' + type);
+  Logger.log('   理由: ' + note);
+
+  return {
+    ok: true,
+    code: "ADJUST_PUNCH_SUCCESS",
+    params: { type: type }
   };
 }
-// function punchAdjusted(sessionToken, type, punchDate, lat, lng, note) {
-//   const employee = checkSession_(sessionToken);
-//   const user = employee.user;
-//   if (!user) return { ok: false, code: "ERR_SESSION_INVALID" };
-
-//   const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_ATTENDANCE);
-//   sh.appendRow([
-//     punchDate,
-//     user.userId,
-//     user.dept,
-//     user.name,
-//     type,
-//     `(${lat},${lng})`,
-//     "",
-//     "補打卡",
-//     "?",
-//     note
-//   ]);
-
-//   return { ok: true, code: `ADJUST_PUNCH_SUCCESS`, params: { type: type } };
-// }
 
 /**
  * 取得出勤紀錄
@@ -1199,6 +1219,7 @@ function getReviewRequest() {
     
     Logger.log(`   ${actualRowNumber}. ${name} - ${date} ${time} ${type}`);
     Logger.log(`      理由: ${reason}`);
+    const isTodayAdjust = reason && reason.includes('【當日修正】');
     
     return {
       id: actualRowNumber,
@@ -1207,8 +1228,9 @@ function getReviewRequest() {
       name: name,
       type: type,
       remark: `補${type}卡`,
-      applicationPeriod: `${date} ${time}`,  // ✅ 使用格式化後的日期時間
-      note: reason || ''
+      applicationPeriod: `${date} ${time}`,
+      note: reason || '',
+      punchTypes: isTodayAdjust ? `當日修正 - 補${type}卡` : `補${type}審核中`  // ⭐ 新增
     };
   });
   

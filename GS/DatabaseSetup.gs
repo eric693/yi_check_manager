@@ -1,13 +1,13 @@
-// DatabaseSetup.gs - 資料庫結構初始化腳本（完整版）
+// DatabaseSetup.gs - 資料庫結構初始化腳本（15種假別完整版）
 
 /**
- * 建立請假系統所需的資料表結構
+ * 建立請假系統所需的資料表結構（15種假別）
  * 執行這個函數會自動建立所需的工作表和欄位
  */
 function setupLeaveSystemDatabase() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   
-  Logger.log('🚀 開始建立請假系統資料庫...\n');
+  Logger.log('🚀 開始建立請假系統資料庫（15種假別）...\n');
   
   // 1. 建立「員工假期額度」工作表
   createLeaveBalanceSheet_(ss);
@@ -25,7 +25,7 @@ function setupLeaveSystemDatabase() {
 }
 
 /**
- * 建立「員工假期額度」工作表
+ * 建立「員工假期額度」工作表（15種假別）
  */
 function createLeaveBalanceSheet_(ss) {
   let sheet = ss.getSheetByName(SHEET_LEAVE_BALANCE);
@@ -35,26 +35,32 @@ function createLeaveBalanceSheet_(ss) {
     return;
   }
   
-  Logger.log('📊 建立「員工假期額度」工作表...');
+  Logger.log('📊 建立「員工假期額度」工作表（15種假別）...');
   
   sheet = ss.insertSheet(SHEET_LEAVE_BALANCE);
   
-  // 設定標題行
+  // 設定標題行（15種假別）
   const headers = [
-    '員工ID',
-    '姓名',
-    '到職日期',
-    '年度',
-    '特休假',
-    '病假',
-    '事假',
-    '婚假',
-    '喪假',
-    '產假',
-    '陪產假',
-    '家庭照顧假',
-    '生理假',
-    '更新時間'
+    '員工ID',              // A (0)
+    '姓名',                // B (1)
+    '到職日期',            // C (2)
+    '年度',                // D (3)
+    '特休假',              // E (4)
+    '加班補休假',          // F (5)
+    '事假',                // G (6)
+    '未住院病假',          // H (7)
+    '住院病假',            // I (8)
+    '喪假',                // J (9)
+    '婚假',                // K (10)
+    '陪產檢及陪產假',      // L (11)
+    '產假',                // M (12)
+    '公假（含兵役假）',    // N (13)
+    '公傷假',              // O (14)
+    '曠工',                // P (15)
+    '天然災害停班',        // Q (16)
+    '家庭照顧假',          // R (17)
+    '生理假',              // S (18)
+    '更新時間'             // T (19)
   ];
   
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
@@ -72,17 +78,17 @@ function createLeaveBalanceSheet_(ss) {
   sheet.setColumnWidth(3, 100); // 到職日期
   sheet.setColumnWidth(4, 60);  // 年度
   
-  // 假期欄位
-  for (let i = 5; i <= 13; i++) {
-    sheet.setColumnWidth(i, 80);
+  // 所有假期欄位（5-19）
+  for (let i = 5; i <= 19; i++) {
+    sheet.setColumnWidth(i, 100);
   }
   
-  sheet.setColumnWidth(14, 150); // 更新時間
+  sheet.setColumnWidth(20, 150); // 更新時間
   
   // 凍結標題行
   sheet.setFrozenRows(1);
   
-  Logger.log('✅ 「員工假期額度」工作表建立完成');
+  Logger.log('✅ 「員工假期額度」工作表建立完成（15種假別）');
 }
 
 /**
@@ -131,7 +137,7 @@ function createLeaveRecordsSheet_(ss) {
   sheet.setColumnWidth(2, 200);  // 員工ID
   sheet.setColumnWidth(3, 100);  // 姓名
   sheet.setColumnWidth(4, 80);   // 部門
-  sheet.setColumnWidth(5, 100);  // 假別
+  sheet.setColumnWidth(5, 120);  // 假別
   sheet.setColumnWidth(6, 100);  // 開始日期
   sheet.setColumnWidth(7, 100);  // 結束日期
   sheet.setColumnWidth(8, 60);   // 天數
@@ -187,7 +193,7 @@ function updateEmployeeSheet_(ss) {
   Logger.log(`📊 目前共有 ${employeeCount} 位員工`);
   
   // 檢查有多少員工已填寫到職日期
-  if (hireDateIndex !== -1) {
+  if (hireDateIndex !== -1 && employeeCount > 0) {
     const values = sheet.getRange(2, hireDateIndex + 1, employeeCount, 1).getValues();
     let filledCount = 0;
     
@@ -205,15 +211,15 @@ function updateEmployeeSheet_(ss) {
 }
 
 /**
- * 驗證資料庫結構
+ * 驗證資料庫結構（15種假別）
  * 檢查所有必要的工作表和欄位是否存在
  */
 function validateLeaveSystemDatabase() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let isValid = true;
   
-  Logger.log('🔍 開始驗證請假系統資料庫結構...\n');
-  Logger.log('=' .repeat(60));
+  Logger.log('🔍 開始驗證請假系統資料庫結構（15種假別）...\n');
+  Logger.log('='.repeat(60));
   
   // 檢查「員工假期額度」工作表
   const balanceSheet = ss.getSheetByName(SHEET_LEAVE_BALANCE);
@@ -227,8 +233,10 @@ function validateLeaveSystemDatabase() {
     const headers = balanceSheet.getRange(1, 1, 1, balanceSheet.getLastColumn()).getValues()[0];
     const requiredHeaders = [
       '員工ID', '姓名', '到職日期', '年度',
-      '特休假', '病假', '事假', '婚假', '喪假',
-      '產假', '陪產假', '家庭照顧假', '生理假', '更新時間'
+      '特休假', '加班補休假', '事假', '未住院病假', '住院病假',
+      '喪假', '婚假', '陪產檢及陪產假', '產假',
+      '公假（含兵役假）', '公傷假', '曠工', '天然災害停班',
+      '家庭照顧假', '生理假', '更新時間'
     ];
     
     let allFieldsPresent = true;
@@ -241,7 +249,7 @@ function validateLeaveSystemDatabase() {
     });
     
     if (allFieldsPresent) {
-      Logger.log('   ✅ 所有欄位完整');
+      Logger.log('   ✅ 所有欄位完整（15種假別）');
       
       // 檢查是否有資料
       const rowCount = balanceSheet.getLastRow() - 1;
@@ -440,7 +448,7 @@ function previewAnnualLeaveCalculation() {
   const values = employeeSheet.getDataRange().getValues();
   
   Logger.log('📋 員工特休假預覽\n');
-  Logger.log('=' .repeat(80));
+  Logger.log('='.repeat(80));
   Logger.log(sprintf('%-30s %-15s %-8s %s', '姓名', '到職日期', '年資', '特休假'));
   Logger.log('-'.repeat(80));
   
@@ -472,7 +480,7 @@ function previewAnnualLeaveCalculation() {
     Logger.log(sprintf('%-30s %-15s %-8s %d天', name, dateStr, yearStr, annualLeave));
   }
   
-  Logger.log('=' .repeat(80));
+  Logger.log('='.repeat(80));
 }
 
 /**

@@ -5,16 +5,19 @@
 
 // ==================== ⭐ 格式化函數 (新增) ====================
 
-/**
- * ⭐ 格式化日期為 YYYY-MM-DD
- */
 function formatDateOnly(dateValue) {
   if (!dateValue) return "";
   
   let date;
   if (typeof dateValue === 'string') {
+    // 已經是 YYYY-MM-DD
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
       return dateValue;
+    }
+    // ⭐ 新增：支援 YYYY/M/D 或 YYYY/MM/DD 格式
+    if (/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(dateValue)) {
+      const parts = dateValue.split('/');
+      return `${parts[0]}-${String(parts[1]).padStart(2, '0')}-${String(parts[2]).padStart(2, '0')}`;
     }
     date = new Date(dateValue);
   } else if (dateValue instanceof Date) {
@@ -26,42 +29,41 @@ function formatDateOnly(dateValue) {
   return Utilities.formatDate(date, Session.getScriptTimeZone(), 'yyyy-MM-dd');
 }
 
-/**
- * ⭐ 格式化時間為 HH:MM
- */
 function formatTimeOnly(timeValue) {
-  if (!timeValue) return "";
-  
-  // 如果已經是 HH:MM 格式
-  if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
-    return timeValue;
-  }
-  
-  // 如果是 "HH:MM:SS" 格式
-  if (typeof timeValue === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(timeValue)) {
-    return timeValue.substring(0, 5); // 只取前5個字元
-  }
-  
-  // 如果是 Date 物件
-  if (timeValue instanceof Date) {
-    const hours = String(timeValue.getHours()).padStart(2, '0');
-    const minutes = String(timeValue.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }
-  
-  // 如果是時間戳字串
-  if (typeof timeValue === 'string') {
-    try {
-      const date = new Date(timeValue);
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
-    } catch (e) {
-      return String(timeValue);
+    // ⭐ 修正：改用 == null
+    if (timeValue == null || timeValue === '') return '00:00';
+    
+    if (typeof timeValue === 'string' && /^\d{2}:\d{2}$/.test(timeValue)) {
+        return timeValue;
     }
-  }
-  
-  return String(timeValue);
+    
+    // ⭐ 新增：處理 "0:00"
+    if (typeof timeValue === 'string' && /^\d{1}:\d{2}$/.test(timeValue)) {
+        return '0' + timeValue;
+    }
+    
+    if (typeof timeValue === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(timeValue)) {
+        return timeValue.substring(0, 5);
+    }
+    
+    if (timeValue instanceof Date) {
+        const hours = String(timeValue.getHours()).padStart(2, '0');
+        const minutes = String(timeValue.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    }
+    
+    if (typeof timeValue === 'string') {
+        try {
+            const date = new Date(timeValue);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        } catch (e) {
+            return '00:00';
+        }
+    }
+    
+    return String(timeValue);
 }
 
 /**
