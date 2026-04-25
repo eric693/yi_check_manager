@@ -1784,13 +1784,18 @@ function handleSaveMonthlySalary(params) {
     }
     
     const result = saveMonthlySalary(salaryData);
-    
-    return { 
-      ok: result.success, 
+
+    // 儲存成功後，標記該員工待扣預支為「已扣」
+    if (result.success && salaryData.employeeId) {
+      markAdvancesAsDeducted(salaryData.employeeId);
+    }
+
+    return {
+      ok: result.success,
       msg: result.message,
       salaryId: result.salaryId
     };
-    
+
   } catch (error) {
     Logger.log('❌ handleSaveMonthlySalary 錯誤: ' + error);
     return { ok: false, msg: error.message };

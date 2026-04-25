@@ -1485,6 +1485,76 @@
                     </div>
                     <div id="holiday-save-status" style="color:#10b981;font-size:0.875rem;min-height:1.25rem;"></div>
 
+                    <hr class="section-divider">
+
+                    <!-- 批次計算薪資 -->
+                    <div class="section-label" style="margin:1rem 0;">📊 批次計算薪資</div>
+                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;">一次計算所有員工指定月份的薪資，自動儲存結果並扣除待扣預支。</p>
+                    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
+                        <input type="month" id="batch-calc-month" class="form-input" style="width:160px;">
+                        <button onclick="batchCalculateSalary()"
+                                style="padding:0.6rem 1.5rem;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.5);color:#c4b5fd;border-radius:8px;cursor:pointer;font-weight:600;">
+                            ⚡ 一鍵計算所有員工薪資
+                        </button>
+                    </div>
+                    <div id="batch-calc-result" style="font-size:0.875rem;min-height:1.5rem;"></div>
+                    <div id="batch-calc-details" style="margin-top:0.75rem;display:none;">
+                        <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+                            <thead>
+                                <tr style="color:#94a3b8;border-bottom:1px solid rgba(255,255,255,0.1);">
+                                    <th style="text-align:left;padding:0.4rem 0.5rem;">員工</th>
+                                    <th style="text-align:right;padding:0.4rem 0.5rem;">實發</th>
+                                    <th style="text-align:center;padding:0.4rem 0.5rem;">狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batch-calc-tbody"></tbody>
+                        </table>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- 薪資預支管理 -->
+                    <div class="section-label" style="margin:1rem 0;">💳 薪資預支管理</div>
+                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;">新增員工薪資預支，下次計算薪資時自動從「其他扣款」扣除。</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.75rem;align-items:end;margin-bottom:1rem;">
+                        <div>
+                            <label class="form-label">員工</label>
+                            <select id="advance-employee-id" class="form-input">
+                                <option value="">— 選擇員工 —</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">預支金額 (NT$)</label>
+                            <input type="number" id="advance-amount" class="form-input" min="1" placeholder="例：5000">
+                        </div>
+                        <div>
+                            <label class="form-label">預支日期</label>
+                            <input type="date" id="advance-date" class="form-input">
+                        </div>
+                        <div>
+                            <button onclick="recordSalaryAdvance()"
+                                    style="padding:0.6rem 1.2rem;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.5);color:#fcd34d;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap;">
+                                + 新增預支
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">備註（選填）</label>
+                        <input type="text" id="advance-note" class="form-input" placeholder="例：急用、生活費...">
+                    </div>
+                    <div id="advance-msg" style="color:#10b981;font-size:0.875rem;min-height:1.25rem;margin:0.5rem 0;"></div>
+
+                    <!-- 預支記錄列表 -->
+                    <div style="margin-top:1rem;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                            <span style="color:#cbd5e1;font-size:0.875rem;">預支記錄</span>
+                            <button onclick="loadSalaryAdvances()" style="font-size:0.75rem;background:none;border:1px solid rgba(255,255,255,0.1);color:#94a3b8;border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;">重新整理</button>
+                        </div>
+                        <div id="advance-list" style="font-size:0.8rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.75rem;min-height:60px;">
+                            <span style="color:#64748b;">載入中...</span>
+                        </div>
+                    </div>
+
                 </div><!-- end system-config-content -->
             </div>
         </div>

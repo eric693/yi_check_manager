@@ -2324,6 +2324,22 @@ async function loadSystemConfig() {
     // Load holidays for current year
     await loadHolidayList();
 
+    // Init batch-calc month selector to current month
+    const batchMonthEl = document.getElementById('batch-calc-month');
+    if (batchMonthEl && !batchMonthEl.value) {
+      batchMonthEl.value = new Date().toISOString().slice(0, 7);
+    }
+
+    // Init advance date to today
+    const advDateEl = document.getElementById('advance-date');
+    if (advDateEl && !advDateEl.value) {
+      advDateEl.value = new Date().toISOString().slice(0, 10);
+    }
+
+    // Load employee list for advance dropdown
+    await loadEmployeeListForAdvance();
+    await loadSalaryAdvances();
+
   } catch (err) {
     console.error('loadSystemConfig error:', err);
     showNotification('載入系統設定失敗', 'error');
@@ -2470,5 +2486,140 @@ async function saveHolidayList() {
   } catch (err) {
     console.error('saveHolidayList error:', err);
     showNotification('儲存失敗', 'error');
+  }
+}
+
+// ==================== 批次計算薪資 ====================
+
+async function batchCalculateSalary() {
+  const monthEl = document.getElementById('batch-calc-month');
+  const yearMonth = monthEl ? monthEl.value : '';
+  if (!yearMonth) {
+    showNotification('請選擇年月', 'error');
+    return;
+  }
+  if (!confirm(`確定要計算 ${yearMonth} 所有員工的薪資嗎？\n此操作會覆蓋已存在的薪資記錄並扣除待扣預支。`)) return;
+
+  const resultEl = document.getElementById('batch-calc-result');
+  const detailsEl = document.getElementById('batch-calc-details');
+  const tbodyEl = document.getElementById('batch-calc-tbody');
+  if (resultEl) resultEl.innerHTML = '<span style="color:#94a3b8;">計算中，請稍候...</span>';
+  if (detailsEl) detailsEl.style.display = 'none';
+
+  try {
+    const res = await callApifetch(`batchCalculateSalary&yearMonth=${encodeURIComponent(yearMonth)}`);
+    if (!res.ok) {
+      if (resultEl) resultEl.innerHTML = `<span style="color:#f87171;">失敗：${res.msg || '未知錯誤'}</span>`;
+      return;
+    }
+    if (resultEl) {
+      resultEl.innerHTML = `<span style="color:#10b981;">✅ 計算完成：成功 ${res.successCount} 人，失敗 ${res.failCount} 人</span>`;
+    }
+    if (tbodyEl && res.details && res.details.length > 0) {
+      tbodyEl.innerHTML = res.details.map(d => `
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:0.4rem 0.5rem;color:#cbd5e1;">${d.employeeName || d.employeeId}</td>
+          <td style="padding:0.4rem 0.5rem;text-align:right;color:#e2e8f0;">${d.ok ? formatCurrency(d.netSalary) : '-'}</td>
+          <td style="padding:0.4rem 0.5rem;text-align:center;">
+            ${d.ok ? '<span style="color:#10b981;">✅</span>' : `<span style="color:#f87171;" title="${d.msg || ''}">❌</span>`}
+          </td>
+        </tr>`).join('');
+      if (detailsEl) detailsEl.style.display = 'block';
+    }
+  } catch (err) {
+    console.error('batchCalculateSalary error:', err);
+    if (resultEl) resultEl.innerHTML = '<span style="color:#f87171;">執行失敗，請查看 console</span>';
+  }
+}
+
+// ==================== 薪資預支管理 ====================
+
+async function loadEmployeeListForAdvance() {
+  const sel = document.getElementById('advance-employee-id');
+  if (!sel) return;
+  try {
+    const res = await callApifetch('getAllEmployeeBasicInfo');
+    if (res.ok && res.data) {
+      const current = sel.value;
+      sel.innerHTML = '<option value="">— 選擇員工 —</option>';
+      res.data.forEach(emp => {
+        const id = emp['員工ID'] || emp.userId || '';
+        const name = emp['員工姓名'] || emp.name || id;
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = name;
+        if (id === current) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
+  } catch (err) {
+    console.error('loadEmployeeListForAdvance error:', err);
+  }
+}
+
+async function recordSalaryAdvance() {
+  const employeeId = document.getElementById('advance-employee-id')?.value;
+  const amount = parseFloat(document.getElementById('advance-amount')?.value || '0');
+  const date = document.getElementById('advance-date')?.value;
+  const note = document.getElementById('advance-note')?.value || '';
+  const msgEl = document.getElementById('advance-msg');
+
+  if (!employeeId) { if (msgEl) msgEl.textContent = '請選擇員工'; return; }
+  if (amount <= 0) { if (msgEl) msgEl.textContent = '請輸入正確金額'; return; }
+
+  try {
+    const res = await callApifetch(
+      `recordSalaryAdvance&employeeId=${encodeURIComponent(employeeId)}&amount=${amount}&date=${encodeURIComponent(date)}&note=${encodeURIComponent(note)}`
+    );
+    if (res.ok) {
+      if (msgEl) msgEl.innerHTML = `<span style="color:#10b981;">✅ ${res.msg}</span>`;
+      document.getElementById('advance-amount').value = '';
+      document.getElementById('advance-note').value = '';
+      await loadSalaryAdvances();
+    } else {
+      if (msgEl) msgEl.innerHTML = `<span style="color:#f87171;">❌ ${res.msg || '新增失敗'}</span>`;
+    }
+  } catch (err) {
+    console.error('recordSalaryAdvance error:', err);
+    if (msgEl) msgEl.textContent = '執行失敗';
+  }
+}
+
+async function loadSalaryAdvances() {
+  const listEl = document.getElementById('advance-list');
+  if (!listEl) return;
+  try {
+    const res = await callApifetch('getSalaryAdvances');
+    if (!res.ok || !res.data || res.data.length === 0) {
+      listEl.innerHTML = '<span style="color:#64748b;">目前無預支記錄</span>';
+      return;
+    }
+    listEl.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="color:#94a3b8;border-bottom:1px solid rgba(255,255,255,0.1);">
+            <th style="text-align:left;padding:0.3rem 0.5rem;">員工</th>
+            <th style="text-align:left;padding:0.3rem 0.5rem;">日期</th>
+            <th style="text-align:right;padding:0.3rem 0.5rem;">金額</th>
+            <th style="text-align:center;padding:0.3rem 0.5rem;">狀態</th>
+            <th style="text-align:left;padding:0.3rem 0.5rem;">備註</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${res.data.map(r => `
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:0.3rem 0.5rem;color:#cbd5e1;">${r.employeeName || r.employeeId}</td>
+              <td style="padding:0.3rem 0.5rem;color:#94a3b8;">${r.date}</td>
+              <td style="padding:0.3rem 0.5rem;text-align:right;color:#fcd34d;">${formatCurrency(r.amount)}</td>
+              <td style="padding:0.3rem 0.5rem;text-align:center;">
+                <span style="color:${r.status === '待扣' ? '#f59e0b' : '#10b981'};">${r.status}</span>
+              </td>
+              <td style="padding:0.3rem 0.5rem;color:#64748b;">${r.note || ''}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch (err) {
+    console.error('loadSalaryAdvances error:', err);
+    listEl.innerHTML = '<span style="color:#f87171;">載入失敗</span>';
   }
 }
