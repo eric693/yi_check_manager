@@ -682,7 +682,15 @@ function displayEmployeeSalary(data) {
         (parseFloat(data.groupInsurance) || 0) +
         (parseFloat(data.otherDeductions) || 0);
     safeSet('detail-other-deductions', formatCurrency(otherDeductions));
-    
+
+    // 預支扣款子項顯示
+    const advanceDeduction = parseFloat(data.advanceDeduction) || 0;
+    const advRow = document.getElementById('detail-advance-row');
+    if (advRow) {
+      advRow.style.display = advanceDeduction > 0 ? 'flex' : 'none';
+    }
+    safeSet('detail-advance-deduction', formatCurrency(advanceDeduction));
+
     // 銀行資訊
     let bankCode = data.bankCode;
     const bankAccount = data.bankAccount;

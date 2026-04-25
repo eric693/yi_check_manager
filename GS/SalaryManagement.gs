@@ -1757,6 +1757,7 @@ function calculateHourlySalary(employeeId, yearMonth) {
                        otherAllowances +
                        weekdayOvertimePay +
                        restdayOvertimePay +
+                       sundayOvertimePay +
                        holidayOvertimePay +
                        holidayWorkPay;
     
@@ -1833,9 +1834,9 @@ function calculateHourlySalary(employeeId, yearMonth) {
       if (otherDeductions > 0) Logger.log(`   - 其他扣款: $${otherDeductions}`);
     }
     
-    // 12. 扣款總額（加入請假扣款）
+    // 12. 扣款總額
     const totalDeductions = laborFee + healthFee + employmentFee + pensionSelf + incomeTax +
-                           leaveDeduction +
+                           leaveDeduction + earlyLeaveDeduction +
                            welfareFee + dormitoryFee + groupInsurance + otherDeductions;
     
     Logger.log(`💸 扣款總額: $${totalDeductions}`);
@@ -2287,13 +2288,20 @@ function calculateMonthlySalary(employeeId, yearMonth) {
       result = calculateMonthlySalaryInternal(employeeId, yearMonth);
     }
 
-    // 3. 預支扣帳：查詢待扣記錄，合併至 otherDeductions
+    // 3. 預支扣帳：查詢待扣記錄，合併至 otherDeductions，同步更新 netSalary
     if (result.success && result.data) {
       const advanceAmt = getPendingAdvanceTotal(employeeId);
       if (advanceAmt > 0) {
         result.data.advanceDeduction = advanceAmt;
-        result.data.otherDeductions = (result.data.otherDeductions || 0) + advanceAmt;
-        result.data.netSalary = Math.round(result.data.netSalary - advanceAmt);
+        result.data.otherDeductions = Math.round((result.data.otherDeductions || 0) + advanceAmt);
+        // grossSalary 不變（預支是扣款，不影響應發），只調整實發
+        result.data.netSalary = Math.round((result.data.grossSalary || 0) -
+          (result.data.laborFee || 0) - (result.data.healthFee || 0) -
+          (result.data.employmentFee || 0) - (result.data.pensionSelf || 0) -
+          (result.data.incomeTax || 0) - (result.data.leaveDeduction || 0) -
+          (result.data.earlyLeaveDeduction || 0) - (result.data.welfareFee || 0) -
+          (result.data.dormitoryFee || 0) - (result.data.groupInsurance || 0) -
+          result.data.otherDeductions);
         result.data.note = (result.data.note || '') + `，薪資預支扣款 $${advanceAmt}`;
         Logger.log(`💳 預支扣款: $${advanceAmt}，新實發: $${result.data.netSalary}`);
       }
