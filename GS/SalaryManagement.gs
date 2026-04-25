@@ -24,6 +24,7 @@ const SYSTEM_CONFIG_DEFAULTS = {
   CANCEL_BONUS_PERSONAL: 1,    // 事假取消全勤獎金（1=是）
   CANCEL_BONUS_SICK:    0,     // 病假取消全勤獎金（0=否）
   DEFAULT_PAYMENT_DAY:  5,     // 預設發薪日
+  HOLIDAY_WORK_AS_NORMAL: 0,   // 國定假日上班不給加班費（1=是，視為平日）
 };
 
 const SYSTEM_CONFIG_LABELS = {
@@ -43,6 +44,7 @@ const SYSTEM_CONFIG_LABELS = {
   CANCEL_BONUS_PERSONAL:'事假取消全勤(1=是,0=否)',
   CANCEL_BONUS_SICK:    '病假取消全勤(1=是,0=否)',
   DEFAULT_PAYMENT_DAY:  '預設發薪日(每月幾號)',
+  HOLIDAY_WORK_AS_NORMAL:'國定假日上班不給加班費(1=是,0=否)',
 };
 
 // Module-level cache for system config (avoids repeated Sheet reads per request)
@@ -1588,7 +1590,8 @@ function calculateHourlySalary(employeeId, yearMonth) {
       }
 
       // ⭐⭐⭐ 關鍵：國定假日分別計算正常薪資與加班費
-      if (dateType === 'holiday') {
+      const _holidayAsNormal1 = parseInt(_sysC1.HOLIDAY_WORK_AS_NORMAL) === 1;
+      if (dateType === 'holiday' && !_holidayAsNormal1) {
         if (isFullTime) {
           // 正職 → 補休，不計費
           holidayCompHours += dailyHours;
@@ -1605,8 +1608,16 @@ function calculateHourlySalary(employeeId, yearMonth) {
           Logger.log(`   - 加班費: $${Math.round(overtimePay)} (×2.0)`);
           Logger.log(`   ✅ 兼職員工國定假日: $${Math.round(normalPay + overtimePay)}`);
         }
-        
+
       } else {
+        // 若 HOLIDAY_WORK_AS_NORMAL=1，國定假日視為平日計算（無加班費）
+        if (dateType === 'holiday' && _holidayAsNormal1) {
+          const normalPay = hourlyRate * dailyHours * 1.0;
+          weekdayOvertimePay += normalPay;
+          totalOvertimeHours += dailyHours;
+          Logger.log(`   ✅ 國定假日視為平日（無加班費）: $${Math.round(normalPay)}`);
+          return;
+        }
         // 其他日期類型：平日/休息日/例假日
         const pay = calculateOvertimePay(dailyHours, hourlyRate, dateType);
         const totalPay = pay.firstPay + pay.secondPay + pay.thirdPay;
@@ -2378,7 +2389,8 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
       }
       
       // 國定假日分別計算正常薪資與加班費
-      if (dateType === 'holiday') {
+      const _holidayAsNormal2 = parseInt(_sysC2.HOLIDAY_WORK_AS_NORMAL) === 1;
+      if (dateType === 'holiday' && !_holidayAsNormal2) {
         if (isFullTime) {
           // 正職 → 補休，不計費
           holidayCompHours += dailyHours;
@@ -2395,8 +2407,16 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
           Logger.log(`   - 加班費: $${Math.round(overtimePay)} (×2.0)`);
           Logger.log(`   ✅ 兼職員工國定假日: $${Math.round(normalPay + overtimePay)}`);
         }
-        
+
       } else {
+        // 若 HOLIDAY_WORK_AS_NORMAL=1，國定假日視為平日計算（無加班費）
+        if (dateType === 'holiday' && _holidayAsNormal2) {
+          const normalPay = hourlyRate * dailyHours * 1.0;
+          weekdayOvertimePay += normalPay;
+          totalOvertimeHours += dailyHours;
+          Logger.log(`   ✅ 國定假日視為平日（無加班費）: $${Math.round(normalPay)}`);
+          return;
+        }
         // 其他日期類型
         const pay = calculateOvertimePay(dailyHours, hourlyRate, dateType);
         const totalPay = pay.firstPay + pay.secondPay + pay.thirdPay;
