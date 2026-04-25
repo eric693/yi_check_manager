@@ -3,6 +3,221 @@
 // ==================== 常數定義 ====================
 
 const SHEET_SALARY_CONFIG_ENHANCED = "員工薪資設定";
+const SHEET_SYSTEM_CONFIG = "系統設定";
+
+// ==================== 系統設定（管理員可配置） ====================
+
+const SYSTEM_CONFIG_DEFAULTS = {
+  OVERTIME_WEEKDAY_1:   1.34,  // 平日加班前2小時費率
+  OVERTIME_WEEKDAY_2:   1.67,  // 平日加班3小時起費率
+  OVERTIME_RESTDAY_1:   1.34,  // 休息日前2小時費率
+  OVERTIME_RESTDAY_2:   1.67,  // 休息日3-8小時費率
+  OVERTIME_RESTDAY_3:   2.67,  // 休息日9小時起費率
+  OVERTIME_SUNDAY:      2.0,   // 例假日（週日）加班費率
+  OVERTIME_HOLIDAY:     2.0,   // 國定假日加班費率
+  MAX_OT_WEEKDAY:       4,     // 平日最多加班時數
+  MAX_OT_RESTDAY:       12,    // 休息日最多加班時數
+  MAX_OT_HOLIDAY:       8,     // 國定假日最多加班時數
+  DAILY_WORK_HOURS:     8,     // 每日標準工時
+  MONTHLY_WORK_DAYS:    30,    // 月薪計算基準天數
+  SICK_LEAVE_RATE:      0.5,   // 病假扣薪率（0.5 = 半薪）
+  CANCEL_BONUS_PERSONAL: 1,    // 事假取消全勤獎金（1=是）
+  CANCEL_BONUS_SICK:    0,     // 病假取消全勤獎金（0=否）
+  DEFAULT_PAYMENT_DAY:  5,     // 預設發薪日
+};
+
+const SYSTEM_CONFIG_LABELS = {
+  OVERTIME_WEEKDAY_1:   '平日加班前2小時費率',
+  OVERTIME_WEEKDAY_2:   '平日加班3小時起費率',
+  OVERTIME_RESTDAY_1:   '休息日前2小時費率',
+  OVERTIME_RESTDAY_2:   '休息日3-8小時費率',
+  OVERTIME_RESTDAY_3:   '休息日9小時起費率',
+  OVERTIME_SUNDAY:      '例假日加班費率',
+  OVERTIME_HOLIDAY:     '國定假日加班費率',
+  MAX_OT_WEEKDAY:       '平日最多加班時數(h)',
+  MAX_OT_RESTDAY:       '休息日最多加班時數(h)',
+  MAX_OT_HOLIDAY:       '國定假日最多加班時數(h)',
+  DAILY_WORK_HOURS:     '每日標準工時(h)',
+  MONTHLY_WORK_DAYS:    '月薪計算基準天數',
+  SICK_LEAVE_RATE:      '病假扣薪率(0~1)',
+  CANCEL_BONUS_PERSONAL:'事假取消全勤(1=是,0=否)',
+  CANCEL_BONUS_SICK:    '病假取消全勤(1=是,0=否)',
+  DEFAULT_PAYMENT_DAY:  '預設發薪日(每月幾號)',
+};
+
+// Module-level cache for system config (avoids repeated Sheet reads per request)
+let _sysConfigCache = null;
+let _sysConfigCacheTime = 0;
+const SYS_CONFIG_CACHE_TTL = 5 * 60 * 1000; // 5 minutes in ms (not used in GAS, just for clarity)
+
+/**
+ * 取得或建立「系統設定」試算表
+ */
+function getSystemConfigSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_SYSTEM_CONFIG);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_SYSTEM_CONFIG);
+    sheet.getRange(1, 1, 1, 4).setValues([['設定鍵', '設定值', '說明', '最後更新']]);
+    sheet.getRange(1, 1, 1, 4).setFontWeight('bold').setBackground('#10b981').setFontColor('#ffffff');
+    sheet.setFrozenRows(1);
+    Logger.log('✅ 建立系統設定試算表');
+  }
+  return sheet;
+}
+
+/**
+ * 讀取所有系統設定，回傳 key→value 物件（已合併預設值）
+ */
+function getSystemConfig() {
+  if (_sysConfigCache !== null) return _sysConfigCache;
+  const sheet = getSystemConfigSheet();
+  const config = Object.assign({}, SYSTEM_CONFIG_DEFAULTS);
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    const key = String(data[i][0]).trim();
+    const val = data[i][1];
+    if (key) config[key] = val;
+  }
+  _sysConfigCache = config;
+  return config;
+}
+
+/**
+ * 取得單一系統設定值（含預設值 fallback）
+ */
+function getSystemConfigValue(key, defaultVal) {
+  const cfg = getSystemConfig();
+  const v = cfg[key];
+  if (v === undefined || v === '' || v === null) return defaultVal;
+  return v;
+}
+
+/**
+ * 寫入多個設定值（key→value 物件）
+ */
+function writeSystemConfig(updates) {
+  const sheet = getSystemConfigSheet();
+  const data = sheet.getDataRange().getValues();
+  const keyToRow = {}; // key → row index (1-based)
+  for (let i = 1; i < data.length; i++) {
+    keyToRow[String(data[i][0]).trim()] = i + 1;
+  }
+  const now = new Date().toISOString();
+  Object.keys(updates).forEach(key => {
+    const val = updates[key];
+    const label = SYSTEM_CONFIG_LABELS[key] || key;
+    if (keyToRow[key]) {
+      sheet.getRange(keyToRow[key], 2).setValue(val);
+      sheet.getRange(keyToRow[key], 4).setValue(now);
+    } else {
+      const nextRow = sheet.getLastRow() + 1;
+      sheet.getRange(nextRow, 1, 1, 4).setValues([[key, val, label, now]]);
+    }
+  });
+  Logger.log('✅ 系統設定已更新: ' + JSON.stringify(updates));
+}
+
+/**
+ * API 處理器：取得系統設定（管理員）
+ */
+function handleGetSystemConfig(params) {
+  try {
+    const session = handleCheckSession(params.token);
+    if (!session.ok) return { ok: false, msg: 'SESSION_INVALID', code: 'SESSION_INVALID' };
+    if (session.user.dept !== '管理員') return { ok: false, msg: '僅限管理員', code: 'PERMISSION_DENIED' };
+
+    const cfg = getSystemConfig();
+    // Also load holidays list
+    const year = new Date().getFullYear();
+    const holidaysKey = 'HOLIDAYS_' + year;
+    const nextHolidaysKey = 'HOLIDAYS_' + (year + 1);
+    cfg['HOLIDAYS_CURRENT_YEAR'] = year;
+    cfg['HOLIDAYS_KEY'] = holidaysKey;
+
+    return { ok: true, data: cfg };
+  } catch (e) {
+    Logger.log('❌ handleGetSystemConfig: ' + e);
+    return { ok: false, msg: e.toString(), code: 'ERROR' };
+  }
+}
+
+/**
+ * API 處理器：儲存系統設定（管理員）
+ * params.configJson — JSON string of key→value updates
+ */
+function handleSaveSystemConfig(params) {
+  try {
+    const session = handleCheckSession(params.token);
+    if (!session.ok) return { ok: false, msg: 'SESSION_INVALID', code: 'SESSION_INVALID' };
+    if (session.user.dept !== '管理員') return { ok: false, msg: '僅限管理員', code: 'PERMISSION_DENIED' };
+
+    const updates = JSON.parse(params.configJson || '{}');
+    writeSystemConfig(updates);
+    return { ok: true, msg: '系統設定已儲存' };
+  } catch (e) {
+    Logger.log('❌ handleSaveSystemConfig: ' + e);
+    return { ok: false, msg: e.toString(), code: 'ERROR' };
+  }
+}
+
+/**
+ * API 處理器：取得指定年份的國定假日清單（管理員）
+ */
+function handleGetHolidays(params) {
+  try {
+    const session = handleCheckSession(params.token);
+    if (!session.ok) return { ok: false, msg: 'SESSION_INVALID', code: 'SESSION_INVALID' };
+    if (session.user.dept !== '管理員') return { ok: false, msg: '僅限管理員', code: 'PERMISSION_DENIED' };
+
+    const year = parseInt(params.year) || new Date().getFullYear();
+    const key = 'HOLIDAYS_' + year;
+    const stored = getSystemConfigValue(key, null);
+
+    let holidays;
+    if (stored) {
+      holidays = String(stored).split(',').map(s => s.trim()).filter(Boolean);
+    } else if (year === 2026) {
+      holidays = TAIWAN_HOLIDAYS_2026.slice(); // return built-in defaults
+    } else {
+      holidays = [];
+    }
+
+    return { ok: true, year: year, holidays: holidays };
+  } catch (e) {
+    Logger.log('❌ handleGetHolidays: ' + e);
+    return { ok: false, msg: e.toString(), code: 'ERROR' };
+  }
+}
+
+/**
+ * API 處理器：儲存指定年份的國定假日清單（管理員）
+ * params.year, params.holidays — comma-separated date string or JSON array string
+ */
+function handleSaveHolidays(params) {
+  try {
+    const session = handleCheckSession(params.token);
+    if (!session.ok) return { ok: false, msg: 'SESSION_INVALID', code: 'SESSION_INVALID' };
+    if (session.user.dept !== '管理員') return { ok: false, msg: '僅限管理員', code: 'PERMISSION_DENIED' };
+
+    const year = parseInt(params.year) || new Date().getFullYear();
+    const key = 'HOLIDAYS_' + year;
+
+    let holidaysStr;
+    if (params.holidaysJson) {
+      const arr = JSON.parse(params.holidaysJson);
+      holidaysStr = arr.join(',');
+    } else {
+      holidaysStr = params.holidays || '';
+    }
+
+    writeSystemConfig({ [key]: holidaysStr });
+    return { ok: true, msg: `${year} 年國定假日已儲存` };
+  } catch (e) {
+    Logger.log('❌ handleSaveHolidays: ' + e);
+    return { ok: false, msg: e.toString(), code: 'ERROR' };
+  }
+}
 const SHEET_MONTHLY_SALARY_ENHANCED = "月薪資記錄";
 
 // 台灣法定最低薪資（2025）
@@ -51,11 +266,22 @@ const TAIWAN_HOLIDAYS_2026 = [
 ];
 
 /**
- * ✅ 判斷是否為國定假日
+ * ✅ 判斷是否為國定假日（優先讀系統設定，回退內建清單）
  * @param {string} dateStr - 日期字串 (YYYY-MM-DD)
  * @returns {boolean}
  */
 function isNationalHoliday(dateStr) {
+  try {
+    const year = dateStr.substring(0, 4);
+    const key = 'HOLIDAYS_' + year;
+    const stored = getSystemConfigValue(key, null);
+    if (stored) {
+      const list = String(stored).split(',').map(s => s.trim());
+      return list.includes(dateStr);
+    }
+  } catch (e) {
+    // fall through to built-in list
+  }
   return TAIWAN_HOLIDAYS_2026.includes(dateStr);
 }
 
@@ -111,44 +337,42 @@ function getDateType(dateStr) {
  * @returns {Object} { firstPay, secondPay, thirdPay }
  */
 function calculateOvertimePay(hours, hourlyRate, dateType) {
-  let firstPay = 0;   // 前2小時
-  let secondPay = 0;  // 3-8小時
-  let thirdPay = 0;   // 9小時起
-  
+  const cfg = getSystemConfig();
+  const r_wd1  = parseFloat(cfg.OVERTIME_WEEKDAY_1)  || 1.34;
+  const r_wd2  = parseFloat(cfg.OVERTIME_WEEKDAY_2)  || 1.67;
+  const r_rd1  = parseFloat(cfg.OVERTIME_RESTDAY_1)  || 1.34;
+  const r_rd2  = parseFloat(cfg.OVERTIME_RESTDAY_2)  || 1.67;
+  const r_rd3  = parseFloat(cfg.OVERTIME_RESTDAY_3)  || 2.67;
+  const r_sun  = parseFloat(cfg.OVERTIME_SUNDAY)     || 2.0;
+  const r_hol  = parseFloat(cfg.OVERTIME_HOLIDAY)    || 2.0;
+
+  let firstPay = 0;
+  let secondPay = 0;
+  let thirdPay = 0;
+
   if (dateType === 'weekday') {
-    // ⭐ 平日加班：前2h ×1.34，3h起 ×1.67
     const first = Math.min(hours, 2);
-    firstPay = hourlyRate * first * 1.34;
-    
+    firstPay = hourlyRate * first * r_wd1;
     if (hours > 2) {
-      const rest = Math.min(hours - 2, 2); // 最多再算2小時（總共4h）
-      secondPay = hourlyRate * rest * 1.67;
+      const rest = Math.min(hours - 2, 2);
+      secondPay = hourlyRate * rest * r_wd2;
     }
-    
   } else if (dateType === 'restday') {
-    // ⭐ 休息日（週六）：前2h ×1.34，3-8h ×1.67，9h起 ×2.67
     const first = Math.min(hours, 2);
-    firstPay = hourlyRate * first * 1.34;
-    
+    firstPay = hourlyRate * first * r_rd1;
     if (hours > 2) {
-      const second = Math.min(hours - 2, 6); // 3-8h
-      secondPay = hourlyRate * second * 1.67;
+      const second = Math.min(hours - 2, 6);
+      secondPay = hourlyRate * second * r_rd2;
     }
-    
     if (hours > 8) {
-      const third = hours - 8; // 9h起
-      thirdPay = hourlyRate * third * 2.67;
+      thirdPay = hourlyRate * (hours - 8) * r_rd3;
     }
-    
   } else if (dateType === 'sunday') {
-    // ⭐ 例假日（週日）：全天 ×2.0（僅加班費）
-    firstPay = hourlyRate * hours * 2.0;
-    
+    firstPay = hourlyRate * hours * r_sun;
   } else if (dateType === 'holiday') {
-    // ⭐⭐⭐ 國定假日：全天 ×2.0（僅加班費，正常薪資另計）
-    firstPay = hourlyRate * hours * 2.0;
+    firstPay = hourlyRate * hours * r_hol;
   }
-  
+
   return {
     firstPay: Math.round(firstPay),
     secondPay: Math.round(secondPay),
@@ -1336,11 +1560,12 @@ function calculateHourlySalary(employeeId, yearMonth) {
     Logger.log(`👤 員工類型: ${employeeType}`);
 
     let holidayCompHours = 0;
-    
+    const _sysC1 = getSystemConfig(); // hoist outside loop
+
     // ⭐⭐⭐ 遍歷每天的加班記錄（區分四種日期類型）
     Object.keys(overtimeByDate).forEach(date => {
       let dailyHours = overtimeByDate[date];
-      
+
       // 判斷日期類型
       const dateType = getDateType(date);
       const dateTypeName = {
@@ -1349,19 +1574,19 @@ function calculateHourlySalary(employeeId, yearMonth) {
         'sunday': '例假日（週日）',
         'holiday': '國定假日'
       }[dateType];
-      
+
       Logger.log(`\n📅 ${date} (${dateTypeName}): ${dailyHours.toFixed(1)}h`);
-      
-      // ⭐ 根據日期類型限制加班時數
-      let maxHours = 4; // 平日最多4h
-      if (dateType === 'restday') maxHours = 12; // 休息日最多12h
-      if (dateType === 'holiday') maxHours = 8;  // 國定假日最多8h
-      
+
+      // ⭐ 根據日期類型限制加班時數（讀系統設定）
+      let maxHours = parseFloat(_sysC1.MAX_OT_WEEKDAY) || 4;
+      if (dateType === 'restday') maxHours = parseFloat(_sysC1.MAX_OT_RESTDAY) || 12;
+      if (dateType === 'holiday') maxHours = parseFloat(_sysC1.MAX_OT_HOLIDAY) || 8;
+
       if (dailyHours > maxHours) {
         Logger.log(`   ⚠️ 超過上限 (${dailyHours}h > ${maxHours}h)，限制為 ${maxHours}h`);
         dailyHours = maxHours;
       }
-      
+
       // ⭐⭐⭐ 關鍵：國定假日分別計算正常薪資與加班費
       if (dateType === 'holiday') {
         if (isFullTime) {
@@ -1462,24 +1687,27 @@ function calculateHourlySalary(employeeId, yearMonth) {
     if (leaveRecords.success && leaveRecords.data && leaveRecords.data.length > 0) {
       Logger.log(`📋 找到 ${leaveRecords.data.length} 筆請假記錄`);
       
+      const _sysCLeave1 = getSystemConfig();
+      const _dailyWorkHours1 = parseFloat(_sysCLeave1.DAILY_WORK_HOURS) || 8;
+      const _sickLeaveRate1  = parseFloat(_sysCLeave1.SICK_LEAVE_RATE)  || 0.5;
+      const _cancelBonusSick1     = parseInt(_sysCLeave1.CANCEL_BONUS_SICK)     || 0;
+      const _cancelBonusPersonal1 = parseInt(_sysCLeave1.CANCEL_BONUS_PERSONAL) !== 0 ? 1 : 0;
+
       leaveRecords.data.forEach(record => {
         if (record.reviewStatus === '核准') {
           const leaveType = String(record.leaveType).toUpperCase();
           const days = parseFloat(record.leaveDays) || 0;
-          const dailyHours = 8; // 一天工作8小時
-          const deductionHours = days * dailyHours; // ⭐ 轉換為時數
-          
-          // ⭐ 病假：扣半薪（時薪 × 工時 × 50%）
+          const deductionHours = days * _dailyWorkHours1;
+
           if (leaveType === 'SICK_LEAVE' || leaveType === '病假') {
-            sickLeaveHours += deductionHours; // ⭐ 累計時數
-            const deduction = Math.round(hourlyRate * deductionHours * 0.5);
+            sickLeaveHours += deductionHours;
+            const deduction = Math.round(hourlyRate * deductionHours * _sickLeaveRate1);
             sickLeaveDeduction += deduction;
-            Logger.log(`   病假 ${days} 天 = ${deductionHours}h × $${hourlyRate} × 50% = $${deduction}`);
+            Logger.log(`   病假 ${days} 天 = ${deductionHours}h × $${hourlyRate} × ${_sickLeaveRate1} = $${deduction}`);
           }
-          
-          // ⭐ 事假：扣全薪（時薪 × 工時）
+
           if (leaveType === 'PERSONAL_LEAVE' || leaveType === '事假') {
-            personalLeaveHours += deductionHours; // ⭐ 累計時數
+            personalLeaveHours += deductionHours;
             const deduction = Math.round(hourlyRate * deductionHours);
             personalLeaveDeduction += deduction;
             Logger.log(`   事假 ${days} 天 = ${deductionHours}h × $${hourlyRate} = $${deduction}`);
@@ -1494,24 +1722,28 @@ function calculateHourlySalary(employeeId, yearMonth) {
       Logger.log(`   事假: ${personalLeaveHours} 小時，扣款 $${personalLeaveDeduction} (全薪)`);
       Logger.log(`   合計扣款: $${leaveDeduction}`);
 
-      // 只有事假才取消全勤獎金；病假依勞基法不影響全勤
-      if (personalLeaveDeduction > 0) {
+      // 根據系統設定決定哪種假別會取消全勤獎金
+      if (_cancelBonusPersonal1 && personalLeaveDeduction > 0) {
         attendanceBonus = 0;
         Logger.log(`⚠️ 有事假記錄，取消全勤獎金`);
+      }
+      if (_cancelBonusSick1 && sickLeaveDeduction > 0) {
+        attendanceBonus = 0;
+        Logger.log(`⚠️ 有病假記錄，取消全勤獎金`);
       }
     } else {
       Logger.log(`✅ 無請假記錄`);
     }
 
     // 9. 應發總額
-    const grossSalary = basePay + 
-                       positionAllowance + 
-                       mealAllowance + 
-                       transportAllowance + 
-                       attendanceBonus + 
-                       performanceBonus + 
+    const grossSalary = basePay +
+                       positionAllowance +
+                       mealAllowance +
+                       transportAllowance +
+                       attendanceBonus +
+                       performanceBonus +
                        otherAllowances +
-                       weekdayOvertimePay + 
+                       weekdayOvertimePay +
                        restdayOvertimePay +
                        holidayOvertimePay +
                        holidayWorkPay;
@@ -2070,11 +2302,14 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
     // 3. 取得請假記錄
     const leaveRecords = getEmployeeMonthlyLeave(employeeId, yearMonth);
     
-    // 4. 基本薪資
+    // 4. 基本薪資（讀系統設定取得月工作天數與每日工時）
+    const _sysCBase = getSystemConfig();
+    const _monthlyDays = parseFloat(_sysCBase.MONTHLY_WORK_DAYS) || 30;
+    const _dailyHoursBase = parseFloat(_sysCBase.DAILY_WORK_HOURS) || 8;
     const baseSalary = parseFloat(config['基本薪資']) || 0;
-    const hourlyRateExact = baseSalary / 30 / 8; // 精確時薪，不先 round 避免累積誤差
-    
-    Logger.log(`💵 基本薪資: ${baseSalary}, 時薪: ${hourlyRate}`);
+    const hourlyRateExact = baseSalary / _monthlyDays / _dailyHoursBase; // 精確時薪，不先 round 避免累積誤差
+
+    Logger.log(`💵 基本薪資: ${baseSalary}, 月工作天數: ${_monthlyDays}, 每日工時: ${_dailyHoursBase}, 時薪: ${hourlyRateExact.toFixed(2)}`);
     
     // 5. 固定津貼
     const positionAllowance = parseFloat(config['職務加給']) || 0;
@@ -2116,10 +2351,11 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
     const isFullTime = (employeeType === '正職');
     let holidayCompHours = 0;
     Logger.log(`👤 員工類型: ${employeeType}`);
+    const _sysC2 = getSystemConfig(); // hoist outside loop
     // 遍歷每天的加班記錄
     Object.keys(overtimeByDate).forEach(date => {
       let dailyHours = overtimeByDate[date];
-      
+
       // 判斷日期類型
       const dateType = getDateType(date);
       const dateTypeName = {
@@ -2128,14 +2364,14 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
         'sunday': '例假日（週日）',
         'holiday': '國定假日'
       }[dateType];
-      
+
       Logger.log(`\n📅 ${date} (${dateTypeName}): ${dailyHours.toFixed(1)}h`);
-      
-      // 根據日期類型限制加班時數
-      let maxHours = 4; // 平日最多4h
-      if (dateType === 'restday') maxHours = 12; // 休息日最多12h
-      if (dateType === 'holiday') maxHours = 8;  // 國定假日最多8h
-      
+
+      // 根據日期類型限制加班時數（讀系統設定）
+      let maxHours = parseFloat(_sysC2.MAX_OT_WEEKDAY) || 4;
+      if (dateType === 'restday') maxHours = parseFloat(_sysC2.MAX_OT_RESTDAY) || 12;
+      if (dateType === 'holiday') maxHours = parseFloat(_sysC2.MAX_OT_HOLIDAY) || 8;
+
       if (dailyHours > maxHours) {
         Logger.log(`   ⚠️ 超過上限 (${dailyHours}h > ${maxHours}h)，限制為 ${maxHours}h`);
         dailyHours = maxHours;
@@ -2275,45 +2511,54 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
     let personalLeaveHours = 0;   
     let personalLeaveDeduction = 0;
     
+    const _sysCLeave2 = getSystemConfig();
+    const _dailyWorkHours2      = parseFloat(_sysCLeave2.DAILY_WORK_HOURS)      || 8;
+    const _monthlyWorkDays2     = parseFloat(_sysCLeave2.MONTHLY_WORK_DAYS)     || 30;
+    const _sickLeaveRate2       = parseFloat(_sysCLeave2.SICK_LEAVE_RATE)       || 0.5;
+    const _cancelBonusSick2     = parseInt(_sysCLeave2.CANCEL_BONUS_SICK)       || 0;
+    const _cancelBonusPersonal2 = parseInt(_sysCLeave2.CANCEL_BONUS_PERSONAL) !== 0 ? 1 : 0;
+
     if (leaveRecords.success && leaveRecords.data && leaveRecords.data.length > 0) {
       Logger.log(`📋 找到 ${leaveRecords.data.length} 筆請假記錄`);
-      
+
       leaveRecords.data.forEach(record => {
         if (record.reviewStatus === '核准') {
           const leaveType = String(record.leaveType).toUpperCase();
           const days = parseFloat(record.leaveDays) || 0;
-          const hours = days * 8;
-          const dailyRate = Math.round(baseSalary / 30);
-          
-          // 病假：扣半薪
+          const hours = days * _dailyWorkHours2;
+          const dailyRate = Math.round(baseSalary / _monthlyWorkDays2);
+
           if (leaveType === 'SICK_LEAVE' || leaveType === '病假') {
             sickLeaveHours += hours;
-            const deduction = Math.round(days * dailyRate * 0.5);
+            const deduction = Math.round(days * dailyRate * _sickLeaveRate2);
             sickLeaveDeduction += deduction;
-            Logger.log(`   病假 ${days} 天 = ${hours}h × $${dailyRate} × 50% = $${deduction}`);
+            Logger.log(`   病假 ${days} 天 × 日薪 $${dailyRate} × ${_sickLeaveRate2} = $${deduction}`);
           }
-          
-          // 事假：扣全薪
+
           if (leaveType === 'PERSONAL_LEAVE' || leaveType === '事假') {
             personalLeaveHours += hours;
             const deduction = Math.round(days * dailyRate);
             personalLeaveDeduction += deduction;
-            Logger.log(`   事假 ${days} 天 = ${hours}h × $${dailyRate} = $${deduction}`);
+            Logger.log(`   事假 ${days} 天 × 日薪 $${dailyRate} = $${deduction}`);
           }
         }
       });
-      
+
       leaveDeduction = sickLeaveDeduction + personalLeaveDeduction;
 
       Logger.log(`\n📋 請假扣款統計:`);
-      Logger.log(`   病假: ${sickLeaveHours} 小時，扣款 $${sickLeaveDeduction} (半薪)`);
-      Logger.log(`   事假: ${personalLeaveHours} 小時，扣款 $${personalLeaveDeduction} (全薪)`);
+      Logger.log(`   病假: ${sickLeaveHours} 小時，扣款 $${sickLeaveDeduction}`);
+      Logger.log(`   事假: ${personalLeaveHours} 小時，扣款 $${personalLeaveDeduction}`);
       Logger.log(`   合計扣款: $${leaveDeduction}`);
 
-      // 只有事假才取消全勤獎金；病假依勞基法不影響全勤
-      if (personalLeaveDeduction > 0) {
+      // 根據系統設定決定哪種假別取消全勤獎金
+      if (_cancelBonusPersonal2 && personalLeaveDeduction > 0) {
         attendanceBonus = 0;
         Logger.log(`⚠️ 有事假記錄，取消全勤獎金`);
+      }
+      if (_cancelBonusSick2 && sickLeaveDeduction > 0) {
+        attendanceBonus = 0;
+        Logger.log(`⚠️ 有病假記錄，取消全勤獎金`);
       }
     } else {
       Logger.log(`✅ 無請假記錄`);

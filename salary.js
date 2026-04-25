@@ -2259,3 +2259,215 @@ async function getEmployeeWorkHours(yearMonth) {
       return { ok: false, msg: error.toString() };
     }
   }
+
+
+// ==================== 系統設定（管理員） ====================
+
+let _systemConfig = null; // module-level cache
+let _holidayList = [];    // current working list of holidays
+
+const SYSTEM_CONFIG_FIELD_KEYS = [
+  'OVERTIME_WEEKDAY_1', 'OVERTIME_WEEKDAY_2',
+  'OVERTIME_RESTDAY_1', 'OVERTIME_RESTDAY_2', 'OVERTIME_RESTDAY_3',
+  'OVERTIME_SUNDAY', 'OVERTIME_HOLIDAY',
+  'MAX_OT_WEEKDAY', 'MAX_OT_RESTDAY', 'MAX_OT_HOLIDAY',
+  'DAILY_WORK_HOURS', 'MONTHLY_WORK_DAYS', 'DEFAULT_PAYMENT_DAY',
+  'SICK_LEAVE_RATE', 'CANCEL_BONUS_PERSONAL', 'CANCEL_BONUS_SICK',
+];
+
+/**
+ * 載入系統設定並填入表單
+ */
+async function loadSystemConfig() {
+  const loading = document.getElementById('system-config-loading');
+  const content = document.getElementById('system-config-content');
+  if (loading) loading.style.display = 'block';
+  if (content) content.style.display = 'none';
+
+  try {
+    const res = await callApifetch('getSystemConfig');
+    if (!res.ok) {
+      showNotification('載入系統設定失敗：' + (res.msg || '未知錯誤'), 'error');
+      return;
+    }
+    _systemConfig = res.data || {};
+
+    // Fill numeric/text fields
+    SYSTEM_CONFIG_FIELD_KEYS.forEach(key => {
+      const el = document.getElementById('cfg-' + key);
+      if (!el) return;
+      if (el.type === 'checkbox') {
+        el.checked = parseInt(_systemConfig[key]) === 1;
+      } else {
+        el.value = _systemConfig[key] !== undefined ? _systemConfig[key] : '';
+      }
+    });
+
+    // Init holiday year selector
+    const yearSel = document.getElementById('holiday-year-select');
+    if (yearSel) {
+      const currentYear = new Date().getFullYear();
+      yearSel.innerHTML = '';
+      for (let y = currentYear - 1; y <= currentYear + 2; y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y + ' 年';
+        if (y === currentYear) opt.selected = true;
+        yearSel.appendChild(opt);
+      }
+    }
+
+    if (loading) loading.style.display = 'none';
+    if (content) content.style.display = 'block';
+
+    // Load holidays for current year
+    await loadHolidayList();
+
+  } catch (err) {
+    console.error('loadSystemConfig error:', err);
+    showNotification('載入系統設定失敗', 'error');
+  }
+}
+
+/**
+ * 儲存指定區塊的系統設定
+ * section: 'overtime' | 'hours' | 'leave'
+ */
+async function saveSystemConfigSection(section) {
+  const sectionKeys = {
+    overtime: ['OVERTIME_WEEKDAY_1','OVERTIME_WEEKDAY_2','OVERTIME_RESTDAY_1','OVERTIME_RESTDAY_2','OVERTIME_RESTDAY_3','OVERTIME_SUNDAY','OVERTIME_HOLIDAY'],
+    hours:    ['DAILY_WORK_HOURS','MONTHLY_WORK_DAYS','DEFAULT_PAYMENT_DAY','MAX_OT_WEEKDAY','MAX_OT_RESTDAY','MAX_OT_HOLIDAY'],
+    leave:    ['SICK_LEAVE_RATE','CANCEL_BONUS_PERSONAL','CANCEL_BONUS_SICK'],
+  };
+
+  const keys = sectionKeys[section];
+  if (!keys) return;
+
+  const updates = {};
+  keys.forEach(key => {
+    const el = document.getElementById('cfg-' + key);
+    if (!el) return;
+    if (el.type === 'checkbox') {
+      updates[key] = el.checked ? 1 : 0;
+    } else {
+      updates[key] = parseFloat(el.value) || el.value;
+    }
+  });
+
+  try {
+    const res = await callApifetch('saveSystemConfig&configJson=' + encodeURIComponent(JSON.stringify(updates)));
+    if (res.ok) {
+      showNotification('✅ 設定已儲存', 'success');
+    } else {
+      showNotification('儲存失敗：' + (res.msg || '未知錯誤'), 'error');
+    }
+  } catch (err) {
+    console.error('saveSystemConfig error:', err);
+    showNotification('儲存失敗', 'error');
+  }
+}
+
+/**
+ * 載入並顯示指定年份的國定假日
+ */
+async function loadHolidayList() {
+  const yearSel = document.getElementById('holiday-year-select');
+  const year = yearSel ? parseInt(yearSel.value) : new Date().getFullYear();
+
+  try {
+    const res = await callApifetch('getHolidays&year=' + year);
+    if (res.ok) {
+      _holidayList = res.holidays || [];
+    } else {
+      _holidayList = [];
+    }
+    renderHolidayList();
+  } catch (err) {
+    console.error('loadHolidayList error:', err);
+    _holidayList = [];
+    renderHolidayList();
+  }
+}
+
+/**
+ * 渲染假日標籤列表
+ */
+function renderHolidayList() {
+  const container = document.getElementById('holiday-list-items');
+  if (!container) return;
+
+  if (_holidayList.length === 0) {
+    container.innerHTML = '<span style="color:#64748b;font-size:0.875rem;">（尚無假日）</span>';
+    return;
+  }
+
+  const sorted = [..._holidayList].sort();
+  container.innerHTML = sorted.map(date => `
+    <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.7rem;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);border-radius:6px;color:#93c5fd;font-size:0.875rem;">
+      ${date}
+      <button onclick="removeHolidayFromList('${date}')"
+              style="background:none;border:none;color:#f87171;cursor:pointer;font-size:1rem;line-height:1;padding:0;"
+              title="移除">×</button>
+    </span>
+  `).join('');
+}
+
+/**
+ * 新增假日到暫存清單（尚未存到後端）
+ */
+function addHolidayToList() {
+  const dateInput = document.getElementById('holiday-add-date');
+  if (!dateInput || !dateInput.value) {
+    showNotification('請選擇日期', 'error');
+    return;
+  }
+  const date = dateInput.value; // YYYY-MM-DD
+  if (_holidayList.includes(date)) {
+    showNotification('該日期已存在清單中', 'error');
+    return;
+  }
+  _holidayList.push(date);
+  renderHolidayList();
+  dateInput.value = '';
+  const labelInput = document.getElementById('holiday-add-label');
+  if (labelInput) labelInput.value = '';
+
+  const status = document.getElementById('holiday-save-status');
+  if (status) status.textContent = '已新增，請按「儲存假日清單」以存入系統';
+}
+
+/**
+ * 從暫存清單移除假日
+ */
+function removeHolidayFromList(date) {
+  _holidayList = _holidayList.filter(d => d !== date);
+  renderHolidayList();
+  const status = document.getElementById('holiday-save-status');
+  if (status) status.textContent = '已移除，請按「儲存假日清單」以存入系統';
+}
+
+/**
+ * 儲存假日清單到後端
+ */
+async function saveHolidayList() {
+  const yearSel = document.getElementById('holiday-year-select');
+  const year = yearSel ? parseInt(yearSel.value) : new Date().getFullYear();
+  const status = document.getElementById('holiday-save-status');
+
+  try {
+    const res = await callApifetch(
+      'saveHolidays&year=' + year +
+      '&holidaysJson=' + encodeURIComponent(JSON.stringify(_holidayList))
+    );
+    if (res.ok) {
+      if (status) status.textContent = '✅ ' + year + ' 年假日清單已儲存（共 ' + _holidayList.length + ' 天）';
+      showNotification('✅ 假日清單已儲存', 'success');
+    } else {
+      if (status) status.textContent = '❌ 儲存失敗：' + (res.msg || '未知錯誤');
+      showNotification('儲存失敗：' + (res.msg || ''), 'error');
+    }
+  } catch (err) {
+    console.error('saveHolidayList error:', err);
+    showNotification('儲存失敗', 'error');
+  }
+}

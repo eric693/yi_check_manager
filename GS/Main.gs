@@ -148,6 +148,16 @@ function doGet(e) {
       case "exportShifts":
         return respond1(handleExportShifts(e.parameter));
       
+      // ==================== 系統設定（管理員） ====================
+      case "getSystemConfig":
+        return respond1(handleGetSystemConfig(e.parameter));
+      case "saveSystemConfig":
+        return respond1(handleSaveSystemConfig(e.parameter));
+      case "getHolidays":
+        return respond1(handleGetHolidays(e.parameter));
+      case "saveHolidays":
+        return respond1(handleSaveHolidays(e.parameter));
+
       // ==================== 薪資系統 ====================
       case "setEmployeeSalaryTW":
         return respond1(handleSetEmployeeSalaryTW(e.parameter));
