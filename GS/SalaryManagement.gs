@@ -1488,21 +1488,21 @@ function calculateHourlySalary(employeeId, yearMonth) {
       });
       
       leaveDeduction = sickLeaveDeduction + personalLeaveDeduction;
-      
+
       Logger.log(`\n📋 請假扣款統計:`);
       Logger.log(`   病假: ${sickLeaveHours} 小時，扣款 $${sickLeaveDeduction} (半薪)`);
       Logger.log(`   事假: ${personalLeaveHours} 小時，扣款 $${personalLeaveDeduction} (全薪)`);
       Logger.log(`   合計扣款: $${leaveDeduction}`);
-      
-      // ⭐ 如果有請假，取消全勤獎金
-      if (leaveDeduction > 0) {
+
+      // 只有事假才取消全勤獎金；病假依勞基法不影響全勤
+      if (personalLeaveDeduction > 0) {
         attendanceBonus = 0;
-        Logger.log(`⚠️ 有請假記錄，取消全勤獎金`);
+        Logger.log(`⚠️ 有事假記錄，取消全勤獎金`);
       }
     } else {
       Logger.log(`✅ 無請假記錄`);
     }
-    
+
     // 9. 應發總額
     const grossSalary = basePay + 
                        positionAllowance + 
@@ -2072,7 +2072,7 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
     
     // 4. 基本薪資
     const baseSalary = parseFloat(config['基本薪資']) || 0;
-    const hourlyRate = Math.round(baseSalary / 30 / 8); // 平日時薪
+    const hourlyRateExact = baseSalary / 30 / 8; // 精確時薪，不先 round 避免累積誤差
     
     Logger.log(`💵 基本薪資: ${baseSalary}, 時薪: ${hourlyRate}`);
     
@@ -2251,7 +2251,7 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
             if (actualMinutes < schedMinutes) {
               const earlyMinutes = schedMinutes - actualMinutes;
               const earlyHours = earlyMinutes / 60;
-              const deduction = Math.round(hourlyRate * earlyHours);
+              const deduction = Math.round(hourlyRateExact * earlyHours);
               
               earlyLeaveDeduction += deduction;
               
@@ -2304,25 +2304,21 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
       });
       
       leaveDeduction = sickLeaveDeduction + personalLeaveDeduction;
-      
+
       Logger.log(`\n📋 請假扣款統計:`);
       Logger.log(`   病假: ${sickLeaveHours} 小時，扣款 $${sickLeaveDeduction} (半薪)`);
       Logger.log(`   事假: ${personalLeaveHours} 小時，扣款 $${personalLeaveDeduction} (全薪)`);
       Logger.log(`   合計扣款: $${leaveDeduction}`);
-      
-      // 如果有請假，取消全勤獎金
-      if (leaveDeduction > 0) {
+
+      // 只有事假才取消全勤獎金；病假依勞基法不影響全勤
+      if (personalLeaveDeduction > 0) {
         attendanceBonus = 0;
-        Logger.log(`⚠️ 有請假記錄，取消全勤獎金`);
+        Logger.log(`⚠️ 有事假記錄，取消全勤獎金`);
       }
     } else {
-      Logger.log(`\n📋 請假扣款統計:`);
-      Logger.log(`   病假: 0 小時，扣款 $0 (半薪)`);
-      Logger.log(`   事假: 0 小時，扣款 $0 (全薪)`);
-      Logger.log(`   合計扣款: $0`);
       Logger.log(`✅ 無請假記錄`);
     }
-    
+
     // 8. ⭐⭐⭐ 法定扣款（直接使用設定表中的數值）
     const laborFee = parseFloat(config['勞保費']) || 0;
     const healthFee = parseFloat(config['健保費']) || 0;
