@@ -803,6 +803,7 @@
             <button class="shift-tab" data-tab="add" data-i18n="SHIFT_TAB_ADD">新增排班</button>
             <button class="shift-tab" data-tab="batch" data-i18n="SHIFT_TAB_BATCH">批量排班</button>
             <button class="shift-tab" data-tab="stats" data-i18n="SHIFT_TAB_STATS">統計分析</button>
+            <button class="shift-tab" data-tab="settings">班別設定</button>
         </div>
 
         <!-- 查看排班 -->
@@ -1028,6 +1029,39 @@
             </div>
 
             <div id="shift-distribution"></div>
+        </div>
+
+        <!-- 班別設定 -->
+        <div id="settings-tab" class="tab-content">
+            <div class="shift-card">
+                <h2>新增班別</h2>
+                <form class="shift-form" id="add-shift-type-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">班別名稱</label>
+                            <input type="text" id="new-type-name" placeholder="例：早班A" required maxlength="20">
+                        </div>
+                        <div class="form-group">
+                            <label class="required">上班時間</label>
+                            <input type="time" id="new-type-start" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">下班時間</label>
+                            <input type="time" id="new-type-end" required>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">新增班別</button>
+                    </div>
+                </form>
+            </div>
+            <div class="shift-card">
+                <h2>班別管理</h2>
+                <p style="color: #666; margin-bottom: 16px; font-size: 14px;">內建班別受系統保護無法刪除，自訂班別可以刪除。</p>
+                <div id="shift-type-list">
+                    <div class="loading">載入中</div>
+                </div>
+            </div>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
