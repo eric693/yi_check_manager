@@ -830,6 +830,9 @@ function getShiftTypeSheet_() {
       .setFontColor('#ffffff');
     sheet.setFrozenRows(1);
 
+    // 強制 C、D 欄（上班/下班時間）儲存為純文字，防止 Sheets 自動轉換時間格式
+    sheet.getRange('C:D').setNumberFormat('@STRING@');
+
     const timestamp = formatDateTime(new Date());
     const rows = BUILT_IN_SHIFT_SEED.map(t => [
       'ST-' + Utilities.getUuid(),
@@ -854,10 +857,10 @@ function getShiftTypesData() {
       types.push({
         id:        data[i][0],
         name:      data[i][1],
-        startTime: data[i][2],
-        endTime:   data[i][3],
+        startTime: formatTimeOnly(data[i][2]),
+        endTime:   formatTimeOnly(data[i][3]),
         category:  data[i][4],
-        createdAt: data[i][5],
+        createdAt: String(data[i][5]),
         status:    data[i][6]
       });
     }
@@ -881,7 +884,8 @@ function addShiftTypeRecord(data) {
     }
 
     const id = 'ST-' + Utilities.getUuid();
-    sheet.appendRow([
+    const lastRow = sheet.getLastRow() + 1;
+    sheet.getRange(lastRow, 1, 1, 7).setValues([[
       id,
       data.name,
       data.startTime || '00:00',
@@ -889,7 +893,9 @@ function addShiftTypeRecord(data) {
       data.category  || '自訂',
       formatDateTime(new Date()),
       '啟用'
-    ]);
+    ]]);
+    // 確保時間欄位保持純文字格式
+    sheet.getRange(lastRow, 3, 1, 2).setNumberFormat('@STRING@');
 
     return { success: true, message: '班別新增成功', id: id };
   } catch (error) {
@@ -906,8 +912,12 @@ function updateShiftTypeRecord(id, data) {
     for (let i = 1; i < rows.length; i++) {
       if (rows[i][0] === id) {
         if (data.name      !== undefined) sheet.getRange(i + 1, 2).setValue(data.name);
-        if (data.startTime !== undefined) sheet.getRange(i + 1, 3).setValue(data.startTime);
-        if (data.endTime   !== undefined) sheet.getRange(i + 1, 4).setValue(data.endTime);
+        if (data.startTime !== undefined) {
+          sheet.getRange(i + 1, 3).setNumberFormat('@STRING@').setValue(data.startTime);
+        }
+        if (data.endTime   !== undefined) {
+          sheet.getRange(i + 1, 4).setNumberFormat('@STRING@').setValue(data.endTime);
+        }
         if (data.category  !== undefined) sheet.getRange(i + 1, 5).setValue(data.category);
         return { success: true, message: '班別更新成功' };
       }

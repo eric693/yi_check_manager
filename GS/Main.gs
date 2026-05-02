@@ -1206,12 +1206,10 @@ function testLineBotLocation() {
 // ==================== 班別設定 Handler 函式 ====================
 
 function checkAdminPermission_(token) {
-  if (!token || !validateSession(token)) {
-    return { ok: false, msg: '未授權或 session 已過期' };
-  }
+  if (!token) return { ok: false, msg: '未授權或 session 已過期' };
   const sessionResult = handleCheckSession(token);
   if (!sessionResult.ok || !sessionResult.user) {
-    return { ok: false, msg: 'Session 資料無效' };
+    return { ok: false, msg: '未授權或 session 已過期' };
   }
   if (sessionResult.user.dept !== '管理員') {
     return { ok: false, msg: '此功能僅限管理員使用' };
