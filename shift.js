@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     
     // 設定預設日期為今天
-    const today = new Date().toISOString().split('T')[0];
+    const today = toTWDateString();
     const shiftDateEl = document.getElementById('shift-date');
     if (shiftDateEl) shiftDateEl.value = today;
     
@@ -147,8 +147,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     const filterStartEl = document.getElementById('filter-start-date');
     const filterEndEl = document.getElementById('filter-end-date');
-    if (filterStartEl) filterStartEl.value = startOfWeek.toISOString().split('T')[0];
-    if (filterEndEl) filterEndEl.value = endOfWeek.toISOString().split('T')[0];
+    if (filterStartEl) filterStartEl.value = toTWDateString(startOfWeek);
+    if (filterEndEl) filterEndEl.value = toTWDateString(endOfWeek);
 });
 
 // ========== 分頁管理 ==========
@@ -1007,8 +1007,8 @@ function clearFilters() {
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(endOfWeek.getDate() + 6);
     
-    document.getElementById('filter-start-date').value = startOfWeek.toISOString().split('T')[0];
-    document.getElementById('filter-end-date').value = endOfWeek.toISOString().split('T')[0];
+    document.getElementById('filter-start-date').value = toTWDateString(startOfWeek);
+    document.getElementById('filter-end-date').value = toTWDateString(endOfWeek);
     
     loadShifts();
 }
@@ -1020,7 +1020,7 @@ function exportShifts() {
     }
     
     const csv = convertToCSV(currentShifts);
-    const filename = `排班表_${new Date().toISOString().split('T')[0]}.csv`;
+    const filename = `排班表_${toTWDateString()}.csv`;
     downloadCSV(csv, filename);
     showMessage(t('SHIFT_EXPORT_SUCCESS'), 'success');
 }
@@ -1066,7 +1066,7 @@ function resetForm() {
         submitBtn.onclick = null;
     }
     
-    const today = new Date().toISOString().split('T')[0];
+    const today = toTWDateString();
     const shiftDateEl = document.getElementById('shift-date');
     if (shiftDateEl) shiftDateEl.value = today;
 }

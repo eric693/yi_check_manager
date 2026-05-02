@@ -26,7 +26,7 @@ function formatDateOnly(dateValue) {
     return String(dateValue);
   }
   
-  return Utilities.formatDate(date, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  return Utilities.formatDate(date, 'Asia/Taipei', 'yyyy-MM-dd');
 }
 
 function formatTimeOnly(timeValue) {
@@ -70,7 +70,7 @@ function formatTimeOnly(timeValue) {
  * ⭐ 格式化完整日期時間
  */
 function formatDateTime(date) {
-  return Utilities.formatDate(date, Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+  return Utilities.formatDate(date, 'Asia/Taipei', 'yyyy-MM-dd HH:mm:ss');
 }
 
 // ==================== 原有功能 ====================

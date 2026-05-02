@@ -1,6 +1,11 @@
 // 使用 CDN 或絕對路徑來載入 JSON 檔案
 // 注意：本檔案需要依賴 config.js，請確保它在腳本之前被載入。
 
+// 取得台灣時區 YYYY-MM-DD（避免 toISOString() 因 UTC 偏移傳回前一天日期）
+function toTWDateString(date = new Date()) {
+    return date.toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' });
+}
+
 let currentLang = localStorage.getItem("lang");
 let currentMonthDate = new Date();
 let translations = {};
@@ -610,7 +615,7 @@ function renderAbnormalRecords(records) {
             switch(record.reason) {
                 case 'STATUS_REPAIR_PENDING':
                     // 👇 修改這段
-                    const isToday = record.date === new Date().toISOString().split('T')[0];
+                    const isToday = record.date === toTWDateString();
                     const isTodayAdjust = record.punchTypes && record.punchTypes.includes('當日修正');
                     const isHistoryAdjust = record.punchTypes && record.punchTypes.includes('歷史補打');
                     
@@ -2840,7 +2845,7 @@ async function loadTodayShift() {
         infoEl.style.display = 'none';
         
         const userId = localStorage.getItem('sessionUserId');
-        const today = new Date().toISOString().split('T')[0];
+        const today = toTWDateString();
         
         const res = await callApifetch(`getEmployeeShiftForDate&employeeId=${userId}&date=${today}`);
         
@@ -2891,11 +2896,11 @@ async function loadWeekShift() {
     const endOfWeek = new Date(today);
     endOfWeek.setDate(today.getDate() + 7);
     
-    const startDateStr = startOfWeek.toISOString().split('T')[0];
-    const endDateStr = endOfWeek.toISOString().split('T')[0];
-    
+    const startDateStr = toTWDateString(startOfWeek);
+    const endDateStr = toTWDateString(endOfWeek);
+
     console.log('📅 未來排班範圍:', {
-        today: today.toISOString().split('T')[0],
+        today: toTWDateString(today),
         startOfWeek: startDateStr,
         endOfWeek: endDateStr
     });
@@ -3053,7 +3058,7 @@ function displayAnnouncements() {
         div.innerHTML = `
             <div class="flex items-start justify-between mb-2">
                 <h3 class="font-bold text-gray-800 dark:text-white">${icon} ${a.title}</h3>
-                <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleDateString()}</span>
+                <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' })}</span>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-300">${a.content}</p>
         `;
@@ -3076,7 +3081,7 @@ function displayAdminAnnouncements() {
                 <div class="flex-1">
                     <h3 class="font-bold text-gray-800 dark:text-white mb-1">${a.title}</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">${a.content}</p>
-                    <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleString()}</span>
+                    <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</span>
                 </div>
                 <button class="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded ml-4" 
                         data-i18n="BTN_DELETE"
@@ -3820,7 +3825,7 @@ async function doPunch(type) {
     if (type === '上班') {
         try {
             const userId = localStorage.getItem('sessionUserId');
-            const today = new Date().toISOString().split('T')[0];
+            const today = toTWDateString();
 
             const now = new Date();
             const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
@@ -4393,7 +4398,7 @@ async function displayAnnouncements() {
         div.innerHTML = `
             <div class="flex items-start justify-between mb-2">
                 <h3 class="font-bold text-gray-800 dark:text-white">${icon} ${a.title}</h3>
-                <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleDateString()}</span>
+                <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' })}</span>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-300">${a.content}</p>
         `;
@@ -4424,7 +4429,7 @@ async function displayAdminAnnouncements() {
                 <div class="flex-1">
                     <h3 class="font-bold text-gray-800 dark:text-white mb-1">${a.title}</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">${a.content}</p>
-                    <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleString()}</span>
+                    <span class="text-xs text-gray-500">${new Date(a.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</span>
                 </div>
                 <button class="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded ml-4" 
                         data-i18n="BTN_DELETE"
@@ -4504,7 +4509,7 @@ async function initEmployeeBasicInfo() {
                 
                 if (updateTimeEl && updateTimeText) {
                     const date = new Date(res.data.updatedAt);
-                    updateTimeText.textContent = date.toLocaleString('zh-TW');
+                    updateTimeText.textContent = date.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
                     updateTimeEl.style.display = 'block';
                 }
             }
@@ -4557,7 +4562,7 @@ async function initEmployeeBasicInfo() {
                 
                 if (updateTimeEl && updateTimeText) {
                     const date = new Date(res.data.updatedAt);
-                    updateTimeText.textContent = date.toLocaleString('zh-TW');
+                    updateTimeText.textContent = date.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
                     updateTimeEl.style.display = 'block';
                 }
             }
@@ -4618,7 +4623,7 @@ async function saveEmployeeBasicInfo() {
             
             if (updateTimeEl && updateTimeText) {
                 const now = new Date();
-                updateTimeText.textContent = now.toLocaleString('zh-TW');
+                updateTimeText.textContent = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
                 updateTimeEl.style.display = 'block';
             }
         } else {
@@ -4647,9 +4652,9 @@ function openAdjustTodayDialog() {
     dialog.id = 'adjust-today-dialog';
     
     const now = new Date();
-    const today = now.toISOString().split('T')[0];
+    const today = toTWDateString(now);
     const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
+
     dialog.innerHTML = `
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
             <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">
@@ -4772,7 +4777,7 @@ async function submitAdjustToday() {
         
         // 組合完整日期時間
         const now = new Date();
-        const today = now.toISOString().split('T')[0];
+        const today = toTWDateString(now);
         const datetime = `${today}T${time}:00`;
         
         const params = new URLSearchParams({
@@ -4816,9 +4821,8 @@ function openHistoryAdjustDialog() {
     dialog.id = 'history-adjust-dialog';
     
     const now = new Date();
-    const today = now.toISOString().split('T')[0];
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-                        .toISOString().split('T')[0];
+    const today = toTWDateString(now);
+    const monthStart = toTWDateString(new Date(now.getFullYear(), now.getMonth(), 1));
     
     dialog.innerHTML = `
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">

@@ -815,7 +815,7 @@ function leaveRecordRow(r, colorClass, icon) {
     const days = parseFloat(r.days) || 0;
     const hours = parseFloat(r.workHours) || 0;
     const startDt = r.startDateTime ? new Date(r.startDateTime) : null;
-    const dateStr = startDt ? startDt.toLocaleDateString('zh-TW') : '--';
+    const dateStr = startDt ? startDt.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }) : '--';
     return `
         <div class="flex justify-between items-center text-sm py-1 border-b border-white/5 last:border-0">
             <span class="${colorClass}">${icon} ${typeLabel}　${dateStr}</span>
@@ -1668,7 +1668,7 @@ async function fetchExchangeRates() {
         if (data.result === 'success') {
             localStorage.setItem('_ex_rates', JSON.stringify(data.rates));
             localStorage.setItem('_ex_rates_exp', String(now + EXCHANGE_RATE_TTL));
-            localStorage.setItem('_ex_rates_time', new Date().toLocaleTimeString('zh-TW'));
+            localStorage.setItem('_ex_rates_time', new Date().toLocaleTimeString('zh-TW', { timeZone: 'Asia/Taipei' }));
             return data.rates;
         }
     } catch (e) {
@@ -2335,13 +2335,13 @@ async function loadSystemConfig() {
     // Init batch-calc month selector to current month
     const batchMonthEl = document.getElementById('batch-calc-month');
     if (batchMonthEl && !batchMonthEl.value) {
-      batchMonthEl.value = new Date().toISOString().slice(0, 7);
+      batchMonthEl.value = toTWDateString().slice(0, 7);
     }
 
     // Init advance date to today
     const advDateEl = document.getElementById('advance-date');
     if (advDateEl && !advDateEl.value) {
-      advDateEl.value = new Date().toISOString().slice(0, 10);
+      advDateEl.value = toTWDateString();
     }
 
     // Load employee list for advance dropdown

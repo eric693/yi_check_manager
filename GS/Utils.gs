@@ -33,7 +33,7 @@ function checkAttendanceAbnormal(attendanceRows) {
   Logger.log("🔍 checkAttendanceAbnormal 開始");
   Logger.log(`📊 總記錄數: ${attendanceRows.length}`);
   
-  const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
+  const today = Utilities.formatDate(new Date(), 'Asia/Taipei', "yyyy-MM-dd");
   
   // ===== 步驟 1：按使用者和日期分組 =====
   let targetUserId = null;

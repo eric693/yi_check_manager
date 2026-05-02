@@ -1292,11 +1292,11 @@ function checkForgotPunchDaily() {
   
   // ✅ 新增：檢查昨天是否為平日
   if (!isWeekday(yesterday)) {
-    Logger.log(`⏭️ ${Utilities.formatDate(yesterday, "GMT+8", "yyyy-MM-dd")} 是週末，跳過檢查`);
+    Logger.log(`⏭️ ${Utilities.formatDate(yesterday, "Asia/Taipei", "yyyy-MM-dd")} 是週末，跳過檢查`);
     return;
   }
   
-  const dateStr = Utilities.formatDate(yesterday, "GMT+8", "yyyy-MM-dd");
+  const dateStr = Utilities.formatDate(yesterday, "Asia/Taipei", "yyyy-MM-dd");
   
   const attendanceSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ATTENDANCE);
   const employeeSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_EMPLOYEES);
@@ -1358,11 +1358,11 @@ function checkForgotPunchInMorning() {
   
   // ✅ 新增：檢查昨天是否為平日
   if (!isWeekday(yesterday)) {
-    Logger.log(`⏭️ ${Utilities.formatDate(yesterday, "GMT+8", "yyyy-MM-dd")} 是週末，跳過檢查`);
+    Logger.log(`⏭️ ${Utilities.formatDate(yesterday, "Asia/Taipei", "yyyy-MM-dd")} 是週末，跳過檢查`);
     return;
   }
   
-  const dateStr = Utilities.formatDate(yesterday, "GMT+8", "yyyy-MM-dd");
+  const dateStr = Utilities.formatDate(yesterday, "Asia/Taipei", "yyyy-MM-dd");
   
   const attendanceSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ATTENDANCE);
   const employeeSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_EMPLOYEES);

@@ -475,7 +475,7 @@ function previewAnnualLeaveCalculation() {
     const remainMonths = months % 12;
     
     const yearStr = years > 0 ? `${years}年${remainMonths}月` : `${remainMonths}月`;
-    const dateStr = Utilities.formatDate(hireDateObj, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    const dateStr = Utilities.formatDate(hireDateObj, 'Asia/Taipei', 'yyyy-MM-dd');
     
     Logger.log(sprintf('%-30s %-15s %-8s %d天', name, dateStr, yearStr, annualLeave));
   }
