@@ -949,13 +949,21 @@ function getEmployeeMonthlyOvertime(employeeId, yearMonth) {
       }
       
       const hoursNum = parseFloat(hours) || 0;
-      
+      // 扣除已轉為補休的時數，不計入加班費
+      const compensatoryHours = parseFloat(row[14]) || 0;
+      const paidHours = Math.max(0, hoursNum - compensatoryHours);
+
+      if (paidHours <= 0) {
+        Logger.log(`   ⏭️ ${dateStr}: 全部 ${hoursNum}h 已轉補休，不計加班費`);
+        continue;
+      }
+
       records.push({
         date: dateStr,
-        hours: hoursNum
+        hours: paidHours
       });
-      
-      Logger.log(`   ✅ ${dateStr}: ${hoursNum}h (狀態: ${status})`);
+
+      Logger.log(`   ✅ ${dateStr}: 總計 ${hoursNum}h，扣除補休 ${compensatoryHours}h，加班費計 ${paidHours}h`);
     }
     
     Logger.log(`✅ 找到 ${records.length} 筆已核准的加班記錄`);

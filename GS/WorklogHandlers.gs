@@ -252,6 +252,55 @@ function handleReviewWorklog(params) {
   }
 }
 /**
+ * ✅ 處理更新工作日誌
+ */
+function handleUpdateWorklog(params) {
+  try {
+    if (!params.token) return { ok: false, msg: '缺少認證 token' };
+
+    const session = checkSession_(params.token);
+    if (!session.ok || !session.user) return { ok: false, msg: '未授權或 session 已過期' };
+
+    const { id, date, hours, content } = params;
+
+    if (!id || !date || !hours || !content) {
+      return { ok: false, msg: '缺少必要參數 (id, date, hours, content)' };
+    }
+
+    const result = updateWorklog(session.user.userId, id, date, parseFloat(hours), content);
+
+    return { ok: result.success, msg: result.message };
+
+  } catch (error) {
+    Logger.log('❌ handleUpdateWorklog 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+/**
+ * ✅ 處理刪除工作日誌
+ */
+function handleDeleteWorklog(params) {
+  try {
+    if (!params.token) return { ok: false, msg: '缺少認證 token' };
+
+    const session = checkSession_(params.token);
+    if (!session.ok || !session.user) return { ok: false, msg: '未授權或 session 已過期' };
+
+    const worklogId = params.id;
+    if (!worklogId) return { ok: false, msg: '缺少工作日誌 ID' };
+
+    const result = deleteWorklog(session.user.userId, worklogId);
+
+    return { ok: result.success, msg: result.message };
+
+  } catch (error) {
+    Logger.log('❌ handleDeleteWorklog 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+/**
  * ✅ 處理取得工作日誌報表
  */
 function handleGetWorklogReport(params) {
