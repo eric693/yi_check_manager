@@ -789,3 +789,152 @@ function checkExistingShifts() {
     Logger.log(`  格式化後: ${formatDateOnly(data[i][3])}`);
   }
 }
+
+// ==================== 班別設定 CRUD ====================
+
+const BUILT_IN_SHIFT_SEED = [
+  { name: '廚房A班', startTime: '11:00', endTime: '20:00', category: '廚房' },
+  { name: '廚房B班', startTime: '11:30', endTime: '20:30', category: '廚房' },
+  { name: '廚房C班', startTime: '12:00', endTime: '21:00', category: '廚房' },
+  { name: '廚房D班', startTime: '13:00', endTime: '22:00', category: '廚房' },
+  { name: '廚房E班', startTime: '14:00', endTime: '23:00', category: '廚房' },
+  { name: '廚房F班', startTime: '15:00', endTime: '00:00', category: '廚房' },
+  { name: '廚房G班', startTime: '11:30', endTime: '15:00', category: '廚房' },
+  { name: '廚房H班', startTime: '18:00', endTime: '23:00', category: '廚房' },
+  { name: '廚房I班', startTime: '18:00', endTime: '00:00', category: '廚房' },
+  { name: '外場A1班', startTime: '11:00', endTime: '20:00', category: '外場' },
+  { name: '外場A2班', startTime: '11:30', endTime: '16:30', category: '外場' },
+  { name: '外場A3班', startTime: '11:30', endTime: '17:00', category: '外場' },
+  { name: '外場A4班', startTime: '11:30', endTime: '20:30', category: '外場' },
+  { name: '外場B1班', startTime: '16:00', endTime: '01:00', category: '外場' },
+  { name: '外場B2班', startTime: '17:00', endTime: '01:00', category: '外場' },
+  { name: '外場B3班', startTime: '18:00', endTime: '01:00', category: '外場' },
+  { name: '外場B4班', startTime: '19:00', endTime: '01:00', category: '外場' },
+  { name: '年假',     startTime: '00:00', endTime: '00:00', category: '假別' },
+  { name: '過年假',   startTime: '00:00', endTime: '00:00', category: '假別' },
+  { name: '國定假日', startTime: '00:00', endTime: '00:00', category: '假別' },
+  { name: '排休',     startTime: '00:00', endTime: '00:00', category: '假別' }
+];
+
+function getShiftTypeSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_SHIFT_TYPES);
+
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_SHIFT_TYPES);
+    const headers = ['班別ID', '班別名稱', '上班時間', '下班時間', '類別', '建立時間', '狀態'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length)
+      .setFontWeight('bold')
+      .setBackground('#34a853')
+      .setFontColor('#ffffff');
+    sheet.setFrozenRows(1);
+
+    const timestamp = formatDateTime(new Date());
+    const rows = BUILT_IN_SHIFT_SEED.map(t => [
+      'ST-' + Utilities.getUuid(),
+      t.name, t.startTime, t.endTime, t.category,
+      timestamp, '啟用'
+    ]);
+    sheet.getRange(2, 1, rows.length, 7).setValues(rows);
+    Logger.log('✅ 班別設定工作表建立並初始化完成');
+  }
+
+  return sheet;
+}
+
+function getShiftTypesData() {
+  try {
+    const sheet = getShiftTypeSheet_();
+    const data = sheet.getDataRange().getValues();
+    const types = [];
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][6] === '停用') continue;
+      types.push({
+        id:        data[i][0],
+        name:      data[i][1],
+        startTime: data[i][2],
+        endTime:   data[i][3],
+        category:  data[i][4],
+        createdAt: data[i][5],
+        status:    data[i][6]
+      });
+    }
+
+    return { success: true, data: types };
+  } catch (error) {
+    Logger.log('❌ getShiftTypesData 錯誤: ' + error);
+    return { success: false, message: error.message, data: [] };
+  }
+}
+
+function addShiftTypeRecord(data) {
+  try {
+    const sheet = getShiftTypeSheet_();
+    const existing = sheet.getDataRange().getValues();
+
+    for (let i = 1; i < existing.length; i++) {
+      if (existing[i][1] === data.name && existing[i][6] !== '停用') {
+        return { success: false, message: `班別「${data.name}」已存在` };
+      }
+    }
+
+    const id = 'ST-' + Utilities.getUuid();
+    sheet.appendRow([
+      id,
+      data.name,
+      data.startTime || '00:00',
+      data.endTime   || '00:00',
+      data.category  || '自訂',
+      formatDateTime(new Date()),
+      '啟用'
+    ]);
+
+    return { success: true, message: '班別新增成功', id: id };
+  } catch (error) {
+    Logger.log('❌ addShiftTypeRecord 錯誤: ' + error);
+    return { success: false, message: error.message };
+  }
+}
+
+function updateShiftTypeRecord(id, data) {
+  try {
+    const sheet = getShiftTypeSheet_();
+    const rows = sheet.getDataRange().getValues();
+
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0] === id) {
+        if (data.name      !== undefined) sheet.getRange(i + 1, 2).setValue(data.name);
+        if (data.startTime !== undefined) sheet.getRange(i + 1, 3).setValue(data.startTime);
+        if (data.endTime   !== undefined) sheet.getRange(i + 1, 4).setValue(data.endTime);
+        if (data.category  !== undefined) sheet.getRange(i + 1, 5).setValue(data.category);
+        return { success: true, message: '班別更新成功' };
+      }
+    }
+
+    return { success: false, message: '找不到該班別' };
+  } catch (error) {
+    Logger.log('❌ updateShiftTypeRecord 錯誤: ' + error);
+    return { success: false, message: error.message };
+  }
+}
+
+function deleteShiftTypeRecord(id) {
+  try {
+    const sheet = getShiftTypeSheet_();
+    const rows = sheet.getDataRange().getValues();
+
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0] === id) {
+        sheet.getRange(i + 1, 7).setValue('停用');
+        return { success: true, message: '班別刪除成功' };
+      }
+    }
+
+    return { success: false, message: '找不到該班別' };
+  } catch (error) {
+    Logger.log('❌ deleteShiftTypeRecord 錯誤: ' + error);
+    return { success: false, message: error.message };
+  }
+}

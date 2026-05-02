@@ -23,6 +23,9 @@ const SHEET_OVERTIME_RECORDS = '加班紀錄';
 const SHEET_LEAVE_RECORDS = '請假紀錄';
 const SHEET_LEAVE_BALANCE = '員工假期額度';
 
+// 班別設定
+const SHEET_SHIFT_TYPES = '班別設定';
+
 // ==================== 工作表名稱（新增）====================
 // const SHEET_WORKLOG = '工作日誌';
 

@@ -2209,11 +2209,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (tabId === 'admin-view') {
             fetchAndRenderReviewRequests();
             loadPendingOvertimeRequests();
-            loadPendingWorklogs();  // 
+            loadPendingWorklogs();  //
             loadPendingLeaveRequests();
             displayAdminAnnouncements();
             initAdminAnalysis();
             loadAllUsers();
+            loadAdminShiftTypes();
         } else if (tabId === 'overtime-view') {
             initOvertimeTab();
         } else if (tabId === 'leave-view') {
@@ -5049,8 +5050,198 @@ async function submitHistoryAdjust() {
         } else {
             showNotification('提交失敗，請稍後再試', 'error');
         }
-        
+
     } finally {
         generalButtonState(submitBtn, 'idle');
     }
 }
+
+// ==================== 管理員班別管理 ====================
+
+async function loadAdminShiftTypes() {
+    const listEl = document.getElementById('admin-shift-types-list');
+    if (!listEl) return;
+
+    listEl.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">載入中...</div>';
+
+    try {
+        // callApifetch 已自動從 localStorage 取 token
+        const res = await callApifetch('getShiftTypes');
+
+        if (res.ok && Array.isArray(res.data)) {
+            renderAdminShiftTypes(res.data);
+        } else {
+            listEl.innerHTML = '<div class="text-center text-red-400 text-sm py-4">載入失敗</div>';
+        }
+    } catch (e) {
+        console.error('載入班別失敗:', e);
+        listEl.innerHTML = '<div class="text-center text-red-400 text-sm py-4">網路錯誤</div>';
+    }
+}
+
+function renderAdminShiftTypes(types) {
+    const listEl = document.getElementById('admin-shift-types-list');
+    if (!listEl) return;
+
+    if (types.length === 0) {
+        listEl.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">尚無班別</div>';
+        return;
+    }
+
+    const catColors = {
+        '廚房': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+        '外場': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+        '假別': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+        '自訂': 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+    };
+
+    const grouped = {};
+    types.forEach(t => {
+        const cat = t.category || '自訂';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(t);
+    });
+
+    let html = '';
+    ['廚房', '外場', '假別', '自訂'].forEach(cat => {
+        if (!grouped[cat]) return;
+        const badgeCls = catColors[cat] || 'bg-gray-100 text-gray-700';
+        html += `<div class="mb-4">
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">${cat}班別 (${grouped[cat].length})</p>
+            <div class="space-y-2">`;
+        grouped[cat].forEach(t => {
+            const timeLabel = t.startTime && t.startTime !== '00:00'
+                ? `${t.startTime}－${t.endTime}` : '全天';
+            html += `<div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div class="flex items-center gap-3">
+                    <span class="text-xs px-2 py-0.5 rounded-full font-medium ${badgeCls}">${cat}</span>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-white">${t.name}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${timeLabel}</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openAdminShiftTypeEditModal('${t.id}','${t.name}','${t.startTime}','${t.endTime}','${t.category}')"
+                        class="text-xs px-2 py-1 rounded bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-800">編輯</button>
+                    <button onclick="adminDeleteShiftType('${t.id}','${t.name}')"
+                        class="text-xs px-2 py-1 rounded bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800">刪除</button>
+                </div>
+            </div>`;
+        });
+        html += '</div></div>';
+    });
+
+    listEl.innerHTML = html;
+}
+
+async function adminAddShiftType() {
+    const name     = document.getElementById('admin-shift-type-name').value.trim();
+    const category = document.getElementById('admin-shift-type-category').value;
+    const start    = document.getElementById('admin-shift-type-start').value || '00:00';
+    const end      = document.getElementById('admin-shift-type-end').value   || '00:00';
+
+    if (!name) { showNotification('請輸入班別名稱', 'error'); return; }
+
+    const btn = document.getElementById('admin-add-shift-type-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '處理中...'; }
+
+    try {
+        const token = localStorage.getItem('sessionToken');
+        const params = new URLSearchParams({ action: 'addShiftType', token, name, startTime: start, endTime: end, category });
+        const res = await fetch(`${API_CONFIG.apiUrl}?${params}`);
+        const data = await res.json();
+
+        if (data.ok) {
+            showNotification(`班別「${name}」新增成功`, 'success');
+            document.getElementById('admin-shift-type-name').value  = '';
+            document.getElementById('admin-shift-type-start').value = '';
+            document.getElementById('admin-shift-type-end').value   = '';
+            await loadAdminShiftTypes();
+        } else {
+            showNotification(data.msg || '新增失敗', 'error');
+        }
+    } catch (e) {
+        console.error('新增班別失敗:', e);
+        showNotification('網路錯誤，請稍後再試', 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '＋ 新增班別'; }
+    }
+}
+
+function openAdminShiftTypeEditModal(id, name, startTime, endTime, category) {
+    document.getElementById('edit-shift-type-id').value       = id;
+    document.getElementById('edit-shift-type-name').value     = name;
+    document.getElementById('edit-shift-type-start').value    = startTime !== '00:00' ? startTime : '';
+    document.getElementById('edit-shift-type-end').value      = endTime   !== '00:00' ? endTime   : '';
+    document.getElementById('edit-shift-type-category').value = category;
+
+    const modal = document.getElementById('admin-shift-type-edit-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeAdminShiftTypeEditModal() {
+    const modal = document.getElementById('admin-shift-type-edit-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function adminSaveShiftType() {
+    const id       = document.getElementById('edit-shift-type-id').value;
+    const name     = document.getElementById('edit-shift-type-name').value.trim();
+    const category = document.getElementById('edit-shift-type-category').value;
+    const start    = document.getElementById('edit-shift-type-start').value || '00:00';
+    const end      = document.getElementById('edit-shift-type-end').value   || '00:00';
+
+    if (!id || !name) { showNotification('資料不完整', 'error'); return; }
+
+    const btn = document.getElementById('edit-shift-type-save-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '儲存中...'; }
+
+    try {
+        const token = localStorage.getItem('sessionToken');
+        const params = new URLSearchParams({ action: 'updateShiftType', token, id, name, startTime: start, endTime: end, category });
+        const res = await fetch(`${API_CONFIG.apiUrl}?${params}`);
+        const data = await res.json();
+
+        if (data.ok) {
+            showNotification('班別更新成功', 'success');
+            closeAdminShiftTypeEditModal();
+            await loadAdminShiftTypes();
+        } else {
+            showNotification(data.msg || '更新失敗', 'error');
+        }
+    } catch (e) {
+        console.error('更新班別失敗:', e);
+        showNotification('網路錯誤，請稍後再試', 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '儲存'; }
+    }
+}
+
+async function adminDeleteShiftType(id, name) {
+    if (!confirm(`確定要刪除班別「${name}」嗎？\n（已排班記錄不受影響，但班別將從下拉選單移除）`)) return;
+
+    try {
+        const token = localStorage.getItem('sessionToken');
+        const params = new URLSearchParams({ action: 'deleteShiftType', token, id });
+        const res = await fetch(`${API_CONFIG.apiUrl}?${params}`);
+        const data = await res.json();
+
+        if (data.ok) {
+            showNotification(`班別「${name}」已刪除`, 'success');
+            await loadAdminShiftTypes();
+        } else {
+            showNotification(data.msg || '刪除失敗', 'error');
+        }
+    } catch (e) {
+        console.error('刪除班別失敗:', e);
+        showNotification('網路錯誤，請稍後再試', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const addBtn = document.getElementById('admin-add-shift-type-btn');
+    if (addBtn) addBtn.addEventListener('click', adminAddShiftType);
+
+    const saveBtn = document.getElementById('edit-shift-type-save-btn');
+    if (saveBtn) saveBtn.addEventListener('click', adminSaveShiftType);
+});

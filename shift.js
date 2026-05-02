@@ -21,6 +21,7 @@ let currentMonth = new Date().getMonth(); // 0-11
 let allMonthShifts = [];
 
 // ========== 班別設定常數與變數 ==========
+// 本地備援資料，僅在後端載入失敗時使用
 const BUILT_IN_SHIFT_TYPES = [
     { name: '廚房A班', startTime: '11:00', endTime: '20:00', category: '廚房' },
     { name: '廚房B班', startTime: '11:30', endTime: '20:30', category: '廚房' },
@@ -39,12 +40,14 @@ const BUILT_IN_SHIFT_TYPES = [
     { name: '外場B2班', startTime: '17:00', endTime: '01:00', category: '外場' },
     { name: '外場B3班', startTime: '18:00', endTime: '01:00', category: '外場' },
     { name: '外場B4班', startTime: '19:00', endTime: '01:00', category: '外場' },
-    { name: '年假', startTime: '00:00', endTime: '00:00', category: '假別' },
-    { name: '過年假', startTime: '00:00', endTime: '00:00', category: '假別' },
+    { name: '年假',     startTime: '00:00', endTime: '00:00', category: '假別' },
+    { name: '過年假',   startTime: '00:00', endTime: '00:00', category: '假別' },
     { name: '國定假日', startTime: '00:00', endTime: '00:00', category: '假別' },
-    { name: '排休', startTime: '00:00', endTime: '00:00', category: '假別' }
+    { name: '排休',     startTime: '00:00', endTime: '00:00', category: '假別' }
 ];
 let customShiftTypes = [];
+// null = 尚未從後端載入，[] 以上 = 已載入（含空）
+let dynamicShiftTypes = null;
 
 // 👇 新增：翻譯函式
 function t(code, params = {}) {
@@ -115,8 +118,11 @@ function renderTranslations(container = document) {
 document.addEventListener('DOMContentLoaded', async function() {
     await loadTranslations(currentLang);
     loadCustomShiftTypes();
-    populateShiftTypeSelects();
-    await loadUserPermissions();
+    populateShiftTypeSelects();       // 先用本地備援資料填充下拉選單
+    await loadUserPermissions();      // 取得 session token
+    await loadShiftTypesFromBackend();// 從後端載入最新班別清單
+    populateShiftTypeSelects();       // 用後端資料重新填充
+    renderShiftTypeSettings();        // 更新設定頁班別列表
     initializeTabs();
     loadEmployees();
     loadLocations();
@@ -125,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupBatchUpload();
 
     const addTypeForm = document.getElementById('add-shift-type-form');
-    if (addTypeForm) addTypeForm.addEventListener('submit', addCustomShiftType);
+    if (addTypeForm) addTypeForm.addEventListener('submit', addShiftTypeToBackend);
     
     
     // 設定預設日期為今天
@@ -297,15 +303,6 @@ function autoFillShiftTime(shiftType) {
     const startTimeInput = document.getElementById('start-time');
     const endTimeInput = document.getElementById('end-time');
 
-    const leaveTypes = ['年假', '過年假', '國定假日', '排休'];
-    if (leaveTypes.includes(shiftType)) {
-        startTimeInput.value = '00:00';
-        endTimeInput.value = '00:00';
-        startTimeInput.disabled = true;
-        endTimeInput.disabled = true;
-        return;
-    }
-
     if (shiftType === '自訂') {
         startTimeInput.value = '';
         endTimeInput.value = '';
@@ -316,6 +313,25 @@ function autoFillShiftTime(shiftType) {
     }
 
     const found = getAllShiftTypes().find(t => t.name === shiftType);
+
+    // 假別（category === '假別'）自動設為全天
+    if (found && found.category === '假別') {
+        startTimeInput.value = '00:00';
+        endTimeInput.value = '00:00';
+        startTimeInput.disabled = true;
+        endTimeInput.disabled = true;
+        return;
+    }
+
+    // 向下相容：若仍找不到 category，依名稱判斷（備援）
+    const leaveNames = ['年假', '過年假', '國定假日', '排休'];
+    if (!found && leaveNames.includes(shiftType)) {
+        startTimeInput.value = '00:00';
+        endTimeInput.value = '00:00';
+        startTimeInput.disabled = true;
+        endTimeInput.disabled = true;
+        return;
+    }
     if (found && found.startTime) {
         startTimeInput.value = found.startTime;
         endTimeInput.value = found.endTime;
@@ -2015,14 +2031,32 @@ function saveCustomShiftTypes() {
 }
 
 function getAllShiftTypes() {
+    if (dynamicShiftTypes !== null) return dynamicShiftTypes;
     return [...BUILT_IN_SHIFT_TYPES, ...customShiftTypes];
 }
 
+async function loadShiftTypesFromBackend() {
+    try {
+        const token = localStorage.getItem('sessionToken');
+        if (!token) return;
+        const res = await fetch(`${apiUrl}?action=getShiftTypes&token=${token}`);
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.data)) {
+            dynamicShiftTypes = data.data;
+            console.log(`✅ 從後端載入 ${dynamicShiftTypes.length} 個班別`);
+        }
+    } catch (e) {
+        console.warn('⚠️ 班別從後端載入失敗，使用本地備援資料:', e);
+    }
+}
+
 function populateShiftTypeSelects() {
+    const types = getAllShiftTypes();
     const categories = {};
-    BUILT_IN_SHIFT_TYPES.forEach(type => {
-        if (!categories[type.category]) categories[type.category] = [];
-        categories[type.category].push(type);
+    types.forEach(type => {
+        const cat = type.category || '自訂';
+        if (!categories[cat]) categories[cat] = [];
+        categories[cat].push(type);
     });
 
     ['shift-type', 'filter-shift-type'].forEach(id => {
@@ -2032,8 +2066,8 @@ function populateShiftTypeSelects() {
         const isFilter = id === 'filter-shift-type';
         let html = isFilter ? '<option value="">全部</option>' : '<option value="">請選擇班別</option>';
 
-        ['廚房', '外場', '假別'].forEach(cat => {
-            if (!categories[cat]) return;
+        ['廚房', '外場', '假別', '自訂'].forEach(cat => {
+            if (!categories[cat] || categories[cat].length === 0) return;
             html += `<optgroup label="${cat}班別">`;
             categories[cat].forEach(type => {
                 const timeLabel = type.startTime && type.startTime !== '00:00'
@@ -2042,15 +2076,6 @@ function populateShiftTypeSelects() {
             });
             html += '</optgroup>';
         });
-
-        if (customShiftTypes.length > 0) {
-            html += '<optgroup label="自訂班別">';
-            customShiftTypes.forEach(type => {
-                const timeLabel = type.startTime ? ` (${type.startTime}-${type.endTime})` : '';
-                html += `<option value="${type.name}">${type.name}${timeLabel}</option>`;
-            });
-            html += '</optgroup>';
-        }
 
         html += `<option value="自訂">${isFilter ? '自訂' : '自訂時間'}</option>`;
         select.innerHTML = html;
@@ -2061,16 +2086,14 @@ function renderShiftTypeSettings() {
     const listDiv = document.getElementById('shift-type-list');
     if (!listDiv) return;
 
+    const types = getAllShiftTypes();
     const categoryColors = { '廚房': '#ff9800', '外場': '#2196f3', '假別': '#4caf50', '自訂': '#9c27b0' };
 
     const grouped = {};
-    BUILT_IN_SHIFT_TYPES.forEach(t => {
-        if (!grouped[t.category]) grouped[t.category] = [];
-        grouped[t.category].push({ ...t, isBuiltIn: true });
-    });
-    customShiftTypes.forEach(t => {
-        if (!grouped['自訂']) grouped['自訂'] = [];
-        grouped['自訂'].push({ ...t, isBuiltIn: false });
+    types.forEach(t => {
+        const cat = t.category || '自訂';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(t);
     });
 
     let html = '';
@@ -2088,16 +2111,16 @@ function renderShiftTypeSettings() {
             const timeDisplay = type.startTime && type.startTime !== '00:00'
                 ? `${type.startTime} - ${type.endTime}`
                 : (cat === '假別' ? '假日（全天）' : '自訂時間');
+            const deleteBtn = type.id
+                ? `<button class="btn-icon btn-danger" onclick="deleteShiftTypeFromSettings('${type.id}', '${type.name}')" style="font-size: 12px; padding: 4px 10px;">刪除</button>`
+                : '<span style="font-size: 11px; color: #999; background: #f0f0f0; padding: 2px 8px; border-radius: 10px;">備援</span>';
             html += `
                 <div style="background: #f9f9f9; border-radius: 8px; padding: 12px 16px; border-left: 4px solid ${color}; display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <div style="font-weight: 600; color: #333;">${type.name}</div>
                         <div style="font-size: 12px; color: #666; margin-top: 4px;">${timeDisplay}</div>
                     </div>
-                    ${type.isBuiltIn
-                        ? '<span style="font-size: 11px; color: #999; background: #f0f0f0; padding: 2px 8px; border-radius: 10px;">內建</span>'
-                        : `<button class="btn-icon btn-danger" onclick="deleteCustomShiftType('${type.name}')" style="font-size: 12px; padding: 4px 10px;">刪除</button>`
-                    }
+                    ${(isAdmin || isScheduler) ? deleteBtn : ''}
                 </div>
             `;
         });
@@ -2108,16 +2131,18 @@ function renderShiftTypeSettings() {
     listDiv.innerHTML = html;
 }
 
-function addCustomShiftType(e) {
+async function addShiftTypeToBackend(e) {
     e.preventDefault();
 
-    const nameEl = document.getElementById('new-type-name');
+    const nameEl  = document.getElementById('new-type-name');
     const startEl = document.getElementById('new-type-start');
-    const endEl = document.getElementById('new-type-end');
+    const endEl   = document.getElementById('new-type-end');
+    const catEl   = document.getElementById('new-type-category');
 
-    const name = nameEl.value.trim();
-    const startTime = startEl.value;
-    const endTime = endEl.value;
+    const name      = nameEl.value.trim();
+    const startTime = startEl.value || '00:00';
+    const endTime   = endEl.value   || '00:00';
+    const category  = catEl ? catEl.value : '自訂';
 
     if (!name) { showMessage('請輸入班別名稱', 'error'); return; }
 
@@ -2126,15 +2151,50 @@ function addCustomShiftType(e) {
         return;
     }
 
-    customShiftTypes.push({ name, startTime, endTime, category: '自訂' });
-    saveCustomShiftTypes();
-    populateShiftTypeSelects();
-    renderShiftTypeSettings();
+    try {
+        const token = localStorage.getItem('sessionToken');
+        const params = new URLSearchParams({ action: 'addShiftType', token, name, startTime, endTime, category });
+        const res = await fetch(`${apiUrl}?${params}`);
+        const data = await res.json();
 
-    nameEl.value = '';
-    startEl.value = '';
-    endEl.value = '';
-    showMessage(`班別「${name}」新增成功`, 'success');
+        if (data.ok) {
+            showMessage(`班別「${name}」新增成功`, 'success');
+            nameEl.value = '';
+            if (startEl) startEl.value = '';
+            if (endEl)   endEl.value   = '';
+            await loadShiftTypesFromBackend();
+            populateShiftTypeSelects();
+            renderShiftTypeSettings();
+        } else {
+            showMessage(data.msg || '新增失敗', 'error');
+        }
+    } catch (err) {
+        console.error('新增班別失敗:', err);
+        showMessage('網路錯誤，請稍後再試', 'error');
+    }
+}
+
+async function deleteShiftTypeFromSettings(id, name) {
+    if (!confirm(`確定要刪除班別「${name}」嗎？`)) return;
+
+    try {
+        const token = localStorage.getItem('sessionToken');
+        const params = new URLSearchParams({ action: 'deleteShiftType', token, id });
+        const res = await fetch(`${apiUrl}?${params}`);
+        const data = await res.json();
+
+        if (data.ok) {
+            showMessage(`班別「${name}」已刪除`, 'success');
+            await loadShiftTypesFromBackend();
+            populateShiftTypeSelects();
+            renderShiftTypeSettings();
+        } else {
+            showMessage(data.msg || '刪除失敗', 'error');
+        }
+    } catch (err) {
+        console.error('刪除班別失敗:', err);
+        showMessage('網路錯誤，請稍後再試', 'error');
+    }
 }
 
 function deleteCustomShiftType(name) {

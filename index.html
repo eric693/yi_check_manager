@@ -1572,7 +1572,93 @@
                             <button data-i18n="API_TEST_BTN" id="test-api-btn" class="w-full py-2 px-4 rounded-lg font-bold btn-primary">測試 API</button>
                         </div>
                     </div>
-                    
+
+                    <!-- 班別管理 -->
+                    <div class="card p-6">
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">⚙️ 班別管理</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">新增、修改或刪除排班班別，變更後立即在下拉選單生效。</p>
+
+                        <!-- 新增班別表單 -->
+                        <div class="space-y-3 mb-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" id="admin-shift-type-name"
+                                    placeholder="班別名稱（例：廚房J班）" maxlength="20"
+                                    class="p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                <select id="admin-shift-type-category"
+                                    class="p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                    <option value="廚房">廚房</option>
+                                    <option value="外場">外場</option>
+                                    <option value="假別">假別</option>
+                                    <option value="自訂">自訂</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">上班時間</label>
+                                    <input type="time" id="admin-shift-type-start"
+                                        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">下班時間</label>
+                                    <input type="time" id="admin-shift-type-end"
+                                        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                </div>
+                            </div>
+                            <button id="admin-add-shift-type-btn"
+                                class="w-full py-2 px-4 rounded-lg font-bold btn-primary text-sm">
+                                ＋ 新增班別
+                            </button>
+                        </div>
+
+                        <!-- 班別列表 -->
+                        <div id="admin-shift-types-list" class="space-y-2">
+                            <div class="text-center text-gray-400 text-sm py-4">載入中...</div>
+                        </div>
+                    </div>
+
+                    <!-- 編輯班別 Modal -->
+                    <div id="admin-shift-type-edit-modal"
+                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                        style="display:none;">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-80 space-y-4 shadow-xl">
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">編輯班別</h3>
+                            <input type="hidden" id="edit-shift-type-id">
+                            <div>
+                                <label class="text-sm text-gray-600 dark:text-gray-400 mb-1 block">班別名稱</label>
+                                <input type="text" id="edit-shift-type-name" maxlength="20"
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 dark:text-gray-400 mb-1 block">類別</label>
+                                <select id="edit-shift-type-category"
+                                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                    <option value="廚房">廚房</option>
+                                    <option value="外場">外場</option>
+                                    <option value="假別">假別</option>
+                                    <option value="自訂">自訂</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">上班時間</label>
+                                    <input type="time" id="edit-shift-type-start"
+                                        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">下班時間</label>
+                                    <input type="time" id="edit-shift-type-end"
+                                        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <button id="edit-shift-type-save-btn"
+                                    class="flex-1 py-2 px-4 rounded-lg font-bold btn-primary text-sm">儲存</button>
+                                <button onclick="closeAdminShiftTypeEditModal()"
+                                    class="flex-1 py-2 px-4 rounded-lg font-bold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm">取消</button>
+                            </div>
+                        </div>
+                    </div>
+
                 </section>
             </div>
             <footer class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">

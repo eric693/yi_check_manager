@@ -147,6 +147,16 @@ function doGet(e) {
         return respond1(handleGetWeeklyShiftStats(e.parameter));
       case "exportShifts":
         return respond1(handleExportShifts(e.parameter));
+
+      // ==================== 班別設定管理 ====================
+      case "getShiftTypes":
+        return respond1(handleGetShiftTypes(e.parameter));
+      case "addShiftType":
+        return respond1(handleAddShiftType(e.parameter));
+      case "updateShiftType":
+        return respond1(handleUpdateShiftType(e.parameter));
+      case "deleteShiftType":
+        return respond1(handleDeleteShiftType(e.parameter));
       
       // ==================== 系統設定（管理員） ====================
       case "getSystemConfig":
@@ -1157,7 +1167,7 @@ function testLineBotMessage() {
 function testLineBotLocation() {
   Logger.log('🧪 測試 LINE Bot 位置打卡');
   Logger.log('');
-  
+
   // 模擬位置訊息
   const testEvent = {
     postData: {
@@ -1184,11 +1194,100 @@ function testLineBotLocation() {
       'X-Line-Signature': 'test-signature'
     }
   };
-  
+
   Logger.log('📍 模擬傳送位置...');
   const result = doPost(testEvent);
-  
+
   Logger.log('');
   Logger.log('📤 結果:');
   Logger.log(result.getContent());
+}
+
+// ==================== 班別設定 Handler 函式 ====================
+
+function checkAdminPermission_(token) {
+  if (!token || !validateSession(token)) {
+    return { ok: false, msg: '未授權或 session 已過期' };
+  }
+  const sessionResult = handleCheckSession(token);
+  if (!sessionResult.ok || !sessionResult.user) {
+    return { ok: false, msg: 'Session 資料無效' };
+  }
+  if (sessionResult.user.dept !== '管理員') {
+    return { ok: false, msg: '此功能僅限管理員使用' };
+  }
+  return { ok: true, user: sessionResult.user };
+}
+
+function handleGetShiftTypes(params) {
+  try {
+    if (!params.token || !validateSession(params.token)) {
+      return { ok: false, msg: '未授權或 session 已過期' };
+    }
+    const result = getShiftTypesData();
+    return { ok: result.success, data: result.data, msg: result.message };
+  } catch (error) {
+    Logger.log('❌ handleGetShiftTypes 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+function handleAddShiftType(params) {
+  try {
+    const permCheck = checkAdminPermission_(params.token);
+    if (!permCheck.ok) return permCheck;
+
+    if (!params.name) return { ok: false, msg: '缺少班別名稱' };
+
+    const result = addShiftTypeRecord({
+      name:      params.name,
+      startTime: params.startTime || '00:00',
+      endTime:   params.endTime   || '00:00',
+      category:  params.category  || '自訂'
+    });
+
+    Logger.log((result.success ? '✅' : '❌') + ' addShiftType: ' + params.name);
+    return { ok: result.success, msg: result.message, id: result.id };
+  } catch (error) {
+    Logger.log('❌ handleAddShiftType 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+function handleUpdateShiftType(params) {
+  try {
+    const permCheck = checkAdminPermission_(params.token);
+    if (!permCheck.ok) return permCheck;
+
+    if (!params.id) return { ok: false, msg: '缺少班別 ID' };
+
+    const result = updateShiftTypeRecord(params.id, {
+      name:      params.name,
+      startTime: params.startTime,
+      endTime:   params.endTime,
+      category:  params.category
+    });
+
+    Logger.log((result.success ? '✅' : '❌') + ' updateShiftType: ' + params.id);
+    return { ok: result.success, msg: result.message };
+  } catch (error) {
+    Logger.log('❌ handleUpdateShiftType 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
+}
+
+function handleDeleteShiftType(params) {
+  try {
+    const permCheck = checkAdminPermission_(params.token);
+    if (!permCheck.ok) return permCheck;
+
+    if (!params.id) return { ok: false, msg: '缺少班別 ID' };
+
+    const result = deleteShiftTypeRecord(params.id);
+    Logger.log((result.success ? '✅' : '❌') + ' deleteShiftType: ' + params.id);
+    return { ok: result.success, msg: result.message };
+  } catch (error) {
+    Logger.log('❌ handleDeleteShiftType 錯誤: ' + error);
+    return { ok: false, msg: error.message };
+  }
 }

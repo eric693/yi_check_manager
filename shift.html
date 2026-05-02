@@ -1042,12 +1042,21 @@
                             <input type="text" id="new-type-name" placeholder="例：早班A" required maxlength="20">
                         </div>
                         <div class="form-group">
-                            <label class="required">上班時間</label>
-                            <input type="time" id="new-type-start" required>
+                            <label>類別</label>
+                            <select id="new-type-category">
+                                <option value="廚房">廚房</option>
+                                <option value="外場">外場</option>
+                                <option value="假別">假別</option>
+                                <option value="自訂">自訂</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label class="required">下班時間</label>
-                            <input type="time" id="new-type-end" required>
+                            <label>上班時間</label>
+                            <input type="time" id="new-type-start">
+                        </div>
+                        <div class="form-group">
+                            <label>下班時間</label>
+                            <input type="time" id="new-type-end">
                         </div>
                     </div>
                     <div class="btn-group">
@@ -1057,9 +1066,9 @@
             </div>
             <div class="shift-card">
                 <h2>班別管理</h2>
-                <p style="color: #666; margin-bottom: 16px; font-size: 14px;">內建班別受系統保護無法刪除，自訂班別可以刪除。</p>
+                <p style="color: #666; margin-bottom: 16px; font-size: 14px;">所有班別均儲存於後端，修改後立即生效。</p>
                 <div id="shift-type-list">
-                    <div class="loading">載入中</div>
+                    <div class="loading">載入中...</div>
                 </div>
             </div>
         </div>
