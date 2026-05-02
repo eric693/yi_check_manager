@@ -712,5 +712,14 @@
   "SHIFT_TYPE_MANAGE_DESC": "Tất cả ca được lưu trên máy chủ và thay đổi có hiệu lực ngay.",
   "SHIFT_TYPE_LOADING": "Đang tải...",
   "SHIFT_TYPE_ALLDAY": "Cả ngày",
-  "SHIFT_TYPE_FALLBACK": "Dự phòng"
+  "SHIFT_TYPE_FALLBACK": "Dự phòng",
+  "ALLOWANCE_DESC": "Phụ cấp hàng tháng cố định (bao gồm trong lương gộp)",
+  "BTN_APPLY_FILTER": "Áp dụng bộ lọc",
+  "BTN_CLEAR_FILTER": "Xóa bộ lọc",
+  "BTN_EXPORT_SHIFTS": "Xuất lịch ca",
+  "SHIFT_ADD_TITLE": "Thêm ca làm",
+  "SHIFT_DATE_LABEL": "Ngày",
+  "SHIFT_EMPLOYEE_LABEL": "Nhân viên",
+  "SHIFT_SELECT_EMPLOYEE": "Chọn nhân viên",
+  "SHIFT_SELECT_TYPE": "Chọn loại ca"
 }

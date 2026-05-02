@@ -721,5 +721,6 @@
   "SHIFT_TYPE_MANAGE_DESC": "Semua shift disimpan di server dan perubahan langsung berlaku.",
   "SHIFT_TYPE_LOADING": "Memuat...",
   "SHIFT_TYPE_ALLDAY": "Sepanjang hari",
-  "SHIFT_TYPE_FALLBACK": "Cadangan"
+  "SHIFT_TYPE_FALLBACK": "Cadangan",
+  "ALLOWANCE_DESC": "Tunjangan bulanan tetap (termasuk dalam gaji bruto)"
 }

@@ -721,5 +721,6 @@
   "SHIFT_TYPE_MANAGE_DESC": "すべてのシフトはサーバーに保存され、変更はすぐに反映されます。",
   "SHIFT_TYPE_LOADING": "読込中...",
   "SHIFT_TYPE_ALLDAY": "終日",
-  "SHIFT_TYPE_FALLBACK": "フォールバック"
+  "SHIFT_TYPE_FALLBACK": "フォールバック",
+  "ALLOWANCE_DESC": "固定月次手当（総支給額に含まれる）"
 }

@@ -721,5 +721,6 @@
   "SHIFT_TYPE_MANAGE_DESC": "모든 근무 유형은 서버에 저장되며 변경사항이 즉시 적용됩니다.",
   "SHIFT_TYPE_LOADING": "로딩 중...",
   "SHIFT_TYPE_ALLDAY": "종일",
-  "SHIFT_TYPE_FALLBACK": "기본값"
+  "SHIFT_TYPE_FALLBACK": "기본값",
+  "ALLOWANCE_DESC": "고정 월 수당 (총 급여에 포함)"
 }

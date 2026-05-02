@@ -711,5 +711,15 @@
   "SHIFT_TYPE_MANAGE_DESC": "กะทั้งหมดถูกเก็บไว้บนเซิร์ฟเวอร์และการเปลี่ยนแปลงมีผลทันที",
   "SHIFT_TYPE_LOADING": "กำลังโหลด...",
   "SHIFT_TYPE_ALLDAY": "ทั้งวัน",
-  "SHIFT_TYPE_FALLBACK": "สำรอง"
+  "SHIFT_TYPE_FALLBACK": "สำรอง",
+  "ALLOWANCE_DESC": "เบี้ยเลี้ยงรายเดือนคงที่ (รวมอยู่ในเงินเดือนรวม)",
+  "BTN_APPLY_FILTER": "ใช้ตัวกรอง",
+  "BTN_CLEAR_FILTER": "ล้างตัวกรอง",
+  "BTN_EXPORT_SHIFTS": "ส่งออกตารางกะ",
+  "REVIEW_COMMENT": "ความเห็นการตรวจสอบ",
+  "SHIFT_ADD_TITLE": "เพิ่มกะ",
+  "SHIFT_DATE_LABEL": "วันที่",
+  "SHIFT_EMPLOYEE_LABEL": "พนักงาน",
+  "SHIFT_SELECT_EMPLOYEE": "เลือกพนักงาน",
+  "SHIFT_SELECT_TYPE": "เลือกประเภทกะ"
 }
