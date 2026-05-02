@@ -854,7 +854,7 @@ async function handleReviewLeave(button, action) {
         if (res.ok) {
             showNotification(action === 'approve' ? t('LEAVE_APPROVED') : t('LEAVE_REJECTED'), 'success');
             await new Promise(resolve => setTimeout(resolve, 500));
-            loadPendingLeaveRequests();
+            await loadPendingLeaveRequests();
         } else {
             showNotification(t('LEAVE_REVIEW_FAILED'), 'error');
         }

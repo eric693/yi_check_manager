@@ -155,12 +155,16 @@ function getWorklogs(userId, limit = 30) {
     // 跳過標題列，從第 2 列開始
     for (let i = 1; i < data.length; i++) {
       if (data[i][1] === userId) {
+        const rawDate = data[i][4];
+        const formattedDate = rawDate instanceof Date
+          ? Utilities.formatDate(rawDate, 'Asia/Taipei', 'yyyy-MM-dd')
+          : String(rawDate || '');
         worklogs.push({
           id: data[i][0],
           userId: data[i][1],
           userName: data[i][2],
           department: data[i][3],
-          date: data[i][4],
+          date: formattedDate,
           hours: data[i][5],
           content: data[i][6],
           status: data[i][7],
@@ -202,6 +206,10 @@ function getWorklogDetail(worklogId) {
     
     for (let i = 1; i < data.length; i++) {
       if (data[i][0] === worklogId) {
+        const rawDate = data[i][4];
+        const formattedDate = rawDate instanceof Date
+          ? Utilities.formatDate(rawDate, 'Asia/Taipei', 'yyyy-MM-dd')
+          : String(rawDate || '');
         return {
           success: true,
           worklog: {
@@ -209,7 +217,7 @@ function getWorklogDetail(worklogId) {
             userId: data[i][1],
             userName: data[i][2],
             department: data[i][3],
-            date: data[i][4],
+            date: formattedDate,
             hours: data[i][5],
             content: data[i][6],
             status: data[i][7],
@@ -245,13 +253,17 @@ function getPendingWorklogs() {
     
     for (let i = 1; i < data.length; i++) {
       if (data[i][7] === WORKLOG_STATUS.PENDING) {
+        const rawDate = data[i][4];
+        const formattedDate = rawDate instanceof Date
+          ? Utilities.formatDate(rawDate, 'Asia/Taipei', 'yyyy-MM-dd')
+          : String(rawDate || '');
         pendingWorklogs.push({
           rowNumber: i + 1,
           id: data[i][0],
           userId: data[i][1],
           userName: data[i][2],
           department: data[i][3],
-          date: data[i][4],
+          date: formattedDate,
           hours: data[i][5],
           content: data[i][6],
           status: data[i][7],

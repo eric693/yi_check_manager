@@ -1881,7 +1881,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
                 // 列表重新整理會渲染新按鈕，覆蓋舊的按鈕
-                fetchAndRenderReviewRequests();
+                await fetchAndRenderReviewRequests();
             } else {
                 showNotification(t('REVIEW_FAILED', { msg: res.msg }), "error");
             }

@@ -463,14 +463,14 @@ function punch(sessionToken, type, lat, lng, note) {
 
   // 防重複：同一天同類型（上班/下班）只能打一次
   const sh = SpreadsheetApp.getActive().getSheetByName(SHEET_ATTENDANCE);
-  const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  const today = Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyy-MM-dd');
   const attendanceValues = sh.getDataRange().getValues();
 
   for (let i = 1; i < attendanceValues.length; i++) {
     const row = attendanceValues[i];
     if (!row[0]) continue;
 
-    const rowDate = Utilities.formatDate(new Date(row[0]), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    const rowDate = Utilities.formatDate(new Date(row[0]), 'Asia/Taipei', 'yyyy-MM-dd');
     const rowUserId = String(row[1]).trim();
     const rowType = String(row[4]).trim();
     const rowNote = String(row[7] || '').trim();
@@ -526,8 +526,8 @@ function punchAdjusted(sessionToken, type, punchDate, lat, lng, note) {
     return { ok: false, code: "ERR_SHEET_NOT_FOUND" };
   }
 
-  const dateOnly = Utilities.formatDate(punchDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
-  const timeOnly = Utilities.formatDate(punchDate, Session.getScriptTimeZone(), 'HH:mm');
+  const dateOnly = Utilities.formatDate(punchDate, 'Asia/Taipei', 'yyyy-MM-dd');
+  const timeOnly = Utilities.formatDate(punchDate, 'Asia/Taipei', 'HH:mm');
 
   // 防重複：同一員工同一日期同一類型，只能有一筆「待審核」申請
   const headers = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
@@ -1200,7 +1200,7 @@ function getReviewRequest() {
     
     // 處理日期
     if (dateValue instanceof Date) {
-      date = Utilities.formatDate(dateValue, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+      date = Utilities.formatDate(dateValue, 'Asia/Taipei', 'yyyy-MM-dd');
     } else if (typeof dateValue === 'string') {
       date = dateValue;
     } else {
@@ -1209,7 +1209,7 @@ function getReviewRequest() {
     
     // 處理時間
     if (timeValue instanceof Date) {
-      time = Utilities.formatDate(timeValue, Session.getScriptTimeZone(), 'HH:mm');
+      time = Utilities.formatDate(timeValue, 'Asia/Taipei', 'HH:mm');
     } else if (typeof timeValue === 'string') {
       time = timeValue;
     } else {
@@ -1293,7 +1293,7 @@ function updateReviewStatus(rowNumber, status, note) {
     
     // 處理日期
     if (dateValue instanceof Date) {
-      punchDate = Utilities.formatDate(dateValue, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+      punchDate = Utilities.formatDate(dateValue, 'Asia/Taipei', 'yyyy-MM-dd');
     } else if (typeof dateValue === 'string') {
       // 如果已經是字串格式，檢查是否符合 YYYY-MM-DD
       if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
@@ -1302,7 +1302,7 @@ function updateReviewStatus(rowNumber, status, note) {
         // 嘗試解析
         const parsedDate = new Date(dateValue);
         if (!isNaN(parsedDate)) {
-          punchDate = Utilities.formatDate(parsedDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+          punchDate = Utilities.formatDate(parsedDate, 'Asia/Taipei', 'yyyy-MM-dd');
         } else {
           punchDate = dateValue;
         }
@@ -1313,7 +1313,7 @@ function updateReviewStatus(rowNumber, status, note) {
     
     // 處理時間
     if (timeValue instanceof Date) {
-      punchTime = Utilities.formatDate(timeValue, Session.getScriptTimeZone(), 'HH:mm');
+      punchTime = Utilities.formatDate(timeValue, 'Asia/Taipei', 'HH:mm');
     } else if (typeof timeValue === 'string') {
       // 如果已經是字串格式，檢查是否符合 HH:mm
       if (/^\d{1,2}:\d{2}$/.test(timeValue)) {
@@ -1646,7 +1646,7 @@ function getDistanceMeters_(lat1, lng1, lat2, lng2) {
 function formatDateTime(date) {
   if (!date) return '';
   try {
-    return Utilities.formatDate(date, Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+    return Utilities.formatDate(date, 'Asia/Taipei', 'yyyy-MM-dd HH:mm:ss');
   } catch (e) {
     return String(date);
   }
@@ -1658,7 +1658,7 @@ function formatDateTime(date) {
 function formatDate(date) {
   if (!date) return '';
   try {
-    return Utilities.formatDate(date, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    return Utilities.formatDate(date, 'Asia/Taipei', 'yyyy-MM-dd');
   } catch (e) {
     return String(date);
   }
@@ -1670,7 +1670,7 @@ function formatDate(date) {
 function formatTime(date) {
   if (!date) return '';
   try {
-    return Utilities.formatDate(date, Session.getScriptTimeZone(), 'HH:mm:ss');
+    return Utilities.formatDate(date, 'Asia/Taipei', 'HH:mm:ss');
   } catch (e) {
     return String(date);
   }
@@ -1722,9 +1722,9 @@ function getEmployeeMonthlyPunchData(employeeId, yearMonth) {
     
     records.forEach(row => {
       const timestamp = new Date(row[0]);
-      const dateKey = Utilities.formatDate(timestamp, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+      const dateKey = Utilities.formatDate(timestamp, 'Asia/Taipei', 'yyyy-MM-dd');
       const type = row[4]; // 上班/下班
-      const time = Utilities.formatDate(timestamp, Session.getScriptTimeZone(), 'HH:mm');
+      const time = Utilities.formatDate(timestamp, 'Asia/Taipei', 'HH:mm');
       const note = row[7] || '';
       const audit = row[8] || '';
       

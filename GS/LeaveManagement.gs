@@ -127,13 +127,13 @@ function submitLeaveRequest(sessionToken, leaveType, startDateTime, endDateTime,
     
     const formattedStartDateTime = Utilities.formatDate(
       start,
-      Session.getScriptTimeZone(),
+      'Asia/Taipei',
       'yyyy-MM-dd HH:mm:ss'
     );
     
     const formattedEndDateTime = Utilities.formatDate(
       end,
-      Session.getScriptTimeZone(),
+      'Asia/Taipei',
       'yyyy-MM-dd HH:mm:ss'
     );
     
@@ -298,7 +298,7 @@ function calculateWorkHoursAndDays_Unlimited(start, end) {
           const overlapHours = overlapMs / (1000 * 60 * 60);
           lunchHoursToDeduct += overlapHours;
           
-          Logger.log(`      ${Utilities.formatDate(currentDate, Session.getScriptTimeZone(), 'yyyy-MM-dd')} 扣除: ${overlapHours.toFixed(2)} 小時`);
+          Logger.log(`      ${Utilities.formatDate(currentDate, 'Asia/Taipei', 'yyyy-MM-dd')} 扣除: ${overlapHours.toFixed(2)} 小時`);
         }
         
         // 移到下一天
@@ -1109,7 +1109,7 @@ function getApprovedLeaveRecords(monthParam, userIdParam) {
 function formatDateTime(date) {
   if (!date) return '';
   try {
-    return Utilities.formatDate(date, Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+    return Utilities.formatDate(date, 'Asia/Taipei', 'yyyy-MM-dd HH:mm:ss');
   } catch (e) {
     return String(date);
   }
@@ -1121,7 +1121,7 @@ function formatDateTime(date) {
 function formatDate(date) {
   if (!date) return '';
   try {
-    return Utilities.formatDate(date, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    return Utilities.formatDate(date, 'Asia/Taipei', 'yyyy-MM-dd');
   } catch (e) {
     return String(date);
   }
@@ -1335,7 +1335,7 @@ function updateAllEmployeesAnnualLeave() {
   const balanceSheet = getLeaveBalanceSheet();
   const balanceValues = balanceSheet.getDataRange().getValues();
   const today = new Date();
-  const todayStr = Utilities.formatDate(today, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  const todayStr = Utilities.formatDate(today, 'Asia/Taipei', 'yyyy-MM-dd');
 
   const todayMonth = today.getMonth();
   const todayDate = today.getDate();
@@ -1375,7 +1375,7 @@ function updateAllEmployeesAnnualLeave() {
     if (lastUpdateDate) {
       const lastUpdateStr = Utilities.formatDate(
         new Date(lastUpdateDate),
-        Session.getScriptTimeZone(),
+        'Asia/Taipei',
         'yyyy-MM-dd'
       );
       if (lastUpdateStr === todayStr) {
