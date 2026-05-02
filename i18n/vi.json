@@ -17,18 +17,15 @@
   "TAB_LEAVE": "Nghỉ phép",
   "TAB_SHIFT": "Ca làm việc",
   "TAB_SALARY": "Lương",
-
   "PUNCH_SECTION_TITLE": "Khu vực chấm công",
   "PUNCH_SECTION_DESCRIPTION": "Vui lòng nhấp vào nút bên dưới để chấm công vào hoặc ra.",
   "PUNCH_SECTION_DESC": "Vui lòng nhấp vào nút bên dưới để chấm công vào hoặc ra.",
-
   "ABNORMAL_RECORDS_TITLE": "Lịch sử chấm công",
   "ABNORMAL_RECORDS_DESCRIPTION": "Hệ thống sẽ phát hiện các bản ghi bất thường. Bạn có thể sửa đổi tại đây.",
   "RECORDS_LOADING": "Đang tải lịch sử...",
   "RECORDS_EMPTY_TITLE": "Tuyệt vời!",
   "RECORDS_EMPTY_MESSAGE": "Hiện tại không có bản ghi bất thường nào trong tháng này.",
   "ERROR_FETCH_RECORDS": "Không thể lấy bản ghi",
-
   "MONTHLY_VIEW_TITLE": "Hồ sơ chấm công",
   "WEEK_SUNDAY": "CN",
   "WEEK_MONDAY": "T2",
@@ -37,9 +34,7 @@
   "WEEK_THURSDAY": "T5",
   "WEEK_FRIDAY": "T6",
   "WEEK_SATURDAY": "T7",
-
   "DAILY_RECORDS_EMPTY": "Không có bản ghi chấm công nào trong ngày.",
-
   "CURRENT_LOCATION_TITLE": "Vị trí hiện tại",
   "CURRENT_LOCATION_DESCRIPTION": "Hệ thống sẽ phát hiện vị trí của bạn qua GPS.",
   "MAP_LOADING": "Đang tải bản đồ...",
@@ -47,13 +42,11 @@
   "LOCATION_STATUS_PENDING": "Chưa phát hiện",
   "COORDINATES_LABEL": "Tọa độ:",
   "COORDINATES_UNKNOWN": "Không xác định",
-
   "PENDING_REQUESTS_TITLE": "Yêu cầu đang chờ duyệt",
   "PENDING_REQUESTS_DESCRIPTION": "Vui lòng xử lý các yêu cầu chấm công bổ sung hoặc ảo của nhân viên.",
   "REQUESTS_LOADING": "Đang tải yêu cầu...",
   "REQUESTS_EMPTY_TITLE": "Tuyệt vời!",
   "REQUESTS_EMPTY_MESSAGE": "Hiện tại không có yêu cầu nào đang chờ duyệt.",
-
   "ADD_LOCATION_TITLE": "Thêm địa điểm",
   "ADD_LOCATION_DESCRIPTION": "Nhập tên địa điểm và sử dụng vị trí hiện tại của bạn làm tọa độ.",
   "LOCATION_NAME_LABEL": "Tên địa điểm",
@@ -62,61 +55,51 @@
   "LONGITUDE_PLACEHOLDER": "Kinh độ",
   "GET_LOCATION_BTN": "Lấy vị trí của tôi",
   "ADD_LOCATION_BTN": "Thêm địa điểm",
-
   "API_TEST_TITLE": "Kiểm thử API",
   "API_TEST_DESCRIPTION": "Nhấp vào đây để kiểm thử chức năng API.",
   "API_TEST_BTN": "Kiểm thử API",
-
   "FOOTER_VERSION": "Hệ thống chấm công v4.6.0",
   "FOOTER_CREDITS_PREFIX": "Được làm bởi",
   "FOOTER_CREDITS_SUFFIX": "",
   "FOOTER_SPONSOR": "Tài trợ cho dự án này",
   "FOOTER_OPEN_SOURCE": "Đây là một dự án mã nguồn mở, hoan nghênh đóng góp.",
   "LOGIN_INFO": "Nhấp vào đăng nhập để tiếp tục.",
-
   "_comment1": "＿＿＿＿＿Bản dịch Frontend JS＿＿＿＿",
   "LOADING": "⏳ Đang xử lý...",
   "CHECKING": "Đang kiểm tra...",
   "NETWORK_ERROR": "Lỗi mạng",
   "UNKNOWN_ERROR": "Lỗi không xác định",
   "CONNECTION_FAILED": "Kết nối thất bại",
-
   "ADJUST_BUTTON_TEXT": "Chấm công bổ sung",
   "MONTH_YEAR_TEMPLATE": "Tháng {month} năm {year}",
   "DAILY_RECORDS_TITLE": "Lịch sử chấm công {dateKey}",
   "RECORD_NOTE_PREFIX": "Ghi chú:",
   "RECORD_REASON_PREFIX": "Hệ thống đánh giá:",
-
   "ADMIN_APPROVE_BUTTON": "Duyệt",
   "ADMIN_REJECT_BUTTON": "Từ chối",
   "REQUEST_APPROVED": "Yêu cầu đã được duyệt!",
   "REQUEST_REJECTED": "Yêu cầu đã bị từ chối!",
   "REVIEW_FAILED": "Duyệt thất bại: {msg}",
   "REVIEW_NETWORK_ERROR": "Duyệt thất bại, vui lòng kiểm tra mạng.",
-
   "SELECT_DATETIME_LABEL": "Chọn ngày và giờ:",
   "BTN_ADJUST_IN": "Bổ sung chấm công vào",
   "BTN_ADJUST_OUT": "Bổ sung chấm công ra",
-
   "DETECTING_LOCATION": "Đang phát hiện vị trí...",
   "UNKNOWN_LOCATION": "Không xác định",
   "DETECTION_SUCCESS": "Phát hiện thành công",
   "CURRENT_LOCATION": "Vị trí hiện tại",
   "DETECTION_FAILED": "Phát hiện thất bại",
-
   "ERROR_GEOLOCATION_PERMISSION_DENIED": "Người dùng đã từ chối quyền truy cập vị trí.",
   "ERROR_GEOLOCATION_UNAVAILABLE": "Thông tin vị trí không khả dụng.",
   "ERROR_GEOLOCATION_TIMEOUT": "Yêu cầu vị trí đã hết thời gian.",
   "ERROR_GEOLOCATION_UNKNOWN": "Đã xảy ra lỗi không xác định.",
   "ERROR_BROWSER_NOT_SUPPORTED": "Trình duyệt của bạn không hỗ trợ định vị địa lý.",
-
   "_comment2": "＿＿＿＿＿Bản dịch Backend＿＿＿＿",
   "FOOTER_NOTICE": "※ Trạng thái đăng nhập được lưu trên trình duyệt của bạn trong một ngày. Bạn cần đăng nhập lại nếu đổi thiết bị hoặc xóa dữ liệu.",
   "ADJUST_PUNCH_TITLE": "Chấm công bổ sung",
   "ADJUST_PUNCH_DATETIME_LABEL": "Chọn ngày & giờ chấm công bổ sung:",
   "PUNCH_SUCCESS": "✅ Chấm công {type} thành công",
   "ADJUST_PUNCH_SUCCESS": "✅ Chấm công bổ sung {type} thành công",
-
   "ERR_SESSION_INVALID": "🔄 Thông tin đăng nhập không hợp lệ. Vui lòng đăng nhập lại.",
   "ERR_SESSION_EXPIRED": "Phiên làm việc đã hết hạn",
   "ERR_SESSION_TOKEN": "sessionToken không hợp lệ",
@@ -130,23 +113,19 @@
   "ERR_ACCOUNT_DISABLED": "Tài khoản chưa được kích hoạt! Vui lòng thông báo cho quản trị viên.",
   "ERR_NO_DATA": "Không có dữ liệu",
   "ERR_OUT_OF_RANGE": "❌ Chấm công thất bại! Bạn đang ở ngoài khu vực cho phép.",
-
   "ABNORMAL_MISSING_ALL": "Không có chấm công nào vào {date}.",
   "ABNORMAL_MISSING_OUT": "Thiếu chấm công ra vào {date}.",
   "ABNORMAL_MISSING_IN": "Thiếu chấm công vào vào {date}.",
-
   "BTN_RELOGIN": "Đăng nhập lại",
   "PLEASE_RELOGIN": "Vui lòng đăng nhập lại.",
   "BTN_PUNCH_IN": "Chấm công vào",
   "BTN_PUNCH_OUT": "Chấm công ra",
   "BTN_VIEW_ABNORMAL": "⚠️ Xem các bản ghi bất thường 👀",
-
   "INVALID_ADJUST_TIME": "⚠️ Thời gian đã chọn không hợp lệ.",
   "SELECT_ADJUST_DATETIME": "Vui lòng chọn ngày và giờ chấm công bổ sung.",
   "LOGIN_SUCCESS": "✅ Đăng nhập thành công!",
   "ERROR_GEOLOCATION": "⚠️ Không thể lấy vị trí: {msg}",
   "ERROR_LOGIN_FAILED": "❌ Đăng nhập thất bại: {msg}",
-
   "calendar_title": "Lịch chấm công của tôi",
   "prev_month": "Tháng trước",
   "next_month": "Tháng sau",
@@ -154,23 +133,17 @@
   "modal_detail_title": "Chi tiết chấm công",
   "close": "Đóng",
   "load_failed": "Tải lịch sử thất bại",
-
   "year": "Năm",
   "month": "Tháng",
-
   "status_normal": "✔️",
   "status_abnormal": "⚠️",
   "status_virtual": "Ảo",
   "status_repair": "Bổ sung",
-
   "repair_approved": "Đã duyệt",
   "repair_pending": "Đang chờ duyệt",
-
   "no_record": "Không có bản ghi",
-
   "ERR_BEFORE_MONTH_START": "⚠️ Không thể chọn thời gian trước tháng này.",
   "ERR_AFTER_TODAY": "⚠️ Không thể chọn thời gian sau hôm nay",
-
   "STATUS_PUNCH_NORMAL": "Chấm công bình thường",
   "STATUS_NO_RECORD": "Không có bản ghi chấm công",
   "STATUS_PUNCH_OUT_MISSING": "Thiếu chấm công ra",
@@ -184,19 +157,15 @@
   "STATUS_REPAIR_REJECTED_IN": "Chấm công vào bổ sung đã bị từ chối",
   "STATUS_REPAIR_REJECTED_OUT": "Chấm công ra bổ sung đã bị từ chối",
   "REAPPLY": "Gửi lại yêu cầu",
-
   "PUNCH_IN": "Chấm công vào",
   "PUNCH_OUT": "Chấm công ra",
-
   "MAKEUP_PUNCH_TITLE": "Chấm công bổ sung: {date} ({type})",
   "SELECT_PUNCH_TIME": "Chọn giờ {type}:",
   "BTN_CANCEL": "Hủy",
   "BTN_SUBMIT_PUNCH_IN": "Gửi chấm công vào bổ sung",
   "BTN_SUBMIT_PUNCH_OUT": "Gửi chấm công ra bổ sung",
-
   "BTN_SUBMIT_OVERTIME": "Gửi đơn làm thêm giờ",
   "BTN_SUBMIT_LEAVE": "Gửi đơn nghỉ phép",
-
   "OVERTIME_APPLY_TITLE": "Đăng ký làm thêm giờ",
   "OVERTIME_APPLY_DESCRIPTION": "Điền thông tin sau để gửi đơn đăng ký làm thêm giờ",
   "OVERTIME_DATE_LABEL": "Ngày làm thêm giờ",
@@ -206,50 +175,39 @@
   "OVERTIME_REASON_LABEL": "Lý do đăng ký:",
   "OVERTIME_REASON_PLACEHOLDER": "Vui lòng giải thích lý do làm thêm giờ...",
   "OVERTIME_SUBMIT_BTN": "Gửi đơn đăng ký",
-
   "OVERTIME_RECORDS_TITLE": "Hồ sơ làm thêm giờ của tôi",
   "OVERTIME_RECORDS_DESCRIPTION": "Xem lịch sử đơn đăng ký làm thêm giờ của bạn",
   "OVERTIME_NO_RECORDS": "Hiện tại không có hồ sơ làm thêm giờ",
-
   "OVERTIME_STATUS_PENDING": "Đang xem xét",
   "OVERTIME_STATUS_APPROVED": "Đã phê duyệt",
   "OVERTIME_STATUS_REJECTED": "Đã từ chối",
-
   "OVERTIME_REVIEW_COMMENT": "Ý kiến đánh giá:",
-
   "OVERTIME_PENDING_TITLE": "Đơn đăng ký làm thêm giờ chờ phê duyệt",
   "OVERTIME_PENDING_DESCRIPTION": "Xem xét đơn đăng ký làm thêm giờ do nhân viên gửi",
   "OVERTIME_NO_PENDING": "Tuyệt vời! Hiện không có đơn đăng ký làm thêm giờ chờ phê duyệt.",
-
   "OVERTIME_FILL_ALL_FIELDS": "Vui lòng điền tất cả các trường",
   "OVERTIME_INVALID_HOURS": "Số giờ làm thêm phải lớn hơn 0",
   "OVERTIME_SUBMIT_SUCCESS": "✅ Đơn đăng ký làm thêm giờ đã được gửi",
   "OVERTIME_APPROVED": "✅ Đơn đăng ký làm thêm giờ đã được phê duyệt",
   "OVERTIME_REJECTED": "❌ Đơn đăng ký làm thêm giờ đã bị từ chối",
   "OVERTIME_REJECT_REASON_PROMPT": "Vui lòng nhập lý do từ chối (tùy chọn)",
-
   "OVERTIME_APPROVED_INFO": "✅ Làm thêm giờ đã được phê duyệt",
   "OVERTIME_HOURS": "{hours} giờ",
   "OVERTIME_TIME_RANGE": "Thời gian làm thêm: {startTime} - {endTime}",
   "OVERTIME_REASON": "Lý do làm thêm giờ: {reason}",
-
   "ERROR_LOAD_OVERTIME": "Không thể tải hồ sơ làm thêm giờ",
   "ERROR_SUBMIT_OVERTIME": "Không thể gửi đơn đăng ký làm thêm giờ",
   "ERR_NO_PERMISSION": "Bạn không có quyền thực hiện hành động này",
-
   "LEAVE_BALANCE_TITLE": "Số ngày phép còn lại",
   "LEAVE_BALANCE_DESCRIPTION": "Hạn mức nghỉ phép có sẵn của bạn",
-
   "LEAVE_APPLY_TITLE": "Đăng ký nghỉ phép",
   "LEAVE_APPLY_DESCRIPTION": "Điền thông tin dưới đây để gửi đơn xin nghỉ phép",
-
   "LEAVE_TYPE_LABEL": "Loại phép",
   "LEAVE_START_DATE_LABEL": "Ngày bắt đầu",
   "LEAVE_END_DATE_LABEL": "Ngày kết thúc",
   "LEAVE_DAYS_LABEL": "Số ngày nghỉ phép",
   "LEAVE_REASON_LABEL": "Lý do nghỉ phép:",
   "LEAVE_SUBMIT_BTN": "Gửi đơn",
-
   "ANNUAL_LEAVE": "Phép năm",
   "COMP_TIME_OFF": "Nghỉ bù",
   "PERSONAL_LEAVE": "Phép cá nhân",
@@ -265,31 +223,24 @@
   "NATURAL_DISASTER_LEAVE": "Nghỉ do thiên tai",
   "FAMILY_CARE_LEAVE": "Phép chăm sóc gia đình",
   "MENSTRUAL_LEAVE": "Phép sinh lý",
-
   "DAYS": "Ngày",
-
   "LEAVE_RECORDS_TITLE": "Lịch sử nghỉ phép",
   "LEAVE_RECORDS_DESCRIPTION": "Xem lịch sử đăng ký nghỉ phép của bạn",
   "LEAVE_NO_RECORDS": "Chưa có lịch sử nghỉ phép",
-
   "PENDING": "Chờ duyệt",
   "APPROVED": "Đã duyệt",
   "REJECTED": "Đã từ chối",
-
   "LEAVE_PENDING_TITLE": "Đơn xin nghỉ phép chờ duyệt",
   "LEAVE_PENDING_DESCRIPTION": "Xem xét đơn xin nghỉ phép của nhân viên",
   "LEAVE_NO_PENDING": "Tuyệt vời! Không có đơn xin nghỉ phép nào chờ duyệt.",
-
   "LEAVE_SUBMIT_SUCCESS": "Đơn xin nghỉ phép đã được gửi, đang chờ quản lý phê duyệt",
   "LEAVE_SUBMIT_FAILED": "Gửi đơn xin nghỉ phép thất bại",
   "LEAVE_APPROVED": "Đơn xin nghỉ phép đã được phê duyệt",
   "LEAVE_REJECTED": "Đơn xin nghỉ phép đã bị từ chối",
-
   "LEGEND_OVERTIME": "Làm thêm giờ",
   "LEGEND_LEAVE_APPROVED": "Nghỉ phép (Đã duyệt)",
   "LEGEND_LEAVE_PENDING": "Nghỉ phép (Đang chờ duyệt)",
   "LEGEND_LEAVE_REJECTED": "Nghỉ phép (Bị từ chối)",
-
   "ERROR_FETCH_LEAVE_BALANCE": "Không thể tải số ngày phép còn lại",
   "ERR_INVALID_LEAVE_TYPE": "Loại phép không hợp lệ",
   "ERR_INSUFFICIENT_LEAVE_BALANCE": "{leaveType} không đủ số dư (cần {required} ngày, còn {available} ngày)",
@@ -302,13 +253,11 @@
   "ERR_MISSING_REJECT_REASON": "Phải điền lý do từ chối khi từ chối nghỉ phép",
   "ENTER_REJECT_REASON": "Nhập lý do từ chối:",
   "REVIEW_COMMENT_LABEL": "Nhận xét đánh giá:",
-
   "EXPORT_ATTENDANCE_BTN": "Xuất báo cáo chấm công tháng này",
   "EXPORT_LOADING": "Đang chuẩn bị báo cáo...",
   "EXPORT_SUCCESS": "Xuất báo cáo thành công!",
   "EXPORT_FAILED": "Xuất thất bại, vui lòng thử lại sau",
   "EXPORT_NO_DATA": "Không có bản ghi chấm công trong tháng này",
-
   "EXPORT_DATE": "Ngày",
   "EXPORT_WEEKDAY": "Thứ",
   "EXPORT_PUNCH_IN_TIME": "Giờ vào",
@@ -322,68 +271,55 @@
   "EXPORT_STATISTICS": "Thống kê",
   "EXPORT_TOTAL_DAYS": "Tổng cộng {count} ngày",
   "EXPORT_AVERAGE": "Trung bình: {avg}",
-
   "ADMIN_EXPORT_TITLE": "Xuất báo cáo",
   "ADMIN_EXPORT_DESCRIPTION": "Xuất báo cáo chấm công của tất cả nhân viên",
   "ADMIN_EXPORT_MONTH_LABEL": "Chọn tháng",
   "ADMIN_EXPORT_ALL_BTN": "Xuất báo cáo tất cả nhân viên",
-
   "SHIFT_TITLE": "Quản lý ca làm việc",
   "SHIFT_DESCRIPTION": "Xem và quản lý thông tin ca làm việc của nhân viên",
   "BTN_SHIFT_MANAGEMENT": "Vào trang quản lý ca làm việc",
-
   "SHIFT_TODAY_TITLE": "Ca làm hôm nay",
   "SHIFT_TODAY_EMPTY": "Hôm nay không có ca làm",
   "SHIFT_WEEK_TITLE": "Ca làm trong tuần này",
   "SHIFT_WEEK_EMPTY": "Tuần này không có ca làm",
   "SHIFT_LOADING": "Đang tải...",
-
   "SHIFT_TYPE_LABEL": "Loại ca",
   "SHIFT_TIME_LABEL": "Thời gian",
   "SHIFT_LOCATION_LABEL": "Địa điểm",
-
   "SHIFT_INFO_NOTIFICATION": "Ca làm hôm nay: {shiftType} ({startTime}-{endTime})",
   "EARLY_PUNCH_WARNING": "Lưu ý: Ca làm của bạn bắt đầu lúc {startTime}, bạn đã chấm công sớm hơn 30 phút.",
   "LATE_PUNCH_WARNING": "Lưu ý: Ca làm của bạn bắt đầu lúc {startTime}, bạn đã trễ hơn 30 phút.",
   "NO_SHIFT_TODAY": "Không có ca làm hôm nay",
-
   "SHIFT_PAGE_TITLE": "Quản lý ca làm việc - Hệ thống chấm công",
   "SHIFT_MANAGEMENT_TITLE": "Quản lý ca làm việc",
   "BTN_BACK": "Quay lại",
-
   "SHIFT_TAB_VIEW": "Xem ca làm",
   "SHIFT_TAB_ADD": "Thêm ca làm",
   "SHIFT_TAB_BATCH": "Thêm theo lô",
   "SHIFT_TAB_STATS": "Thống kê",
-
   "SHIFT_FILTER_TITLE": "Điều kiện lọc",
   "SHIFT_START_DATE": "Ngày bắt đầu",
   "SHIFT_END_DATE": "Ngày kết thúc",
   "OPTION_ALL": "Tất cả",
-
   "SHIFT_TYPE_MORNING": "Ca sáng",
   "SHIFT_TYPE_AFTERNOON": "Ca chiều",
   "SHIFT_TYPE_NIGHT": "Ca tối",
   "SHIFT_TYPE_FULL": "Ca cả ngày",
   "SHIFT_TYPE_DAYOFF": "Nghỉ",
   "SHIFT_TYPE_CUSTOM": "Tùy chỉnh",
-
   "SHIFT_MORNING_DESC": "Ca sáng (08:00-16:00)",
   "SHIFT_AFTERNOON_DESC": "Ca chiều (12:00-20:00)",
   "SHIFT_NIGHT_DESC": "Ca tối (16:00-24:00)",
   "SHIFT_FULL_DESC": "Ca cả ngày (09:00-18:00)",
   "SHIFT_DAYOFF_DESC": "Nghỉ (ngày nghỉ)",
   "SHIFT_CUSTOM_DESC": "Giờ tùy chỉnh",
-
   "SHIFT_START_TIME": "Giờ bắt đầu",
   "SHIFT_END_TIME": "Giờ kết thúc",
   "SHIFT_SELECT_LOCATION": "Chọn địa điểm",
   "SHIFT_NOTE_LABEL": "Ghi chú",
   "SHIFT_NOTE_PLACEHOLDER": "Nhập ghi chú...",
-
   "BTN_ADD_SHIFT": "Thêm ca làm",
   "BTN_RESET": "Đặt lại",
-
   "SHIFT_BATCH_TITLE": "Thêm ca làm theo lô",
   "SHIFT_BATCH_DESC": "Tải lên tệp CSV hoặc Excel để thêm ca làm theo lô. Định dạng: Mã nhân viên, Tên, Ngày, Loại ca, Giờ bắt đầu, Giờ kết thúc, Địa điểm, Ghi chú",
   "SHIFT_UPLOAD_DESC": "Kéo và thả tệp vào đây hoặc nhấp để chọn tệp",
@@ -391,21 +327,16 @@
   "SHIFT_PREVIEW_TITLE": "Xem trước dữ liệu",
   "BTN_CONFIRM_UPLOAD": "Xác nhận tải lên",
   "BTN_DOWNLOAD_TEMPLATE": "Tải mẫu",
-
   "SHIFT_STATS_LOADING": "Đang tải dữ liệu thống kê...",
   "BTN_PREV_MONTH": "◀ Tháng trước",
   "BTN_NEXT_MONTH": "Tháng sau ▶",
   "BTN_TODAY": "Hôm nay",
   "SHIFT_CALENDAR_LOADING": "Đang tải lịch...",
-
   "SHIFT_NO_DATA": "Không có dữ liệu ca làm",
   "SHIFT_LOAD_FAILED": "Tải thất bại",
   "SHIFT_LOAD_ERROR": "Tải thất bại",
-
   "BTN_EDIT": "Chỉnh sửa",
-
   "SHIFT_STATS_TOTAL": "Tổng số ca làm trong tháng",
-
   "SHIFT_FILL_TIME": "Vui lòng nhập giờ bắt đầu và giờ kết thúc",
   "SHIFT_CONFIRM_CROSS_DAY": "Giờ kết thúc sớm hơn giờ bắt đầu. Đây có phải ca qua đêm không?",
   "SHIFT_ADD_SUCCESS": "Thêm ca làm thành công!",
@@ -415,48 +346,37 @@
   "SHIFT_DELETE_CONFIRM": "Bạn có chắc chắn muốn xóa ca làm này không?",
   "SHIFT_DELETE_SUCCESS": "Đã xóa ca làm",
   "SHIFT_DELETE_FAILED": "Xóa ca làm thất bại",
-
   "SHIFT_NO_EXPORT_DATA": "Không có dữ liệu để xuất",
   "SHIFT_EXPORT_SUCCESS": "Xuất thành công",
-
   "SHIFT_BATCH_CSV_ONLY": "Hiện chỉ hỗ trợ định dạng CSV",
   "SHIFT_BATCH_NO_DATA": "Không có dữ liệu hợp lệ trong tệp",
   "SHIFT_BATCH_UPLOAD_SUCCESS": "Tải lên theo lô thành công",
   "SHIFT_BATCH_UPLOAD_FAILED": "Tải lên theo lô thất bại",
   "SHIFT_BATCH_NETWORK_ERROR": "Tải lên theo lô thất bại: Lỗi mạng",
-
   "SHIFT_DETAIL_TITLE": "Chi tiết ca làm",
   "SHIFT_NO_NOTE": "Không có",
-
   "SHIFT_DISTRIBUTION_TITLE": "Phân bố ca làm theo tháng",
   "SHIFT_TYPE_DISTRIBUTION_TITLE": "Phân bố loại ca theo tháng",
   "SHIFT_SHIFTS_COUNT": "{count} ca",
-
   "SHIFT_LOGIN_REQUIRED": "Vui lòng đăng nhập trước",
   "SHIFT_NO_EMPLOYEE_DATA": "Không có dữ liệu nhân viên",
   "SHIFT_LOAD_EMPLOYEES_FAILED": "Tải danh sách nhân viên thất bại",
   "SHIFT_LOAD_EMPLOYEES_ERROR": "Tải danh sách nhân viên thất bại",
-
   "SHIFT_ADD_ERROR": "Thêm ca làm thất bại",
-
   "SHIFT_EDIT_TITLE": "Chỉnh sửa ca làm",
   "BTN_UPDATE_SHIFT": "Cập nhật ca làm",
-
   "SHIFT_BATCH_UPLOAD_ERROR": "Tải lên theo lô thất bại",
   "SALARY_CURRENT_TITLE": "Lương tháng này",
   "SALARY_NOT_CALCULATED": "Lương tháng này chưa được tính",
   "SALARY_CONTACT_ADMIN": "Vui lòng liên hệ quản trị viên để tính lương",
-
   "SALARY_GROSS": "Tổng lương",
   "SALARY_DEDUCTIONS": "Tổng khấu trừ",
   "SALARY_NET": "Lương thực nhận",
-
   "SALARY_EARNINGS": "Các khoản thu nhập",
   "SALARY_BASE": "Lương cơ bản",
   "SALARY_WEEKDAY_OT": "Phụ cấp làm thêm ngày thường",
   "SALARY_REST_OT": "Phụ cấp làm thêm ngày nghỉ",
   "SALARY_HOLIDAY_OT": "Phụ cấp làm thêm ngày lễ",
-
   "SALARY_DEDUCTIONS_DETAIL": "Các khoản khấu trừ",
   "SALARY_LABOR_INS": "Bảo hiểm lao động",
   "SALARY_HEALTH_INS": "Bảo hiểm y tế",
@@ -464,14 +384,11 @@
   "SALARY_PENSION": "Đóng góp lương hưu",
   "SALARY_TAX": "Thuế thu nhập",
   "SALARY_LEAVE_DEDUCT": "Khấu trừ nghỉ phép",
-
   "SALARY_BANK_INFO": "Thông tin ngân hàng",
   "SALARY_BANK": "Ngân hàng",
   "SALARY_ACCOUNT": "Số tài khoản",
-
   "SALARY_HISTORY_TITLE": "Lịch sử lương",
   "SALARY_NO_HISTORY": "Chưa có lịch sử",
-
   "SALARY_MANAGEMENT_TITLE": "Quản lý lương",
   "SALARY_MANAGEMENT_DESC": "Xem và quản lý thông tin lương nhân viên",
   "BTN_SALARY_SYSTEM": "Vào hệ thống quản lý lương",
@@ -480,15 +397,12 @@
   "SALARY_FEATURE_2": "Tự động tính phụ cấp làm thêm và các khoản khấu trừ",
   "SALARY_FEATURE_3": "Tạo và quản lý phiếu lương",
   "SALARY_FEATURE_4": "Theo dõi chi tiết lương theo giờ",
-
   "SALARY_THIS_MONTH": "Lương tháng này",
   "WORK_HOURS": "Giờ làm việc",
   "SALARY_CALCULATED": "Đang tính...",
   "HOURS_THIS_MONTH": "Thống kê tháng này",
-
   "SALARY_REMINDER_TITLE": "Lưu ý",
   "SALARY_REMINDER_TEXT": "Hệ thống lương tự động tích hợp bản ghi chấm công, làm thêm giờ và nghỉ phép của bạn để tính toán. Vui lòng chấm công đúng giờ để đảm bảo tính lương chính xác.",
-
   "WEEKDAY_SUNDAY": "Chủ nhật",
   "WEEKDAY_MONDAY": "Thứ hai",
   "WEEKDAY_TUESDAY": "Thứ ba",
@@ -496,10 +410,8 @@
   "WEEKDAY_THURSDAY": "Thứ năm",
   "WEEKDAY_FRIDAY": "Thứ sáu",
   "WEEKDAY_SATURDAY": "Thứ bảy",
-
   "ANNOUNCEMENT_TITLE": "📢 Thông báo mới nhất",
   "ANNOUNCEMENT_EMPTY": "Hiện chưa có thông báo nào",
-
   "BIOMETRIC_PUNCH_TITLE": "Chấm công nhanh bằng sinh trắc học",
   "BIOMETRIC_PUNCH_DESC": "Sử dụng Face ID hoặc vân tay để chấm công một chạm",
   "BIOMETRIC_STATUS_NOT_SETUP": "Chưa thiết lập",
@@ -507,10 +419,8 @@
   "BIOMETRIC_SETUP_BTN": "Thiết lập chấm công sinh trắc học",
   "BIOMETRIC_PUNCH_IN_BTN": "Chấm công vào",
   "BIOMETRIC_PUNCH_OUT_BTN": "Chấm công ra",
-
   "LINE_CHANNEL_TITLE": "Tham gia kênh LINE nội bộ để nhận thông báo mới nhất!",
   "LINE_CHANNEL_ID": "@464mssoh",
-
   "MONTHLY_STATS_TITLE": "Thống kê chấm công tháng này",
   "STATS_TOTAL_HOURS": "Tổng giờ làm",
   "STATS_WORK_DAYS": "Số ngày làm việc",
@@ -519,20 +429,17 @@
   "UNIT_HOURS": "giờ",
   "UNIT_DAYS": "ngày",
   "UNIT_RECORDS": "bản ghi",
-
   "DAILY_ATTENDANCE_TITLE": "Hồ sơ chấm công",
   "PUNCH_RECORDS_TITLE": "Bản ghi chấm công",
   "OVERTIME_PERIOD": "Thời gian làm thêm",
   "TIME_LABEL": "Thời gian",
   "REASON_LABEL": "Lý do",
   "SYSTEM_JUDGMENT": "Ghi chú hệ thống",
-
   "LEAVE_INFO_TITLE": "Thông tin nghỉ phép",
   "LEAVE_TYPE": "Loại phép",
   "LEAVE_DAYS_COUNT": "Số ngày",
   "LEAVE_REASON_DISPLAY": "Lý do",
   "REVIEW_COMMENT": "Nhận xét đánh giá",
-
   "ADMIN_ANNOUNCEMENT_MANAGEMENT": "📢 Quản lý thông báo",
   "ANNOUNCEMENT_TITLE_PLACEHOLDER": "Tiêu đề thông báo",
   "ANNOUNCEMENT_CONTENT_PLACEHOLDER": "Nội dung thông báo",
@@ -543,7 +450,6 @@
   "BTN_DELETE": "Xóa",
   "DELETE_ANNOUNCEMENT_CONFIRM": "Bạn có chắc chắn muốn xóa thông báo này không?",
   "ANNOUNCEMENT_DELETED": "Đã xóa thông báo",
-
   "SEARCH_LOCATION_LABEL": "🔍 Tìm kiếm địa điểm",
   "SEARCH_LOCATION_PLACEHOLDER": "Nhập địa chỉ hoặc tên địa điểm...",
   "LOCATION_NAME_PLACEHOLDER": "Ví dụ: Landmark 81",
@@ -551,7 +457,6 @@
   "LONGITUDE_LABEL": "Kinh độ",
   "PUNCH_RANGE_LABEL": "Phạm vi chấm công",
   "PUNCH_RANGE_DESCRIPTION": "Kéo thanh trượt để điều chỉnh bán kính chấm công cho phép (30–2000 mét).",
-
   "ADMIN_PUNCH_ANALYSIS_TITLE": "Phân tích chấm công của nhân viên",
   "ADMIN_PUNCH_ANALYSIS_DESC": "Xem phân bố thời gian chấm công và thống kê giờ làm việc theo tháng",
   "SELECT_EMPLOYEE_LABEL": "Chọn nhân viên",
@@ -559,28 +464,22 @@
   "SELECT_MONTH_LABEL": "Chọn tháng",
   "BTN_LOAD_ANALYSIS": "Tải biểu đồ phân tích",
   "BTN_EXPORT_PUNCH_REPORT": "Xuất báo cáo chấm công",
-
   "CHART_WORK_HOURS_TITLE": "Giờ làm việc mỗi ngày",
   "CHART_PUNCH_TIME_TITLE": "Phân bố thời gian chấm công",
   "ANALYSIS_LOADING": "Đang tải dữ liệu phân tích...",
   "ANALYSIS_NO_DATA": "Không có bản ghi chấm công trong tháng này",
-
-
   "SALARY_PAGE_TITLE": "Hệ thống quản lý lương - Quản lý chấm công",
   "SALARY_SYSTEM_TITLE": "Hệ thống quản lý lương",
   "SALARY_SYSTEM_DESC": "Giải pháp quản lý lương toàn diện (bao gồm phụ cấp và khấu trừ)",
-
   "SALARY_TAB_EMPLOYEE": "Lương nhân viên",
   "SALARY_TAB_SETTING": "Cài đặt lương",
   "SALARY_TAB_MONTHLY": "Tính lương tháng",
   "SALARY_TAB_HOURLY": "Tính lương theo giờ",
   "SALARY_TAB_LIST": "Danh sách lương",
-
   "SALARY_QUERY_MONTH": "📅 Tháng tra cứu:",
   "BTN_QUERY": "🔍 Tra cứu",
   "SALARY_MY_DETAIL": "Chi tiết lương của tôi",
   "SALARY_NO_RECORD": "Chưa có dữ liệu lương",
-
   "SALARY_EARNINGS_TITLE": "Khoản thu nhập",
   "SALARY_POSITION_ALLOWANCE": "Phụ cấp chức vụ",
   "SALARY_MEAL_ALLOWANCE": "Phụ cấp ăn uống",
@@ -588,14 +487,11 @@
   "SALARY_ATTENDANCE_BONUS": "Thưởng chuyên cần",
   "SALARY_PERFORMANCE_BONUS": "Thưởng hiệu suất",
   "SALARY_RESTDAY_OT": "Tiền làm thêm ngày nghỉ",
-
   "SALARY_DEDUCTIONS_TITLE": "Khoản khấu trừ",
   "SALARY_OTHER_DEDUCT": "Khấu trừ khác",
-
   "SALARY_BANK_INFO_TITLE": "Thông tin ngân hàng",
   "SALARY_BANK_NAME_LABEL": "Ngân hàng:",
   "SALARY_ACCOUNT_LABEL": "Số tài khoản:",
-
   "SALARY_SETTING_FORM_TITLE": "Thiết lập lương nhân viên (đầy đủ)",
   "SALARY_BASIC_INFO": "Thông tin cơ bản",
   "SALARY_EMPLOYEE_LABEL": "Nhân viên",
@@ -607,9 +503,7 @@
   "SALARY_TYPE_LABEL": "Hình thức lương",
   "SALARY_BASE_LABEL": "Lương cơ bản",
   "SALARY_ALLOWANCE_TITLE": "💰 Phụ cấp & trợ cấp cố định",
-
   "BTN_SAVE_SALARY_SETTING": "💾 Lưu thiết lập lương",
-
   "SALARY_LOGIN_REQUIRED": "Vui lòng đăng nhập trước",
   "SALARY_INIT_FAILED": "Khởi tạo thất bại",
   "SALARY_SELECT_MONTH": "Vui lòng chọn tháng",
@@ -630,14 +524,12 @@
   "SALARY_HOURLY_MIN_190": "Lương theo giờ không được thấp hơn 190",
   "SALARY_INPUT_WORK_HOURS": "Vui lòng nhập số giờ làm việc",
   "SALARY_HOURLY_CALC_SUCCESS": "Tính lương theo giờ hoàn tất",
-
   "SALARY_SETTING_DESC": "Thiết lập lương cơ bản, phụ cấp và tất cả các khoản khấu trừ",
   "PLEASE_SELECT": "Vui lòng chọn",
   "FULL_TIME": "Nhân viên chính thức",
   "PART_TIME": "Nhân viên bán thời gian",
   "CONTRACT": "Nhân viên hợp đồng",
   "HINT_AUTO_FILL": "Sau khi chọn nhân viên, hệ thống sẽ tự động điền mã và tên",
-
   "SALARY_POSITION_ALLOWANCE_LABEL": "Phụ cấp chức vụ",
   "HINT_POSITION_ALLOWANCE": "Chi trả cố định theo chức danh",
   "SALARY_MEAL_ALLOWANCE_LABEL": "Phụ cấp ăn uống",
@@ -650,12 +542,10 @@
   "HINT_PERFORMANCE_BONUS": "Chi trả dựa trên đánh giá hiệu suất",
   "SALARY_OTHER_ALLOWANCES_LABEL": "Phụ cấp khác",
   "HINT_OTHER_ALLOWANCES": "Các khoản phụ cấp cố định khác",
-
   "SALARY_LEGAL_DEDUCTIONS_TITLE": "Khấu trừ theo quy định",
   "AUTO_CALCULATE": "✨ Tính tự động",
   "LEGAL_DEDUCTIONS_DESC": "Hệ thống sẽ tự động tính theo quy định pháp luật lao động",
   "AUTO": "Tự động",
-
   "SALARY_LABOR_INS_LABEL": "Bảo hiểm lao động",
   "HINT_LABOR_INS": "Người lao động đóng 20%",
   "SALARY_HEALTH_INS_LABEL": "Bảo hiểm y tế",
@@ -666,7 +556,6 @@
   "HINT_PENSION_RATE": "Có thể chọn từ 0% đến 6%",
   "SALARY_PENSION_SELF_LABEL": "Khoản đóng hưu trí cá nhân",
   "SALARY_TAX_LABEL": "Thuế thu nhập",
-
   "OTHER_DEDUCTIONS_TITLE": "⚠️ Khấu trừ khác",
   "SALARY_WELFARE_FEE_LABEL": "Quỹ phúc lợi",
   "HINT_WELFARE_FEE": "Quỹ phúc lợi nhân viên",
@@ -676,7 +565,6 @@
   "HINT_GROUP_INSURANCE": "Phần bảo hiểm nhóm do nhân viên chi trả",
   "SALARY_OTHER_DEDUCTIONS_LABEL": "Khấu trừ khác",
   "HINT_OTHER_DEDUCTIONS": "Các khoản khấu trừ cố định khác",
-
   "SALARY_PREVIEW_TITLE": "💡 Xem trước tính lương",
   "PREVIEW_BASE_SALARY": "Lương cơ bản:",
   "PREVIEW_ALLOWANCES_TOTAL": "Tổng phụ cấp:",
@@ -685,7 +573,6 @@
   "PREVIEW_LEGAL_DEDUCTIONS": "Khấu trừ theo quy định:",
   "PREVIEW_OTHER_DEDUCTIONS": "Khấu trừ khác:",
   "PREVIEW_NET_SALARY": "Lương thực nhận ước tính:",
-
   "BANK_INFO_TITLE": "🏦 Thông tin tài khoản ngân hàng",
   "BANK_CODE_LABEL": "Mã ngân hàng",
   "SELECT_BANK": "-- Chọn ngân hàng --",
@@ -696,13 +583,11 @@
   "HINT_PAYMENT_DAY": "Ngày trả lương hàng tháng (1-31)",
   "NOTE_LABEL": "Ghi chú",
   "NOTE_PLACEHOLDER": "Không bắt buộc, dùng để ghi chú thêm",
-
   "MONTHLY_CALC_TITLE": "Tính lương tháng",
   "MONTHLY_CALC_DESC": "Tự động tính lương tháng bao gồm tăng ca, phụ cấp và khấu trừ",
   "CALC_EMPLOYEE_LABEL": "Nhân viên",
   "CALC_YEAR_MONTH_LABEL": "Năm & tháng",
   "BTN_START_CALC": "🧮 Bắt đầu tính",
-
   "HOURLY_CALC_TITLE": "Tính lương theo giờ",
   "HOURLY_CALC_DESC": "Tính lương dựa trên số giờ làm việc thực tế",
   "HOURLY_EMPLOYEE_LABEL": "Nhân viên",
@@ -713,23 +598,16 @@
   "HINT_OVERTIME_HOURS": "Giờ tăng ca ngày thường (1,34 lần)",
   "HOURLY_CALC_MONTH_LABEL": "Năm & tháng",
   "BTN_START_HOURLY_CALC": "🧮 Bắt đầu tính lương",
-
   "SALARY_LIST_TITLE": "Danh sách lương",
   "SALARY_LIST_DESC": "Xem lịch sử lương của toàn bộ nhân viên",
   "FILTER_YEAR_MONTH_LABEL": "Năm & tháng",
   "BTN_LOAD_SALARY_LIST": "📋 Tải danh sách lương",
-
   "SALARY_SELECT_QUERY_MONTH": "Vui lòng chọn tháng cần tra cứu",
-
   "FOOTER_CREDITS": "Được phát triển bởi 0J",
-
   "ADJUST_REASON_LABEL": "Lý do điều chỉnh",
   "ADJUST_REASON_PLACEHOLDER": "Vui lòng nêu lý do điều chỉnh (ví dụ: quên chấm công, lỗi hệ thống, v.v.)",
   "ADJUST_REASON_REQUIRED": "Vui lòng nhập lý do điều chỉnh",
-
-
   "STATS_OVERTIME_HOURS": "Giờ làm thêm",
-
   "TAB_WORKLOG": "Nhật ký công việc",
   "WORKLOG_TITLE": "Nhật ký công việc",
   "WORKLOG_DESCRIPTION": "Ghi lại nội dung và giờ làm việc hàng ngày, gửi để cấp trên phê duyệt",
@@ -775,7 +653,6 @@
   "STATUS_REJECTED": "Đã từ chối",
   "DELETE_FAILED": "Xóa thất bại",
   "LOAD_FAILED": "Tải thất bại",
-
   "MY_BASIC_INFO_TITLE": "Thông tin cơ bản của tôi",
   "MY_BASIC_INFO_DESC": "Điền hoặc cập nhật thông tin cá nhân cơ bản của bạn",
   "ID_NUMBER_LABEL": "Số CMND/CCCD",
@@ -785,9 +662,55 @@
   "BTN_SAVE_BASIC_INFO": "Lưu thông tin cơ bản",
   "SAVING": "Đang lưu...",
   "SAVE_SUCCESS": "Lưu thành công!",
-
   "STATS_WORK_HOURS": "Giờ chấm công",
   "STATS_NORMAL_HOURS": "Giờ chấm công bình thường",
-
-  "SALARY_EARLY_LEAVE_DEDUCT": "Khấu trừ về sớm"
+  "SALARY_EARLY_LEAVE_DEDUCT": "Khấu trừ về sớm",
+  "_comment_leave_validation": "=== Xác thực nghỉ phép ===",
+  "LEAVE_END_AFTER_START": "❌ Thời gian kết thúc phải sau thời gian bắt đầu",
+  "LEAVE_MUST_INTEGER_HOURS": "❌ Số giờ nghỉ phải là số nguyên (hiện tại {hours} giờ)\nVui lòng điều chỉnh thời gian",
+  "LEAVE_NON_STANDARD_HOURS": " (bao gồm giờ làm ngoài tiêu chuẩn)",
+  "LEAVE_HOURS_OK": "✅ Số giờ tính đúng{info}, có thể nộp đơn",
+  "LEAVE_SUBMITTED": "Đơn nghỉ phép đã nộp! Số giờ: {hours}",
+  "LEAVE_SELECT_TYPE": "Vui lòng chọn loại nghỉ phép",
+  "LEAVE_SELECT_START": "Vui lòng chọn thời gian bắt đầu",
+  "LEAVE_SELECT_END": "Vui lòng chọn thời gian kết thúc",
+  "LEAVE_START_WHOLE_HOUR": "Thời gian bắt đầu phải đúng giờ (vd: 09:00, 10:00)",
+  "LEAVE_END_WHOLE_HOUR": "Thời gian kết thúc phải đúng giờ (vd: 09:00, 10:00)",
+  "LEAVE_REASON_MIN_2": "Vui lòng nhập lý do nghỉ (ít nhất 2 ký tự)",
+  "LEAVE_HOURS_GT_ZERO": "Số giờ nghỉ phải lớn hơn 0",
+  "LEAVE_HOURS_INTEGER": "Số giờ nghỉ phải là số nguyên, hiện tại {hours} giờ",
+  "LEAVE_NOT_SET": "Chưa đặt",
+  "LEAVE_REASON_NONE": "Không có",
+  "LEAVE_HOURS_UNKNOWN": "Số giờ không xác định",
+  "LEAVE_TIME_NOT_SET": "Thời gian chưa đặt",
+  "LEAVE_REJECT_REASON_PROMPT": "Nhập lý do từ chối:",
+  "LEAVE_REJECT_REASON_REQUIRED": "Vui lòng nhập lý do từ chối",
+  "LEAVE_REVIEW_FAILED": "Xét duyệt thất bại",
+  "LEAVE_BALANCE_EXCEEDED": "Số dư không đủ! {type} còn {available} giờ, nhưng bạn yêu cầu {requested} giờ",
+  "LEAVE_INSUFFICIENT_BALANCE_DAYS": "⚠️ Nhân viên không đủ số dư ({days} ngày còn lại)",
+  "BTN_APPROVE": "Phê duyệt",
+  "BTN_REJECT": "Từ chối",
+  "_comment_overtime_stats": "=== Thống kê làm thêm ===",
+  "OVERTIME_MONTH_STATS": "Thống kê làm thêm {yearMonth}",
+  "OVERTIME_APPROVED_HOURS_LABEL": "Giờ được duyệt",
+  "OVERTIME_MAX_HOURS": "/ {max} giờ",
+  "OVERTIME_EXCEEDED_LABEL": "Vượt quá",
+  "OVERTIME_REMAINING_LABEL": "Còn lại",
+  "OVERTIME_HOURS_UNIT": "giờ",
+  "OVERTIME_EXCEEDED_WARNING": "⚠️ Đã vượt giới hạn tháng, số giờ dư cần chuyển thành nghỉ bù",
+  "OVERTIME_COMPENSATORY_NEGATIVE": "Giờ nghỉ bù không thể âm",
+  "OVERTIME_COMPENSATORY_EXCEED": "Giờ nghỉ bù không thể vượt quá {hours} giờ",
+  "_comment_shift_settings": "=== Cài đặt ca ===",
+  "SHIFT_TAB_SETTINGS": "Cài đặt Ca làm",
+  "SHIFT_MULTI_SELECT_HINT": "Giữ Ctrl/Cmd để chọn nhiều",
+  "SHIFT_TYPE_ADD_TITLE": "Thêm loại ca",
+  "SHIFT_TYPE_NAME_LABEL": "Tên ca",
+  "SHIFT_TYPE_NAME_PLACEHOLDER": "vd: Sáng-A",
+  "SHIFT_TYPE_CATEGORY_LABEL": "Danh mục",
+  "SHIFT_TYPE_ADD_BTN": "Thêm ca",
+  "SHIFT_TYPE_MANAGE_TITLE": "Quản lý ca",
+  "SHIFT_TYPE_MANAGE_DESC": "Tất cả ca được lưu trên máy chủ và thay đổi có hiệu lực ngay.",
+  "SHIFT_TYPE_LOADING": "Đang tải...",
+  "SHIFT_TYPE_ALLDAY": "Cả ngày",
+  "SHIFT_TYPE_FALLBACK": "Dự phòng"
 }

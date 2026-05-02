@@ -58,7 +58,6 @@
   "FOOTER_SPONSOR": "Sponsor this project",
   "FOOTER_OPEN_SOURCE": "This is an open-source project. Contributions welcome.",
   "LOGIN_INFO": "Please click login to continue.",
-  
   "_comment1": "＿＿＿＿＿Frontend JS Translations＿＿＿＿",
   "LOADING": "⏳ Processing...",
   "ADJUST_BUTTON_TEXT": "Make-up Punch",
@@ -85,7 +84,6 @@
   "ERROR_GEOLOCATION_TIMEOUT": "Location request timed out.",
   "ERROR_GEOLOCATION_UNKNOWN": "An unknown error occurred.",
   "ERROR_BROWSER_NOT_SUPPORTED": "Your browser does not support geolocation.",
-  
   "_comment2": "＿＿＿＿＿Backend Translations＿＿＿＿",
   "FOOTER_NOTICE": "※ Login status is saved in your browser for one day. Re-login required if you switch devices or clear data.",
   "ADJUST_PUNCH_TITLE": "Make-up Punch",
@@ -151,7 +149,6 @@
   "STATUS_REPAIR_REJECTED_IN": "Punch In Rejected",
   "STATUS_REPAIR_REJECTED_OUT": "Punch Out Rejected",
   "REAPPLY": "Reapply",
-
   "TAB_OVERTIME": "Overtime",
   "OVERTIME_APPLY_TITLE": "Apply for Overtime",
   "OVERTIME_APPLY_DESCRIPTION": "Fill in the following information to submit overtime application",
@@ -185,7 +182,6 @@
   "ERROR_LOAD_OVERTIME": "Failed to load overtime records",
   "ERROR_SUBMIT_OVERTIME": "Failed to submit overtime application",
   "ERR_NO_PERMISSION": "You do not have permission to perform this action",
-
   "TAB_LEAVE": "Leave",
   "LEAVE_BALANCE_TITLE": "Leave Balance",
   "LEAVE_BALANCE_DESCRIPTION": "Your available leave quota",
@@ -243,7 +239,6 @@
   "ERR_MISSING_REJECT_REASON": "Rejection reason is required when rejecting leave",
   "ENTER_REJECT_REASON": "Enter rejection reason:",
   "REVIEW_COMMENT_LABEL": "Review Comment:",
-
   "EXPORT_ATTENDANCE_BTN": "Export This Month's Attendance Report",
   "EXPORT_LOADING": "Preparing report...",
   "EXPORT_SUCCESS": "Report exported successfully!",
@@ -253,7 +248,6 @@
   "ADMIN_EXPORT_DESCRIPTION": "Export attendance reports for all employees",
   "ADMIN_EXPORT_MONTH_LABEL": "Select Month",
   "ADMIN_EXPORT_ALL_BTN": "Export All Employee Reports",
-
   "TAB_SHIFT": "Shift",
   "SHIFT_TITLE": "Shift Management",
   "SHIFT_DESCRIPTION": "View and manage employee shift information",
@@ -270,7 +264,6 @@
   "EARLY_PUNCH_WARNING": "Notice: Your shift starts at {startTime}, you are clocking in more than 30 minutes early.",
   "LATE_PUNCH_WARNING": "Notice: Your shift starts at {startTime}, you are over 30 minutes late.",
   "NO_SHIFT_TODAY": "No shift record for today",
-
   "TAB_SALARY": "Salary",
   "SALARY_CURRENT_TITLE": "This Month's Salary",
   "SALARY_NOT_CALCULATED": "This month's salary has not been calculated yet",
@@ -309,7 +302,6 @@
   "HOURS_THIS_MONTH": "This Month's Statistics",
   "SALARY_REMINDER_TITLE": "Reminder",
   "SALARY_REMINDER_TEXT": "The salary system automatically integrates your punch records, overtime, and leave records for calculation. Please ensure timely punching to ensure accurate salary calculation.",
-
   "EXPORT_DATE": "Date",
   "EXPORT_WEEKDAY": "Weekday",
   "EXPORT_PUNCH_IN_TIME": "Punch In Time",
@@ -323,7 +315,6 @@
   "EXPORT_STATISTICS": "Statistics",
   "EXPORT_TOTAL_DAYS": "Total {count} days",
   "EXPORT_AVERAGE": "Average: {avg}",
-  
   "WEEKDAY_SUNDAY": "Sunday",
   "WEEKDAY_MONDAY": "Monday",
   "WEEKDAY_TUESDAY": "Tuesday",
@@ -331,11 +322,6 @@
   "WEEKDAY_THURSDAY": "Thursday",
   "WEEKDAY_FRIDAY": "Friday",
   "WEEKDAY_SATURDAY": "Saturday",
-
-
-
-
-
   "ANNOUNCEMENT_TITLE": "📢 Latest Announcements",
   "ANNOUNCEMENT_EMPTY": "No announcements currently",
   "BIOMETRIC_PUNCH_TITLE": "Biometric Quick Punch",
@@ -347,8 +333,6 @@
   "BIOMETRIC_PUNCH_OUT_BTN": "Punch Out",
   "LINE_CHANNEL_TITLE": "Join Employee LINE Channel for Latest Announcements!",
   "LINE_CHANNEL_ID": "@464mssoh",
-
-
   "MONTHLY_STATS_TITLE": "Monthly Attendance Statistics",
   "STATS_TOTAL_HOURS": "Total Hours",
   "STATS_WORK_DAYS": "Work Days",
@@ -357,21 +341,17 @@
   "UNIT_HOURS": "hrs",
   "UNIT_DAYS": "days",
   "UNIT_RECORDS": "records",
-  
   "DAILY_ATTENDANCE_TITLE": "Attendance Records",
   "PUNCH_RECORDS_TITLE": "Punch Records",
   "OVERTIME_PERIOD": "Overtime Period",
   "TIME_LABEL": "Time",
   "REASON_LABEL": "Reason",
   "SYSTEM_JUDGMENT": "System Note",
-  
   "LEAVE_INFO_TITLE": "Leave Information",
   "LEAVE_TYPE": "Leave Type",
   "LEAVE_DAYS_COUNT": "Days",
   "LEAVE_REASON_DISPLAY": "Reason",
   "REVIEW_COMMENT": "Review Comment",
-
-
   "ADMIN_ANNOUNCEMENT_MANAGEMENT": "📢 Announcement Management",
   "ANNOUNCEMENT_TITLE_PLACEHOLDER": "Announcement Title",
   "ANNOUNCEMENT_CONTENT_PLACEHOLDER": "Announcement Content",
@@ -382,7 +362,6 @@
   "BTN_DELETE": "Delete",
   "DELETE_ANNOUNCEMENT_CONFIRM": "Are you sure you want to delete this announcement?",
   "ANNOUNCEMENT_DELETED": "Announcement deleted",
-  
   "SEARCH_LOCATION_LABEL": "🔍 Search Location",
   "SEARCH_LOCATION_PLACEHOLDER": "Enter address or location name...",
   "LOCATION_NAME_PLACEHOLDER": "e.g., Taipei 101",
@@ -390,7 +369,6 @@
   "LONGITUDE_LABEL": "Longitude",
   "PUNCH_RANGE_LABEL": "Punch Range",
   "PUNCH_RANGE_DESCRIPTION": "Drag the slider to adjust the allowed punch radius (30-2000 meters).",
-  
   "ADMIN_PUNCH_ANALYSIS_TITLE": "Employee Punch Analysis",
   "ADMIN_PUNCH_ANALYSIS_DESC": "View employee monthly punch time distribution and work hour statistics",
   "SELECT_EMPLOYEE_LABEL": "Select Employee",
@@ -398,20 +376,15 @@
   "SELECT_MONTH_LABEL": "Select Month",
   "BTN_LOAD_ANALYSIS": "Load Analysis Charts",
   "BTN_EXPORT_PUNCH_REPORT": "Export Punch Report",
-  
   "CHART_WORK_HOURS_TITLE": "Daily Work Hours",
   "CHART_PUNCH_TIME_TITLE": "Punch Time Distribution",
   "ANALYSIS_LOADING": "Loading analysis data...",
   "ANALYSIS_NO_DATA": "No punch records for this month",
-
-
   "MAKEUP_PUNCH_TITLE": "Make-up Punch: {date} ({type})",
   "SELECT_PUNCH_TIME": "Select {type} Time:",
   "BTN_CANCEL": "Cancel",
   "BTN_SUBMIT_PUNCH_IN": "Submit Punch In",
   "BTN_SUBMIT_PUNCH_OUT": "Submit Punch Out",
-
-
   "BTN_SUBMIT_OVERTIME": "Submit Overtime Application",
   "BTN_SUBMIT_LEAVE": "Submit Leave Application",
   "ERROR_FETCH_RECORDS": "Failed to fetch records",
@@ -420,56 +393,44 @@
   "CHECKING": "Checking...",
   "NETWORK_ERROR": "Network error",
   "ERR_AFTER_TODAY": "⚠️ Cannot select a date after today",
-
-
-
   "SHIFT_PAGE_TITLE": "Shift Management - Attendance System",
   "SHIFT_MANAGEMENT_TITLE": "Shift Management",
   "BTN_BACK": "Back",
-  
   "SHIFT_TAB_VIEW": "View Shifts",
   "SHIFT_TAB_ADD": "Add Shift",
   "SHIFT_TAB_BATCH": "Batch Upload",
   "SHIFT_TAB_STATS": "Statistics",
-  
   "SHIFT_FILTER_TITLE": "Filter Criteria",
   "SHIFT_START_DATE": "Start Date",
   "SHIFT_END_DATE": "End Date",
   "OPTION_ALL": "All",
-  
   "SHIFT_TYPE_MORNING": "Morning",
   "SHIFT_TYPE_AFTERNOON": "Afternoon",
   "SHIFT_TYPE_NIGHT": "Night",
   "SHIFT_TYPE_FULL": "Full Day",
   "SHIFT_TYPE_DAYOFF": "Day Off",
   "SHIFT_TYPE_CUSTOM": "Custom",
-  
   "BTN_APPLY_FILTER": "Apply Filter",
   "BTN_CLEAR_FILTER": "Clear Filter",
   "BTN_EXPORT_SHIFTS": "Export Shift Schedule",
-  
   "SHIFT_ADD_TITLE": "Add Shift",
   "SHIFT_EMPLOYEE_LABEL": "Employee",
   "SHIFT_SELECT_EMPLOYEE": "Select Employee",
   "SHIFT_DATE_LABEL": "Date",
   "SHIFT_SELECT_TYPE": "Select Shift Type",
-  
   "SHIFT_MORNING_DESC": "Morning (08:00-16:00)",
   "SHIFT_AFTERNOON_DESC": "Afternoon (12:00-20:00)",
   "SHIFT_NIGHT_DESC": "Night (16:00-24:00)",
   "SHIFT_FULL_DESC": "Full Day (09:00-18:00)",
   "SHIFT_DAYOFF_DESC": "Day Off (Rest Day)",
   "SHIFT_CUSTOM_DESC": "Custom Time",
-  
   "SHIFT_START_TIME": "Start Time",
   "SHIFT_END_TIME": "End Time",
   "SHIFT_SELECT_LOCATION": "Select Location",
   "SHIFT_NOTE_LABEL": "Notes",
   "SHIFT_NOTE_PLACEHOLDER": "Enter notes...",
-  
   "BTN_ADD_SHIFT": "Add Shift",
   "BTN_RESET": "Reset",
-  
   "SHIFT_BATCH_TITLE": "Batch Add Shifts",
   "SHIFT_BATCH_DESC": "Upload CSV or Excel file for batch shift upload. Format: Employee ID, Name, Date, Shift Type, Start Time, End Time, Location, Notes",
   "SHIFT_UPLOAD_DESC": "Drag and drop file here, or click to select",
@@ -477,22 +438,16 @@
   "SHIFT_PREVIEW_TITLE": "Preview Data",
   "BTN_CONFIRM_UPLOAD": "Confirm Upload",
   "BTN_DOWNLOAD_TEMPLATE": "Download Template",
-  
   "SHIFT_STATS_LOADING": "Loading statistics...",
   "BTN_PREV_MONTH": "◀ Previous Month",
   "BTN_NEXT_MONTH": "Next Month ▶",
   "BTN_TODAY": "Today",
   "SHIFT_CALENDAR_LOADING": "Loading calendar...",
-
-
   "SHIFT_NO_DATA": "No shift data available",
   "SHIFT_LOAD_FAILED": "Load failed",
   "SHIFT_LOAD_ERROR": "Load failed",
-  
   "BTN_EDIT": "Edit",
-  
   "SHIFT_STATS_TOTAL": "Total Monthly Shifts",
-
   "SHIFT_FILL_TIME": "Please fill in start and end time",
   "SHIFT_CONFIRM_CROSS_DAY": "End time is before start time, is this an overnight shift?",
   "SHIFT_ADD_SUCCESS": "Shift added successfully!",
@@ -502,56 +457,38 @@
   "SHIFT_DELETE_CONFIRM": "Are you sure you want to delete this shift?",
   "SHIFT_DELETE_SUCCESS": "Shift deleted",
   "SHIFT_DELETE_FAILED": "Delete failed",
-  
   "SHIFT_NO_EXPORT_DATA": "No data to export",
   "SHIFT_EXPORT_SUCCESS": "Export successful",
-  
   "SHIFT_BATCH_CSV_ONLY": "Only CSV format is supported",
   "SHIFT_BATCH_NO_DATA": "No valid data in file",
   "SHIFT_BATCH_UPLOAD_SUCCESS": "Batch upload successful",
   "SHIFT_BATCH_UPLOAD_FAILED": "Batch upload failed",
   "SHIFT_BATCH_NETWORK_ERROR": "Batch upload failed: Network error",
-  
   "SHIFT_DETAIL_TITLE": "Shift Details",
   "SHIFT_NO_NOTE": "None",
-  
   "SHIFT_DISTRIBUTION_TITLE": "Monthly Employee Shift Distribution",
   "SHIFT_TYPE_DISTRIBUTION_TITLE": "Monthly Shift Type Distribution",
   "SHIFT_SHIFTS_COUNT": "{count} shifts",
-
   "SHIFT_LOGIN_REQUIRED": "Please log in first",
   "SHIFT_NO_EMPLOYEE_DATA": "No employee data available",
   "SHIFT_LOAD_EMPLOYEES_FAILED": "Failed to load employee list",
   "SHIFT_LOAD_EMPLOYEES_ERROR": "Failed to load employee list",
-  
   "SHIFT_ADD_ERROR": "Failed to add shift",
-  
   "SHIFT_EDIT_TITLE": "Edit Shift",
   "BTN_UPDATE_SHIFT": "Update Shift",
-  
   "SHIFT_BATCH_UPLOAD_ERROR": "Batch upload failed",
-
-
-
-
-
-
-
   "SALARY_PAGE_TITLE": "Salary Management System - Attendance Manager",
   "SALARY_SYSTEM_TITLE": "Salary Management System",
   "SALARY_SYSTEM_DESC": "Complete salary management solution (with allowances and deductions)",
-  
   "SALARY_TAB_EMPLOYEE": "My Salary",
   "SALARY_TAB_SETTING": "Salary Settings",
   "SALARY_TAB_MONTHLY": "Monthly Calculation",
   "SALARY_TAB_HOURLY": "Hourly Calculation",
   "SALARY_TAB_LIST": "Salary List",
-  
   "SALARY_QUERY_MONTH": "📅 Query Month:",
   "BTN_QUERY": "🔍 Query",
   "SALARY_MY_DETAIL": "My Salary Details",
   "SALARY_NO_RECORD": "No Salary Record",
-  
   "SALARY_EARNINGS_TITLE": "Earnings",
   "SALARY_POSITION_ALLOWANCE": "Position Allowance",
   "SALARY_MEAL_ALLOWANCE": "Meal Allowance",
@@ -559,14 +496,11 @@
   "SALARY_ATTENDANCE_BONUS": "Attendance Bonus",
   "SALARY_PERFORMANCE_BONUS": "Performance Bonus",
   "SALARY_RESTDAY_OT": "Rest Day Overtime Pay",
-  
   "SALARY_DEDUCTIONS_TITLE": "Deductions",
   "SALARY_OTHER_DEDUCT": "Other Deductions",
-  
   "SALARY_BANK_INFO_TITLE": "Bank Information",
   "SALARY_BANK_NAME_LABEL": "Bank:",
   "SALARY_ACCOUNT_LABEL": "Account:",
-  
   "SALARY_SETTING_FORM_TITLE": "Employee Salary Settings (Full Version)",
   "SALARY_BASIC_INFO": "Basic Information",
   "SALARY_EMPLOYEE_LABEL": "Employee",
@@ -578,9 +512,7 @@
   "SALARY_TYPE_LABEL": "Salary Type",
   "SALARY_BASE_LABEL": "Base Salary",
   "SALARY_ALLOWANCE_TITLE": "💰 Fixed Allowances",
-  
   "BTN_SAVE_SALARY_SETTING": "💾 Save Settings",
-  
   "SALARY_LOGIN_REQUIRED": "Please log in first",
   "SALARY_INIT_FAILED": "Initialization failed",
   "SALARY_SELECT_MONTH": "Please select query month",
@@ -601,16 +533,13 @@
   "SALARY_HOURLY_MIN_190": "Hourly wage must not be less than 190",
   "SALARY_INPUT_WORK_HOURS": "Please enter work hours",
   "SALARY_HOURLY_CALC_SUCCESS": "Hourly calculation completed",
-
   "SALARY_SETTING_DESC": "Set base salary and all allowance/deduction items",
   "PLEASE_SELECT": "Please select",
   "FULL_TIME": "Full-time",
   "PART_TIME": "Part-time",
   "CONTRACT": "Contract",
   "HINT_AUTO_FILL": "Employee ID and name will be auto-filled after selection",
- 
   "ALLOWANCE_DESC": "Fixed monthly allowances (included in gross salary)",
-  
   "SALARY_POSITION_ALLOWANCE_LABEL": "Position Allowance",
   "HINT_POSITION_ALLOWANCE": "Fixed payment based on position level",
   "SALARY_MEAL_ALLOWANCE_LABEL": "Meal Allowance",
@@ -623,12 +552,10 @@
   "HINT_PERFORMANCE_BONUS": "Based on performance evaluation",
   "SALARY_OTHER_ALLOWANCES_LABEL": "Other Allowances",
   "HINT_OTHER_ALLOWANCES": "Other fixed allowance items",
-  
   "SALARY_LEGAL_DEDUCTIONS_TITLE": "Statutory Deductions",
   "AUTO_CALCULATE": "✨ Auto Calculate",
   "LEGAL_DEDUCTIONS_DESC": "After entering base salary, the system will automatically calculate the following items based on Taiwan labor regulations",
   "AUTO": "Auto",
-  
   "SALARY_LABOR_INS_LABEL": "Labor Insurance",
   "HINT_LABOR_INS": "Employee burden 20%",
   "SALARY_HEALTH_INS_LABEL": "Health Insurance",
@@ -639,7 +566,6 @@
   "HINT_PENSION_RATE": "Optional 0% ~ 6%",
   "SALARY_PENSION_SELF_LABEL": "Pension Self-Contribution Amount",
   "SALARY_TAX_LABEL": "Income Tax",
-  
   "OTHER_DEDUCTIONS_TITLE": "⚠️ Other Deductions",
   "SALARY_WELFARE_FEE_LABEL": "Welfare Fund",
   "HINT_WELFARE_FEE": "Employee Welfare Committee fund",
@@ -649,7 +575,6 @@
   "HINT_GROUP_INSURANCE": "Group insurance employee share",
   "SALARY_OTHER_DEDUCTIONS_LABEL": "Other Deductions",
   "HINT_OTHER_DEDUCTIONS": "Other fixed deduction items",
-  
   "SALARY_PREVIEW_TITLE": "💡 Salary Calculation Preview",
   "PREVIEW_BASE_SALARY": "Base Salary:",
   "PREVIEW_ALLOWANCES_TOTAL": "Fixed Allowances Total:",
@@ -658,7 +583,6 @@
   "PREVIEW_LEGAL_DEDUCTIONS": "Statutory Deductions:",
   "PREVIEW_OTHER_DEDUCTIONS": "Other Deductions:",
   "PREVIEW_NET_SALARY": "Estimated Net Salary:",
-  
   "BANK_INFO_TITLE": "🏦 Bank Account Information",
   "BANK_CODE_LABEL": "Bank Code",
   "SELECT_BANK": "-- Please Select Bank --",
@@ -669,13 +593,11 @@
   "HINT_PAYMENT_DAY": "Monthly payment date (1-31)",
   "NOTE_LABEL": "Note",
   "NOTE_PLACEHOLDER": "Optional, can record special notes",
-  
   "MONTHLY_CALC_TITLE": "Monthly Salary Calculation",
   "MONTHLY_CALC_DESC": "Automatically calculate employee monthly salary, including overtime pay, allowances, and deductions",
   "CALC_EMPLOYEE_LABEL": "Employee",
   "CALC_YEAR_MONTH_LABEL": "Calculation Month",
   "BTN_START_CALC": "🧮 Start Calculation",
-  
   "HOURLY_CALC_TITLE": "Hourly Wage Calculation",
   "HOURLY_CALC_DESC": "Calculate hourly employee wages based on actual working hours",
   "HOURLY_EMPLOYEE_LABEL": "Employee",
@@ -686,22 +608,16 @@
   "HINT_OVERTIME_HOURS": "Weekday overtime hours (×1.34)",
   "HOURLY_CALC_MONTH_LABEL": "Calculation Month",
   "BTN_START_HOURLY_CALC": "🧮 Calculate Hourly Wage",
-  
   "SALARY_LIST_TITLE": "Salary List",
   "SALARY_LIST_DESC": "View all employee salary records",
   "FILTER_YEAR_MONTH_LABEL": "Query Month",
   "BTN_LOAD_SALARY_LIST": "📋 Load Salary List",
-  
   "SALARY_SELECT_QUERY_MONTH": "Please select query month",
-
   "FOOTER_CREDITS": "Made by 0J",
-
   "ADJUST_REASON_LABEL": "Reason for Adjustment",
   "ADJUST_REASON_PLACEHOLDER": "Please describe the reason for the adjustment (e.g., forgot to check in, system error, etc.)",
   "ADJUST_REASON_REQUIRED": "Please provide a reason for the adjustment",
-
   "STATS_OVERTIME_HOURS": "Overtime Hours",
-
   "TAB_WORKLOG": "Work Log",
   "WORKLOG_TITLE": "Work Log",
   "WORKLOG_DESCRIPTION": "Record daily work content and hours, submit for supervisor review",
@@ -749,7 +665,6 @@
   "_comment_common": "=== Common Buttons and Labels ===",
   "DELETE_FAILED": "Delete failed",
   "LOAD_FAILED": "Load failed",
-
   "MY_BASIC_INFO_TITLE": "My Basic Information",
   "MY_BASIC_INFO_DESC": "Fill in or update your basic personal information",
   "ID_NUMBER_LABEL": "ID Number",
@@ -759,9 +674,55 @@
   "BTN_SAVE_BASIC_INFO": "Save Basic Information",
   "SAVING": "Saving...",
   "SAVE_SUCCESS": "Saved successfully!",
-
   "STATS_WORK_HOURS": "Attendance Hours",
   "STATS_NORMAL_HOURS": "Regular Clock-in Hours",
-
-  "SALARY_EARLY_LEAVE_DEDUCT": "Early Leave Deduction"
+  "SALARY_EARLY_LEAVE_DEDUCT": "Early Leave Deduction",
+  "_comment_leave_validation": "=== Leave Validation ===",
+  "LEAVE_END_AFTER_START": "❌ End time must be after start time",
+  "LEAVE_MUST_INTEGER_HOURS": "❌ Leave hours must be whole hours (currently {hours} hours)\nPlease adjust the time to whole hours",
+  "LEAVE_NON_STANDARD_HOURS": " (includes non-standard work hours)",
+  "LEAVE_HOURS_OK": "✅ Hours calculated correctly{info}, you may submit",
+  "LEAVE_SUBMITTED": "Leave request submitted! Hours: {hours}",
+  "LEAVE_SELECT_TYPE": "Please select leave type",
+  "LEAVE_SELECT_START": "Please select start time",
+  "LEAVE_SELECT_END": "Please select end time",
+  "LEAVE_START_WHOLE_HOUR": "Start time must be on the hour (e.g. 09:00, 10:00)",
+  "LEAVE_END_WHOLE_HOUR": "End time must be on the hour (e.g. 09:00, 10:00)",
+  "LEAVE_REASON_MIN_2": "Please enter a reason (at least 2 characters)",
+  "LEAVE_HOURS_GT_ZERO": "Leave hours must be greater than 0",
+  "LEAVE_HOURS_INTEGER": "Leave hours must be whole hours, currently {hours} hours",
+  "LEAVE_NOT_SET": "Not set",
+  "LEAVE_REASON_NONE": "None",
+  "LEAVE_HOURS_UNKNOWN": "Hours unknown",
+  "LEAVE_TIME_NOT_SET": "Time not set",
+  "LEAVE_REJECT_REASON_PROMPT": "Please enter reason for rejection:",
+  "LEAVE_REJECT_REASON_REQUIRED": "Please enter rejection reason",
+  "LEAVE_REVIEW_FAILED": "Review failed",
+  "LEAVE_BALANCE_EXCEEDED": "Insufficient balance! {type} has {available} hours remaining, but you requested {requested} hours",
+  "LEAVE_INSUFFICIENT_BALANCE_DAYS": "⚠️ Employee has insufficient balance ({days} days remaining)",
+  "BTN_APPROVE": "Approve",
+  "BTN_REJECT": "Reject",
+  "_comment_overtime_stats": "=== Overtime Stats ===",
+  "OVERTIME_MONTH_STATS": "{yearMonth} Overtime Stats",
+  "OVERTIME_APPROVED_HOURS_LABEL": "Approved Hours",
+  "OVERTIME_MAX_HOURS": "/ {max} hrs",
+  "OVERTIME_EXCEEDED_LABEL": "Exceeded",
+  "OVERTIME_REMAINING_LABEL": "Remaining",
+  "OVERTIME_HOURS_UNIT": "hrs",
+  "OVERTIME_EXCEEDED_WARNING": "⚠️ Monthly limit exceeded, excess hours should be converted to compensatory time off",
+  "OVERTIME_COMPENSATORY_NEGATIVE": "Compensatory hours cannot be negative",
+  "OVERTIME_COMPENSATORY_EXCEED": "Compensatory hours cannot exceed {hours} hours",
+  "_comment_shift_settings": "=== Shift Settings ===",
+  "SHIFT_TAB_SETTINGS": "Shift Settings",
+  "SHIFT_MULTI_SELECT_HINT": "Hold Ctrl/Cmd to select multiple",
+  "SHIFT_TYPE_ADD_TITLE": "Add Shift Type",
+  "SHIFT_TYPE_NAME_LABEL": "Shift Name",
+  "SHIFT_TYPE_NAME_PLACEHOLDER": "e.g. Morning-A",
+  "SHIFT_TYPE_CATEGORY_LABEL": "Category",
+  "SHIFT_TYPE_ADD_BTN": "Add Shift Type",
+  "SHIFT_TYPE_MANAGE_TITLE": "Shift Management",
+  "SHIFT_TYPE_MANAGE_DESC": "All shifts are stored on the server and changes take effect immediately.",
+  "SHIFT_TYPE_LOADING": "Loading...",
+  "SHIFT_TYPE_ALLDAY": "All-day (Leave)",
+  "SHIFT_TYPE_FALLBACK": "Fallback"
 }

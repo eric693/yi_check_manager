@@ -2090,10 +2090,10 @@ function renderShiftTypeSettings() {
     const categoryColors = { '廚房': '#ff9800', '外場': '#2196f3', '假別': '#4caf50', '自訂': '#9c27b0' };
 
     const grouped = {};
-    types.forEach(t => {
-        const cat = t.category || '自訂';
+    types.forEach(tp => {
+        const cat = tp.category || '自訂';
         if (!grouped[cat]) grouped[cat] = [];
-        grouped[cat].push(t);
+        grouped[cat].push(tp);
     });
 
     let html = '';
@@ -2103,17 +2103,17 @@ function renderShiftTypeSettings() {
         html += `
             <div style="margin-bottom: 24px;">
                 <h3 style="color: ${color}; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid ${color}33;">
-                    ${cat}班別 (${grouped[cat].length})
+                    ${cat} (${grouped[cat].length})
                 </h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px;">
         `;
         grouped[cat].forEach(type => {
             const timeDisplay = type.startTime && type.startTime !== '00:00'
                 ? `${type.startTime} - ${type.endTime}`
-                : (cat === '假別' ? '假日（全天）' : '自訂時間');
+                : (cat === '假別' ? t('SHIFT_TYPE_ALLDAY') || '全天' : t('SHIFT_TYPE_CUSTOM') || '自訂時間');
             const deleteBtn = type.id
-                ? `<button class="btn-icon btn-danger" onclick="deleteShiftTypeFromSettings('${type.id}', '${type.name}')" style="font-size: 12px; padding: 4px 10px;">刪除</button>`
-                : '<span style="font-size: 11px; color: #999; background: #f0f0f0; padding: 2px 8px; border-radius: 10px;">備援</span>';
+                ? `<button class="btn-icon btn-danger" onclick="deleteShiftTypeFromSettings('${type.id}', '${type.name}')" style="font-size: 12px; padding: 4px 10px;">${t('BTN_DELETE') || '刪除'}</button>`
+                : `<span style="font-size: 11px; color: #999; background: #f0f0f0; padding: 2px 8px; border-radius: 10px;">${t('SHIFT_TYPE_FALLBACK') || '備援'}</span>`;
             html += `
                 <div style="background: #f9f9f9; border-radius: 8px; padding: 12px 16px; border-left: 4px solid ${color}; display: flex; justify-content: space-between; align-items: center;">
                     <div>
@@ -2127,7 +2127,7 @@ function renderShiftTypeSettings() {
         html += '</div></div>';
     });
 
-    if (!html) html = '<div class="empty-state"><p>尚無班別資料</p></div>';
+    if (!html) html = `<div class="empty-state"><p>${t('SHIFT_NO_DATA') || '尚無班別資料'}</p></div>`;
     listDiv.innerHTML = html;
 }
 

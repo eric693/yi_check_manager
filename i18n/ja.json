@@ -58,7 +58,6 @@
   "FOOTER_SPONSOR": "このプロジェクトを支援する",
   "FOOTER_OPEN_SOURCE": "このプロジェクトはオープンソースです。貢献を歓迎します。",
   "LOGIN_INFO": "続けるにはログインをクリックしてください。",
-
   "_comment1": "＿＿＿＿＿フロントエンドJS翻訳＿＿＿＿",
   "LOADING": "⏳ 処理中...",
   "ADJUST_BUTTON_TEXT": "修正打刻",
@@ -85,7 +84,6 @@
   "ERROR_GEOLOCATION_TIMEOUT": "位置情報の要求がタイムアウトしました。",
   "ERROR_GEOLOCATION_UNKNOWN": "不明なエラーが発生しました。",
   "ERROR_BROWSER_NOT_SUPPORTED": "お使いのブラウザは地理情報に対応していません。",
-
   "_comment2": "＿＿＿＿＿バックエンド翻訳＿＿＿＿",
   "FOOTER_NOTICE": "※ ログイン状態はブラウザに1日保存されます。端末を変えたりデータを消去した場合は、再度ログインが必要です。",
   "ADJUST_PUNCH_TITLE": "修正打刻",
@@ -151,7 +149,6 @@
   "STATUS_REPAIR_REJECTED_IN": "出勤修正（却下）",
   "STATUS_REPAIR_REJECTED_OUT": "退勤修正（却下）",
   "REAPPLY": "再申請",
-
   "TAB_OVERTIME": "残業",
   "OVERTIME_APPLY_TITLE": "残業申請",
   "OVERTIME_APPLY_DESCRIPTION": "以下の情報を入力して残業申請を提出してください",
@@ -185,7 +182,6 @@
   "ERROR_LOAD_OVERTIME": "残業記録の読み込みに失敗しました",
   "ERROR_SUBMIT_OVERTIME": "残業申請の提出に失敗しました",
   "ERR_NO_PERMISSION": "この操作を実行する権限がありません",
-
   "TAB_LEAVE": "休暇",
   "LEAVE_BALANCE_TITLE": "休暇残高",
   "LEAVE_BALANCE_DESCRIPTION": "利用可能な休暇日数",
@@ -243,7 +239,6 @@
   "ERR_MISSING_REJECT_REASON": "休暇を却下する際は理由を入力してください",
   "ENTER_REJECT_REASON": "却下理由を入力してください：",
   "REVIEW_COMMENT_LABEL": "審査コメント：",
-
   "EXPORT_ATTENDANCE_BTN": "今月の勤怠レポートをエクスポート",
   "EXPORT_LOADING": "レポートを準備中...",
   "EXPORT_SUCCESS": "レポートのエクスポートに成功しました！",
@@ -253,7 +248,6 @@
   "ADMIN_EXPORT_DESCRIPTION": "全従業員の勤怠レポートをエクスポート",
   "ADMIN_EXPORT_MONTH_LABEL": "月を選択",
   "ADMIN_EXPORT_ALL_BTN": "全従業員レポートをエクスポート",
-
   "TAB_SHIFT": "シフト",
   "SHIFT_TITLE": "シフト管理",
   "SHIFT_DESCRIPTION": "従業員のシフト情報を確認・管理します",
@@ -270,7 +264,6 @@
   "EARLY_PUNCH_WARNING": "注意：シフト開始時刻は {startTime} です。30分以上早く打刻しています。",
   "LATE_PUNCH_WARNING": "注意：シフト開始時刻は {startTime} です。30分以上遅れています。",
   "NO_SHIFT_TODAY": "本日のシフト記録はありません",
-
   "TAB_SALARY": "給与",
   "SALARY_CURRENT_TITLE": "今月の給与",
   "SALARY_NOT_CALCULATED": "今月の給与はまだ計算されていません",
@@ -309,7 +302,6 @@
   "HOURS_THIS_MONTH": "今月の統計",
   "SALARY_REMINDER_TITLE": "お知らせ",
   "SALARY_REMINDER_TEXT": "給与システムは、打刻・残業・休暇記録を自動的に統合して計算します。正確な給与計算のため、時間通りに打刻してください。",
-
   "EXPORT_DATE": "日付",
   "EXPORT_WEEKDAY": "曜日",
   "EXPORT_PUNCH_IN_TIME": "出勤時刻",
@@ -323,7 +315,6 @@
   "EXPORT_STATISTICS": "統計",
   "EXPORT_TOTAL_DAYS": "合計 {count} 日",
   "EXPORT_AVERAGE": "平均：{avg}",
-
   "WEEKDAY_SUNDAY": "日曜日",
   "WEEKDAY_MONDAY": "月曜日",
   "WEEKDAY_TUESDAY": "火曜日",
@@ -331,7 +322,6 @@
   "WEEKDAY_THURSDAY": "木曜日",
   "WEEKDAY_FRIDAY": "金曜日",
   "WEEKDAY_SATURDAY": "土曜日",
-
   "ANNOUNCEMENT_TITLE": "📢 最新のお知らせ",
   "ANNOUNCEMENT_EMPTY": "現在お知らせはありません",
   "BIOMETRIC_PUNCH_TITLE": "生体認証クイック打刻",
@@ -343,7 +333,6 @@
   "BIOMETRIC_PUNCH_OUT_BTN": "退勤打刻",
   "LINE_CHANNEL_TITLE": "従業員向けLINEチャンネルに参加して最新のお知らせをチェック！",
   "LINE_CHANNEL_ID": "@464mssoh",
-
   "MONTHLY_STATS_TITLE": "今月の勤怠統計",
   "STATS_TOTAL_HOURS": "総勤務時間",
   "STATS_WORK_DAYS": "出勤日数",
@@ -352,20 +341,17 @@
   "UNIT_HOURS": "時間",
   "UNIT_DAYS": "日",
   "UNIT_RECORDS": "件",
-
   "DAILY_ATTENDANCE_TITLE": "出勤記録",
   "PUNCH_RECORDS_TITLE": "打刻記録",
   "OVERTIME_PERIOD": "残業時間帯",
   "TIME_LABEL": "時間",
   "REASON_LABEL": "理由",
   "SYSTEM_JUDGMENT": "システム判定",
-
   "LEAVE_INFO_TITLE": "休暇情報",
   "LEAVE_TYPE": "休暇種別",
   "LEAVE_DAYS_COUNT": "日数",
   "LEAVE_REASON_DISPLAY": "理由",
   "REVIEW_COMMENT": "審査コメント",
-
   "ADMIN_ANNOUNCEMENT_MANAGEMENT": "📢 お知らせ管理",
   "ANNOUNCEMENT_TITLE_PLACEHOLDER": "お知らせタイトル",
   "ANNOUNCEMENT_CONTENT_PLACEHOLDER": "お知らせ内容",
@@ -376,7 +362,6 @@
   "BTN_DELETE": "削除",
   "DELETE_ANNOUNCEMENT_CONFIRM": "このお知らせを削除してもよろしいですか？",
   "ANNOUNCEMENT_DELETED": "お知らせを削除しました",
-
   "SEARCH_LOCATION_LABEL": "🔍 場所を検索",
   "SEARCH_LOCATION_PLACEHOLDER": "住所または場所名を入力して検索...",
   "LOCATION_NAME_PLACEHOLDER": "例：東京タワー",
@@ -384,7 +369,6 @@
   "LONGITUDE_LABEL": "経度",
   "PUNCH_RANGE_LABEL": "打刻可能範囲",
   "PUNCH_RANGE_DESCRIPTION": "スライダーをドラッグして、打刻を許可する半径（30〜2000メートル）を調整してください。",
-
   "ADMIN_PUNCH_ANALYSIS_TITLE": "従業員打刻分析",
   "ADMIN_PUNCH_ANALYSIS_DESC": "従業員の月別打刻時間分布と勤務時間統計を確認",
   "SELECT_EMPLOYEE_LABEL": "従業員を選択",
@@ -392,18 +376,15 @@
   "SELECT_MONTH_LABEL": "月を選択",
   "BTN_LOAD_ANALYSIS": "分析チャートを読み込む",
   "BTN_EXPORT_PUNCH_REPORT": "打刻レポートをエクスポート",
-
   "CHART_WORK_HOURS_TITLE": "日別勤務時間",
   "CHART_PUNCH_TIME_TITLE": "打刻時間分布",
   "ANALYSIS_LOADING": "分析データを読み込み中...",
   "ANALYSIS_NO_DATA": "この月には打刻記録がありません",
-
   "MAKEUP_PUNCH_TITLE": "修正打刻：{date}（{type}）",
   "SELECT_PUNCH_TIME": "{type}の時間を選択：",
   "BTN_CANCEL": "キャンセル",
   "BTN_SUBMIT_PUNCH_IN": "出勤修正を送信",
   "BTN_SUBMIT_PUNCH_OUT": "退勤修正を送信",
-
   "BTN_SUBMIT_OVERTIME": "残業申請を送信",
   "BTN_SUBMIT_LEAVE": "休暇申請を送信",
   "ERROR_FETCH_RECORDS": "記録を取得できませんでした",
@@ -412,54 +393,44 @@
   "CHECKING": "確認中...",
   "NETWORK_ERROR": "ネットワークエラー",
   "ERR_AFTER_TODAY": "⚠️ 今日以降の日付は選択できません",
-
   "SHIFT_PAGE_TITLE": "シフト管理 - 勤怠システム",
   "SHIFT_MANAGEMENT_TITLE": "シフト管理",
   "BTN_BACK": "戻る",
-
   "SHIFT_TAB_VIEW": "シフト一覧",
   "SHIFT_TAB_ADD": "シフト追加",
   "SHIFT_TAB_BATCH": "一括登録",
   "SHIFT_TAB_STATS": "統計",
-
   "SHIFT_FILTER_TITLE": "絞り込み条件",
   "SHIFT_START_DATE": "開始日",
   "SHIFT_END_DATE": "終了日",
   "OPTION_ALL": "すべて",
-
   "SHIFT_TYPE_MORNING": "早番",
   "SHIFT_TYPE_AFTERNOON": "中番",
   "SHIFT_TYPE_NIGHT": "遅番",
   "SHIFT_TYPE_FULL": "フルタイム",
   "SHIFT_TYPE_DAYOFF": "休み",
   "SHIFT_TYPE_CUSTOM": "カスタム",
-
   "BTN_APPLY_FILTER": "絞り込みを適用",
   "BTN_CLEAR_FILTER": "絞り込みをクリア",
   "BTN_EXPORT_SHIFTS": "シフト表をエクスポート",
-
   "SHIFT_ADD_TITLE": "シフトを追加",
   "SHIFT_EMPLOYEE_LABEL": "従業員",
   "SHIFT_SELECT_EMPLOYEE": "従業員を選択してください",
   "SHIFT_DATE_LABEL": "日付",
   "SHIFT_SELECT_TYPE": "シフト種別を選択してください",
-
   "SHIFT_MORNING_DESC": "早番 (08:00-16:00)",
   "SHIFT_AFTERNOON_DESC": "中番 (12:00-20:00)",
   "SHIFT_NIGHT_DESC": "遅番 (16:00-24:00)",
   "SHIFT_FULL_DESC": "フルタイム (09:00-18:00)",
   "SHIFT_DAYOFF_DESC": "休日（公休）",
   "SHIFT_CUSTOM_DESC": "カスタム時間",
-
   "SHIFT_START_TIME": "開始時刻",
   "SHIFT_END_TIME": "終了時刻",
   "SHIFT_SELECT_LOCATION": "場所を選択してください",
   "SHIFT_NOTE_LABEL": "メモ",
   "SHIFT_NOTE_PLACEHOLDER": "メモを入力してください...",
-
   "BTN_ADD_SHIFT": "シフトを追加",
   "BTN_RESET": "リセット",
-
   "SHIFT_BATCH_TITLE": "シフト一括追加",
   "SHIFT_BATCH_DESC": "CSV または Excel ファイルをアップロードしてシフトを一括登録します。フォーマット：従業員ID, 氏名, 日付, シフト種別, 開始時刻, 終了時刻, 場所, メモ",
   "SHIFT_UPLOAD_DESC": "ファイルをここにドラッグ＆ドロップ、またはクリックして選択",
@@ -467,21 +438,16 @@
   "SHIFT_PREVIEW_TITLE": "データプレビュー",
   "BTN_CONFIRM_UPLOAD": "アップロードを確定",
   "BTN_DOWNLOAD_TEMPLATE": "テンプレートをダウンロード",
-
   "SHIFT_STATS_LOADING": "統計データを読み込み中...",
   "BTN_PREV_MONTH": "◀ 前の月",
   "BTN_NEXT_MONTH": "次の月 ▶",
   "BTN_TODAY": "今日に戻る",
   "SHIFT_CALENDAR_LOADING": "カレンダーを読み込み中...",
-
   "SHIFT_NO_DATA": "シフトデータがありません",
   "SHIFT_LOAD_FAILED": "読み込みに失敗しました",
   "SHIFT_LOAD_ERROR": "読み込みに失敗しました",
-
   "BTN_EDIT": "編集",
-
   "SHIFT_STATS_TOTAL": "今月のシフト合計",
-
   "SHIFT_FILL_TIME": "開始時刻と終了時刻を入力してください",
   "SHIFT_CONFIRM_CROSS_DAY": "終了時刻が開始時刻より前です。翌日までのシフトですか？",
   "SHIFT_ADD_SUCCESS": "シフトを追加しました！",
@@ -491,50 +457,38 @@
   "SHIFT_DELETE_CONFIRM": "このシフトを削除してもよろしいですか？",
   "SHIFT_DELETE_SUCCESS": "シフトを削除しました",
   "SHIFT_DELETE_FAILED": "削除に失敗しました",
-
   "SHIFT_NO_EXPORT_DATA": "エクスポートできるデータがありません",
   "SHIFT_EXPORT_SUCCESS": "エクスポートに成功しました",
-
   "SHIFT_BATCH_CSV_ONLY": "現在、CSV 形式のみ対応しています",
   "SHIFT_BATCH_NO_DATA": "ファイルに有効なデータがありません",
   "SHIFT_BATCH_UPLOAD_SUCCESS": "一括アップロードに成功しました",
   "SHIFT_BATCH_UPLOAD_FAILED": "一括アップロードに失敗しました",
   "SHIFT_BATCH_NETWORK_ERROR": "一括アップロードに失敗しました：ネットワークエラー",
-
   "SHIFT_DETAIL_TITLE": "シフト詳細",
   "SHIFT_NO_NOTE": "なし",
-
   "SHIFT_DISTRIBUTION_TITLE": "今月の従業員シフト分布",
   "SHIFT_TYPE_DISTRIBUTION_TITLE": "今月のシフト種別分布",
   "SHIFT_SHIFTS_COUNT": "{count}件のシフト",
-
   "SHIFT_LOGIN_REQUIRED": "先にログインしてください",
   "SHIFT_NO_EMPLOYEE_DATA": "従業員データがありません",
   "SHIFT_LOAD_EMPLOYEES_FAILED": "従業員一覧の読み込みに失敗しました",
   "SHIFT_LOAD_EMPLOYEES_ERROR": "従業員一覧の読み込みに失敗しました",
-
   "SHIFT_ADD_ERROR": "シフトの追加に失敗しました",
-
   "SHIFT_EDIT_TITLE": "シフトを編集",
   "BTN_UPDATE_SHIFT": "シフトを更新",
-
   "SHIFT_BATCH_UPLOAD_ERROR": "一括アップロードに失敗しました",
-
   "SALARY_PAGE_TITLE": "給与管理システム - 勤怠マネージャー",
   "SALARY_SYSTEM_TITLE": "給与管理システム",
   "SALARY_SYSTEM_DESC": "手当・控除を含む包括的な給与管理ソリューション",
-
   "SALARY_TAB_EMPLOYEE": "従業員給与",
   "SALARY_TAB_SETTING": "給与設定",
   "SALARY_TAB_MONTHLY": "月給計算",
   "SALARY_TAB_HOURLY": "時給計算",
   "SALARY_TAB_LIST": "給与一覧",
-
   "SALARY_QUERY_MONTH": "📅 対象月：",
   "BTN_QUERY": "🔍 検索",
   "SALARY_MY_DETAIL": "自分の給与明細",
   "SALARY_NO_RECORD": "給与データがありません",
-
   "SALARY_EARNINGS_TITLE": "支給項目",
   "SALARY_POSITION_ALLOWANCE": "役職手当",
   "SALARY_MEAL_ALLOWANCE": "食事手当",
@@ -542,14 +496,11 @@
   "SALARY_ATTENDANCE_BONUS": "皆勤手当",
   "SALARY_PERFORMANCE_BONUS": "業績ボーナス",
   "SALARY_RESTDAY_OT": "休日出勤手当",
-
   "SALARY_DEDUCTIONS_TITLE": "控除項目",
   "SALARY_OTHER_DEDUCT": "その他控除",
-
   "SALARY_BANK_INFO_TITLE": "銀行口座情報",
   "SALARY_BANK_NAME_LABEL": "銀行：",
   "SALARY_ACCOUNT_LABEL": "口座番号：",
-
   "SALARY_SETTING_FORM_TITLE": "従業員給与設定（詳細）",
   "SALARY_BASIC_INFO": "基本情報",
   "SALARY_EMPLOYEE_LABEL": "従業員",
@@ -561,9 +512,7 @@
   "SALARY_TYPE_LABEL": "給与形態",
   "SALARY_BASE_LABEL": "基本給",
   "SALARY_ALLOWANCE_TITLE": "💰 固定手当・補助",
-
   "BTN_SAVE_SALARY_SETTING": "💾 給与設定を保存",
-
   "SALARY_LOGIN_REQUIRED": "ログインしてください",
   "SALARY_INIT_FAILED": "初期化に失敗しました",
   "SALARY_SELECT_MONTH": "対象月を選択してください",
@@ -584,14 +533,12 @@
   "SALARY_HOURLY_MIN_190": "時給は190元以上である必要があります",
   "SALARY_INPUT_WORK_HOURS": "勤務時間を入力してください",
   "SALARY_HOURLY_CALC_SUCCESS": "時給計算が完了しました",
-
   "SALARY_SETTING_DESC": "基本給・手当・控除項目を設定します",
   "PLEASE_SELECT": "選択してください",
   "FULL_TIME": "正社員",
   "PART_TIME": "パート",
   "CONTRACT": "契約社員",
   "HINT_AUTO_FILL": "従業員を選択するとIDと氏名が自動入力されます",
-
   "SALARY_POSITION_ALLOWANCE_LABEL": "役職手当",
   "HINT_POSITION_ALLOWANCE": "役職に応じて固定支給",
   "SALARY_MEAL_ALLOWANCE_LABEL": "食事手当",
@@ -604,12 +551,10 @@
   "HINT_PERFORMANCE_BONUS": "評価結果に基づき支給",
   "SALARY_OTHER_ALLOWANCES_LABEL": "その他手当",
   "HINT_OTHER_ALLOWANCES": "その他の固定手当",
-
   "SALARY_LEGAL_DEDUCTIONS_TITLE": "法定控除",
   "AUTO_CALCULATE": "✨ 自動計算",
   "LEGAL_DEDUCTIONS_DESC": "基本給に基づき法令に従って自動計算されます",
   "AUTO": "自動",
-
   "SALARY_LABOR_INS_LABEL": "労災保険料",
   "HINT_LABOR_INS": "本人負担20%",
   "SALARY_HEALTH_INS_LABEL": "健康保険料",
@@ -620,7 +565,6 @@
   "HINT_PENSION_RATE": "0%～6%を選択可能",
   "SALARY_PENSION_SELF_LABEL": "年金自己負担額",
   "SALARY_TAX_LABEL": "所得税",
-
   "OTHER_DEDUCTIONS_TITLE": "⚠️ その他控除",
   "SALARY_WELFARE_FEE_LABEL": "福利厚生費",
   "HINT_WELFARE_FEE": "福利厚生委員会費",
@@ -630,7 +574,6 @@
   "HINT_GROUP_INSURANCE": "団体保険の個人負担分",
   "SALARY_OTHER_DEDUCTIONS_LABEL": "その他控除",
   "HINT_OTHER_DEDUCTIONS": "その他の固定控除",
-
   "SALARY_PREVIEW_TITLE": "💡 給与シミュレーション",
   "PREVIEW_BASE_SALARY": "基本給：",
   "PREVIEW_ALLOWANCES_TOTAL": "手当合計：",
@@ -639,7 +582,6 @@
   "PREVIEW_LEGAL_DEDUCTIONS": "法定控除：",
   "PREVIEW_OTHER_DEDUCTIONS": "その他控除：",
   "PREVIEW_NET_SALARY": "支給予定額：",
-
   "BANK_INFO_TITLE": "🏦 銀行口座情報",
   "BANK_CODE_LABEL": "銀行コード",
   "SELECT_BANK": "-- 銀行を選択 --",
@@ -650,13 +592,11 @@
   "HINT_PAYMENT_DAY": "毎月の支給日（1～31）",
   "NOTE_LABEL": "備考",
   "NOTE_PLACEHOLDER": "任意入力（特記事項）",
-
   "MONTHLY_CALC_TITLE": "月給計算",
   "MONTHLY_CALC_DESC": "残業代・手当・控除を含めた月給を自動計算します",
   "CALC_EMPLOYEE_LABEL": "従業員",
   "CALC_YEAR_MONTH_LABEL": "対象年月",
   "BTN_START_CALC": "🧮 計算開始",
-
   "HOURLY_CALC_TITLE": "時給計算",
   "HOURLY_CALC_DESC": "実働時間に基づき時給制給与を計算します",
   "HOURLY_EMPLOYEE_LABEL": "従業員",
@@ -667,22 +607,16 @@
   "HINT_OVERTIME_HOURS": "平日残業時間（1.34倍）",
   "HOURLY_CALC_MONTH_LABEL": "対象年月",
   "BTN_START_HOURLY_CALC": "🧮 時給計算開始",
-
   "SALARY_LIST_TITLE": "給与一覧",
   "SALARY_LIST_DESC": "全従業員の給与履歴を表示します",
   "FILTER_YEAR_MONTH_LABEL": "対象年月",
   "BTN_LOAD_SALARY_LIST": "📋 給与一覧を表示",
-
   "SALARY_SELECT_QUERY_MONTH": "対象月を選択してください",
-
   "FOOTER_CREDITS": "0J 制作",
-
   "ADJUST_REASON_LABEL": "修正理由",
   "ADJUST_REASON_PLACEHOLDER": "修正理由を記入してください（例：打刻忘れ、システム障害など）",
   "ADJUST_REASON_REQUIRED": "修正理由を入力してください",
-
   "STATS_OVERTIME_HOURS": "残業時間",
-
   "TAB_WORKLOG": "作業日誌",
   "WORKLOG_TITLE": "作業日誌",
   "WORKLOG_DESCRIPTION": "毎日の作業内容と労働時間を記録し、上司の承認を得ます",
@@ -728,7 +662,6 @@
   "STATUS_REJECTED": "却下",
   "DELETE_FAILED": "削除に失敗しました",
   "LOAD_FAILED": "読み込みに失敗しました",
-
   "MY_BASIC_INFO_TITLE": "基本情報",
   "MY_BASIC_INFO_DESC": "個人の基本情報を入力または更新してください",
   "ID_NUMBER_LABEL": "身分証番号",
@@ -738,8 +671,55 @@
   "BTN_SAVE_BASIC_INFO": "基本情報を保存",
   "SAVING": "保存中...",
   "SAVE_SUCCESS": "保存しました！",
-
   "STATS_WORK_HOURS": "出勤時間",
   "STATS_NORMAL_HOURS": "通常打刻時間",
-  "SALARY_EARLY_LEAVE_DEDUCT": "早退控除"
+  "SALARY_EARLY_LEAVE_DEDUCT": "早退控除",
+  "_comment_leave_validation": "=== 休暇バリデーション ===",
+  "LEAVE_END_AFTER_START": "❌ 終了時刻は開始時刻より後でなければなりません",
+  "LEAVE_MUST_INTEGER_HOURS": "❌ 休暇時間は整数でなければなりません（現在 {hours} 時間）\n時刻を調整してください",
+  "LEAVE_NON_STANDARD_HOURS": "（標準外の勤務時間を含む）",
+  "LEAVE_HOURS_OK": "✅ 時間数が正しく計算されました{info}、申請できます",
+  "LEAVE_SUBMITTED": "休暇申請を提出しました！時間数：{hours}",
+  "LEAVE_SELECT_TYPE": "休暇種類を選択してください",
+  "LEAVE_SELECT_START": "開始時刻を選択してください",
+  "LEAVE_SELECT_END": "終了時刻を選択してください",
+  "LEAVE_START_WHOLE_HOUR": "開始時刻は正時でなければなりません（例：09:00、10:00）",
+  "LEAVE_END_WHOLE_HOUR": "終了時刻は正時でなければなりません（例：09:00、10:00）",
+  "LEAVE_REASON_MIN_2": "休暇理由を入力してください（最低2文字）",
+  "LEAVE_HOURS_GT_ZERO": "休暇時間は0より大きくなければなりません",
+  "LEAVE_HOURS_INTEGER": "休暇時間は整数でなければなりません。現在 {hours} 時間です",
+  "LEAVE_NOT_SET": "未設定",
+  "LEAVE_REASON_NONE": "なし",
+  "LEAVE_HOURS_UNKNOWN": "時間数不明",
+  "LEAVE_TIME_NOT_SET": "時刻未設定",
+  "LEAVE_REJECT_REASON_PROMPT": "却下理由を入力してください：",
+  "LEAVE_REJECT_REASON_REQUIRED": "却下理由を入力してください",
+  "LEAVE_REVIEW_FAILED": "審査に失敗しました",
+  "LEAVE_BALANCE_EXCEEDED": "残高不足！{type} の残高は {available} 時間ですが、{requested} 時間を申請しました",
+  "LEAVE_INSUFFICIENT_BALANCE_DAYS": "⚠️ 従業員の残高が不足しています（残り {days} 日）",
+  "BTN_APPROVE": "承認",
+  "BTN_REJECT": "却下",
+  "_comment_overtime_stats": "=== 残業統計 ===",
+  "OVERTIME_MONTH_STATS": "{yearMonth} 残業統計",
+  "OVERTIME_APPROVED_HOURS_LABEL": "承認済み時間",
+  "OVERTIME_MAX_HOURS": "/ {max} 時間",
+  "OVERTIME_EXCEEDED_LABEL": "超過時間",
+  "OVERTIME_REMAINING_LABEL": "残り時間",
+  "OVERTIME_HOURS_UNIT": "時間",
+  "OVERTIME_EXCEEDED_WARNING": "⚠️ 月間上限を超えました。超過分は代休に変換が必要です",
+  "OVERTIME_COMPENSATORY_NEGATIVE": "代休時間は負にできません",
+  "OVERTIME_COMPENSATORY_EXCEED": "代休時間は {hours} 時間を超えることができません",
+  "_comment_shift_settings": "=== シフト設定 ===",
+  "SHIFT_TAB_SETTINGS": "シフト設定",
+  "SHIFT_MULTI_SELECT_HINT": "Ctrl/Cmdを押しながら複数選択",
+  "SHIFT_TYPE_ADD_TITLE": "シフト種類追加",
+  "SHIFT_TYPE_NAME_LABEL": "シフト名",
+  "SHIFT_TYPE_NAME_PLACEHOLDER": "例：早番A",
+  "SHIFT_TYPE_CATEGORY_LABEL": "カテゴリ",
+  "SHIFT_TYPE_ADD_BTN": "シフト追加",
+  "SHIFT_TYPE_MANAGE_TITLE": "シフト管理",
+  "SHIFT_TYPE_MANAGE_DESC": "すべてのシフトはサーバーに保存され、変更はすぐに反映されます。",
+  "SHIFT_TYPE_LOADING": "読込中...",
+  "SHIFT_TYPE_ALLDAY": "終日",
+  "SHIFT_TYPE_FALLBACK": "フォールバック"
 }

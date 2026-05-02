@@ -58,7 +58,6 @@
   "FOOTER_SPONSOR": "이 프로젝트 후원하기",
   "FOOTER_OPEN_SOURCE": "오픈소스 프로젝트입니다. 기여를 환영합니다.",
   "LOGIN_INFO": "계속하려면 로그인을 클릭하세요.",
-
   "_comment1": "＿＿＿＿＿프론트엔드 JS 번역＿＿＿＿",
   "LOADING": "⏳ 처리 중...",
   "ADJUST_BUTTON_TEXT": "보충 기록",
@@ -85,7 +84,6 @@
   "ERROR_GEOLOCATION_TIMEOUT": "위치 요청 시간이 초과되었습니다.",
   "ERROR_GEOLOCATION_UNKNOWN": "알 수 없는 오류가 발생했습니다.",
   "ERROR_BROWSER_NOT_SUPPORTED": "브라우저가 위치 정보를 지원하지 않습니다.",
-
   "_comment2": "＿＿＿＿＿백엔드 번역＿＿＿＿",
   "FOOTER_NOTICE": "※ 로그인 상태는 브라우저에 하루 동안 저장됩니다. 기기를 변경하거나 데이터를 삭제한 경우 다시 로그인해야 합니다.",
   "ADJUST_PUNCH_TITLE": "보충 기록",
@@ -151,7 +149,6 @@
   "STATUS_REPAIR_REJECTED_IN": "출근 보충 기록 거부됨",
   "STATUS_REPAIR_REJECTED_OUT": "퇴근 보충 기록 거부됨",
   "REAPPLY": "다시 신청",
-
   "TAB_OVERTIME": "초과근무",
   "OVERTIME_APPLY_TITLE": "초과근무 신청",
   "OVERTIME_APPLY_DESCRIPTION": "다음 정보를 작성하여 초과근무 신청을 제출하세요",
@@ -185,7 +182,6 @@
   "ERROR_LOAD_OVERTIME": "초과근무 기록 로드 실패",
   "ERROR_SUBMIT_OVERTIME": "초과근무 신청 제출 실패",
   "ERR_NO_PERMISSION": "이 작업을 수행할 권한이 없습니다",
-
   "TAB_LEAVE": "휴가",
   "LEAVE_BALANCE_TITLE": "휴가 잔여일",
   "LEAVE_BALANCE_DESCRIPTION": "사용 가능한 휴가 일수",
@@ -243,7 +239,6 @@
   "ERR_MISSING_REJECT_REASON": "휴가를 거부할 때는 사유를 입력해야 합니다",
   "ENTER_REJECT_REASON": "거부 사유를 입력하세요:",
   "REVIEW_COMMENT_LABEL": "검토 의견:",
-
   "EXPORT_ATTENDANCE_BTN": "이번 달 근태 보고서 내보내기",
   "EXPORT_LOADING": "보고서 준비 중...",
   "EXPORT_SUCCESS": "보고서를 성공적으로 내보냈습니다!",
@@ -253,7 +248,6 @@
   "ADMIN_EXPORT_DESCRIPTION": "모든 직원의 근태 보고서 내보내기",
   "ADMIN_EXPORT_MONTH_LABEL": "월 선택",
   "ADMIN_EXPORT_ALL_BTN": "전체 직원 보고서 내보내기",
-
   "TAB_SHIFT": "근무표",
   "SHIFT_TITLE": "근무표 관리",
   "SHIFT_DESCRIPTION": "직원 근무 일정을 확인하고 관리합니다",
@@ -270,7 +264,6 @@
   "EARLY_PUNCH_WARNING": "주의: 근무 시작 시간은 {startTime}이며, 30분 이상 일찍 출근하였습니다.",
   "LATE_PUNCH_WARNING": "주의: 근무 시작 시간은 {startTime}이며, 30분 이상 지각하였습니다.",
   "NO_SHIFT_TODAY": "오늘 근무 기록이 없습니다",
-
   "TAB_SALARY": "급여",
   "SALARY_CURRENT_TITLE": "이번 달 급여",
   "SALARY_NOT_CALCULATED": "이번 달 급여가 아직 계산되지 않았습니다",
@@ -309,7 +302,6 @@
   "HOURS_THIS_MONTH": "이번 달 통계",
   "SALARY_REMINDER_TITLE": "안내",
   "SALARY_REMINDER_TEXT": "급여 시스템은 출퇴근 기록, 초과근무, 휴가 기록을 자동으로 통합하여 계산합니다. 정확한 급여 계산을 위해 제시간에 출퇴근 기록을 해주세요.",
-
   "EXPORT_DATE": "날짜",
   "EXPORT_WEEKDAY": "요일",
   "EXPORT_PUNCH_IN_TIME": "출근 시간",
@@ -323,7 +315,6 @@
   "EXPORT_STATISTICS": "통계",
   "EXPORT_TOTAL_DAYS": "총 {count}일",
   "EXPORT_AVERAGE": "평균: {avg}",
-
   "WEEKDAY_SUNDAY": "일요일",
   "WEEKDAY_MONDAY": "월요일",
   "WEEKDAY_TUESDAY": "화요일",
@@ -331,7 +322,6 @@
   "WEEKDAY_THURSDAY": "목요일",
   "WEEKDAY_FRIDAY": "금요일",
   "WEEKDAY_SATURDAY": "토요일",
-
   "ANNOUNCEMENT_TITLE": "📢 최신 공지사항",
   "ANNOUNCEMENT_EMPTY": "현재 공지사항이 없습니다",
   "BIOMETRIC_PUNCH_TITLE": "생체인증 빠른 출퇴근",
@@ -343,7 +333,6 @@
   "BIOMETRIC_PUNCH_OUT_BTN": "퇴근 기록",
   "LINE_CHANNEL_TITLE": "직원 LINE 채널에 가입하고 최신 공지를 받아보세요!",
   "LINE_CHANNEL_ID": "@464mssoh",
-
   "MONTHLY_STATS_TITLE": "월간 근태 통계",
   "STATS_TOTAL_HOURS": "총 근무 시간",
   "STATS_WORK_DAYS": "근무 일수",
@@ -352,20 +341,17 @@
   "UNIT_HOURS": "시간",
   "UNIT_DAYS": "일",
   "UNIT_RECORDS": "건",
-
   "DAILY_ATTENDANCE_TITLE": "근태 기록",
   "PUNCH_RECORDS_TITLE": "출퇴근 기록",
   "OVERTIME_PERIOD": "초과근무 시간대",
   "TIME_LABEL": "시간",
   "REASON_LABEL": "사유",
   "SYSTEM_JUDGMENT": "시스템 판정",
-
   "LEAVE_INFO_TITLE": "휴가 정보",
   "LEAVE_TYPE": "휴가 유형",
   "LEAVE_DAYS_COUNT": "일수",
   "LEAVE_REASON_DISPLAY": "사유",
   "REVIEW_COMMENT": "검토 의견",
-
   "ADMIN_ANNOUNCEMENT_MANAGEMENT": "📢 공지사항 관리",
   "ANNOUNCEMENT_TITLE_PLACEHOLDER": "공지 제목",
   "ANNOUNCEMENT_CONTENT_PLACEHOLDER": "공지 내용",
@@ -376,7 +362,6 @@
   "BTN_DELETE": "삭제",
   "DELETE_ANNOUNCEMENT_CONFIRM": "이 공지를 삭제하시겠습니까?",
   "ANNOUNCEMENT_DELETED": "공지가 삭제되었습니다",
-
   "SEARCH_LOCATION_LABEL": "🔍 위치 검색",
   "SEARCH_LOCATION_PLACEHOLDER": "주소 또는 장소명을 입력하세요...",
   "LOCATION_NAME_PLACEHOLDER": "예: 서울역",
@@ -384,7 +369,6 @@
   "LONGITUDE_LABEL": "경도",
   "PUNCH_RANGE_LABEL": "출퇴근 허용 범위",
   "PUNCH_RANGE_DESCRIPTION": "슬라이더를 드래그하여 허용 반경(30~2000m)을 조절하세요.",
-
   "ADMIN_PUNCH_ANALYSIS_TITLE": "직원 출퇴근 분석",
   "ADMIN_PUNCH_ANALYSIS_DESC": "직원 월별 출퇴근 시간 분포와 근무 시간 통계를 확인합니다",
   "SELECT_EMPLOYEE_LABEL": "직원 선택",
@@ -392,18 +376,15 @@
   "SELECT_MONTH_LABEL": "월 선택",
   "BTN_LOAD_ANALYSIS": "분석 차트 불러오기",
   "BTN_EXPORT_PUNCH_REPORT": "출퇴근 보고서 내보내기",
-
   "CHART_WORK_HOURS_TITLE": "일별 근무 시간",
   "CHART_PUNCH_TIME_TITLE": "출퇴근 시간 분포",
   "ANALYSIS_LOADING": "분석 데이터 불러오는 중...",
   "ANALYSIS_NO_DATA": "해당 월의 출퇴근 기록이 없습니다",
-
   "MAKEUP_PUNCH_TITLE": "보충 기록: {date} ({type})",
   "SELECT_PUNCH_TIME": "{type} 시간을 선택하세요:",
   "BTN_CANCEL": "취소",
   "BTN_SUBMIT_PUNCH_IN": "출근 보충 기록 제출",
   "BTN_SUBMIT_PUNCH_OUT": "퇴근 보충 기록 제출",
-
   "BTN_SUBMIT_OVERTIME": "초과근무 신청 제출",
   "BTN_SUBMIT_LEAVE": "휴가 신청 제출",
   "ERROR_FETCH_RECORDS": "기록을 가져오지 못했습니다",
@@ -412,54 +393,44 @@
   "CHECKING": "확인 중...",
   "NETWORK_ERROR": "네트워크 오류",
   "ERR_AFTER_TODAY": "⚠️ 오늘 이후의 시간은 선택할 수 없습니다",
-
   "SHIFT_PAGE_TITLE": "근무표 관리 - 근태 시스템",
   "SHIFT_MANAGEMENT_TITLE": "근무표 관리",
   "BTN_BACK": "뒤로가기",
-
   "SHIFT_TAB_VIEW": "근무표 보기",
   "SHIFT_TAB_ADD": "근무 추가",
   "SHIFT_TAB_BATCH": "일괄 업로드",
   "SHIFT_TAB_STATS": "통계",
-
   "SHIFT_FILTER_TITLE": "필터 조건",
   "SHIFT_START_DATE": "시작일",
   "SHIFT_END_DATE": "종료일",
   "OPTION_ALL": "전체",
-
   "SHIFT_TYPE_MORNING": "오전 근무",
   "SHIFT_TYPE_AFTERNOON": "오후 근무",
   "SHIFT_TYPE_NIGHT": "야간 근무",
   "SHIFT_TYPE_FULL": "전일 근무",
   "SHIFT_TYPE_DAYOFF": "휴무",
   "SHIFT_TYPE_CUSTOM": "사용자 지정",
-
   "BTN_APPLY_FILTER": "필터 적용",
   "BTN_CLEAR_FILTER": "필터 초기화",
   "BTN_EXPORT_SHIFTS": "근무표 내보내기",
-
   "SHIFT_ADD_TITLE": "근무 추가",
   "SHIFT_EMPLOYEE_LABEL": "직원",
   "SHIFT_SELECT_EMPLOYEE": "직원을 선택하세요",
   "SHIFT_DATE_LABEL": "날짜",
   "SHIFT_SELECT_TYPE": "근무 종류 선택",
-
   "SHIFT_MORNING_DESC": "오전 근무 (08:00-16:00)",
   "SHIFT_AFTERNOON_DESC": "오후 근무 (12:00-20:00)",
   "SHIFT_NIGHT_DESC": "야간 근무 (16:00-24:00)",
   "SHIFT_FULL_DESC": "전일 근무 (09:00-18:00)",
   "SHIFT_DAYOFF_DESC": "휴무 (휴일)",
   "SHIFT_CUSTOM_DESC": "사용자 지정 시간",
-
   "SHIFT_START_TIME": "시작 시간",
   "SHIFT_END_TIME": "종료 시간",
   "SHIFT_SELECT_LOCATION": "장소 선택",
   "SHIFT_NOTE_LABEL": "메모",
   "SHIFT_NOTE_PLACEHOLDER": "메모를 입력하세요...",
-
   "BTN_ADD_SHIFT": "근무 추가",
   "BTN_RESET": "초기화",
-
   "SHIFT_BATCH_TITLE": "근무 일괄 추가",
   "SHIFT_BATCH_DESC": "CSV 또는 Excel 파일을 업로드하여 근무 일정을 일괄 추가합니다. 형식: 직원ID, 이름, 날짜, 근무 종류, 시작 시간, 종료 시간, 장소, 메모",
   "SHIFT_UPLOAD_DESC": "파일을 이곳에 끌어다 놓거나 클릭하여 선택하세요",
@@ -467,21 +438,16 @@
   "SHIFT_PREVIEW_TITLE": "데이터 미리보기",
   "BTN_CONFIRM_UPLOAD": "업로드 확인",
   "BTN_DOWNLOAD_TEMPLATE": "템플릿 다운로드",
-
   "SHIFT_STATS_LOADING": "통계 데이터 불러오는 중...",
   "BTN_PREV_MONTH": "◀ 이전 달",
   "BTN_NEXT_MONTH": "다음 달 ▶",
   "BTN_TODAY": "오늘로 이동",
   "SHIFT_CALENDAR_LOADING": "달력 불러오는 중...",
-
   "SHIFT_NO_DATA": "근무 일정이 없습니다",
   "SHIFT_LOAD_FAILED": "불러오기 실패",
   "SHIFT_LOAD_ERROR": "불러오기 실패",
-
   "BTN_EDIT": "편집",
-
   "SHIFT_STATS_TOTAL": "이번 달 총 근무 횟수",
-
   "SHIFT_FILL_TIME": "시작 시간과 종료 시간을 입력하세요",
   "SHIFT_CONFIRM_CROSS_DAY": "종료 시간이 시작 시간보다 이릅니다. 야간(익일) 근무로 등록하시겠습니까?",
   "SHIFT_ADD_SUCCESS": "근무가 추가되었습니다!",
@@ -491,50 +457,38 @@
   "SHIFT_DELETE_CONFIRM": "이 근무 일정을 삭제하시겠습니까?",
   "SHIFT_DELETE_SUCCESS": "근무 일정이 삭제되었습니다",
   "SHIFT_DELETE_FAILED": "근무 삭제에 실패했습니다",
-
   "SHIFT_NO_EXPORT_DATA": "내보낼 데이터가 없습니다",
   "SHIFT_EXPORT_SUCCESS": "내보내기에 성공했습니다",
-
   "SHIFT_BATCH_CSV_ONLY": "현재 CSV 형식만 지원합니다",
   "SHIFT_BATCH_NO_DATA": "파일에 유효한 데이터가 없습니다",
   "SHIFT_BATCH_UPLOAD_SUCCESS": "일괄 업로드에 성공했습니다",
   "SHIFT_BATCH_UPLOAD_FAILED": "일괄 업로드에 실패했습니다",
   "SHIFT_BATCH_NETWORK_ERROR": "일괄 업로드 실패: 네트워크 오류",
-
   "SHIFT_DETAIL_TITLE": "근무 상세",
   "SHIFT_NO_NOTE": "없음",
-
   "SHIFT_DISTRIBUTION_TITLE": "월간 직원 근무 분포",
   "SHIFT_TYPE_DISTRIBUTION_TITLE": "월간 근무 유형 분포",
   "SHIFT_SHIFTS_COUNT": "{count}건의 근무",
-
   "SHIFT_LOGIN_REQUIRED": "먼저 로그인하세요",
   "SHIFT_NO_EMPLOYEE_DATA": "직원 데이터가 없습니다",
   "SHIFT_LOAD_EMPLOYEES_FAILED": "직원 목록 불러오기 실패",
   "SHIFT_LOAD_EMPLOYEES_ERROR": "직원 목록 불러오기 실패",
-
   "SHIFT_ADD_ERROR": "근무 추가 실패",
-
   "SHIFT_EDIT_TITLE": "근무 편집",
   "BTN_UPDATE_SHIFT": "근무 업데이트",
-
   "SHIFT_BATCH_UPLOAD_ERROR": "일괄 업로드 실패",
-
   "SALARY_PAGE_TITLE": "급여 관리 시스템 - 근태 매니저",
   "SALARY_SYSTEM_TITLE": "급여 관리 시스템",
   "SALARY_SYSTEM_DESC": "수당 및 공제를 포함한 종합 급여 관리 솔루션",
-
   "SALARY_TAB_EMPLOYEE": "직원 급여",
   "SALARY_TAB_SETTING": "급여 설정",
   "SALARY_TAB_MONTHLY": "월급 계산",
   "SALARY_TAB_HOURLY": "시급 계산",
   "SALARY_TAB_LIST": "급여 목록",
-
   "SALARY_QUERY_MONTH": "📅 조회 월:",
   "BTN_QUERY": "🔍 조회",
   "SALARY_MY_DETAIL": "내 급여 명세",
   "SALARY_NO_RECORD": "급여 기록이 없습니다",
-
   "SALARY_EARNINGS_TITLE": "지급 항목",
   "SALARY_POSITION_ALLOWANCE": "직책 수당",
   "SALARY_MEAL_ALLOWANCE": "식대",
@@ -542,14 +496,11 @@
   "SALARY_ATTENDANCE_BONUS": "개근 수당",
   "SALARY_PERFORMANCE_BONUS": "성과 보너스",
   "SALARY_RESTDAY_OT": "휴일 근무 수당",
-
   "SALARY_DEDUCTIONS_TITLE": "공제 항목",
   "SALARY_OTHER_DEDUCT": "기타 공제",
-
   "SALARY_BANK_INFO_TITLE": "은행 계좌 정보",
   "SALARY_BANK_NAME_LABEL": "은행:",
   "SALARY_ACCOUNT_LABEL": "계좌번호:",
-
   "SALARY_SETTING_FORM_TITLE": "직원 급여 설정 (상세)",
   "SALARY_BASIC_INFO": "기본 정보",
   "SALARY_EMPLOYEE_LABEL": "직원",
@@ -561,9 +512,7 @@
   "SALARY_TYPE_LABEL": "급여 유형",
   "SALARY_BASE_LABEL": "기본 급여",
   "SALARY_ALLOWANCE_TITLE": "💰 고정 수당 및 지원금",
-
   "BTN_SAVE_SALARY_SETTING": "💾 급여 설정 저장",
-
   "SALARY_LOGIN_REQUIRED": "로그인이 필요합니다",
   "SALARY_INIT_FAILED": "초기화에 실패했습니다",
   "SALARY_SELECT_MONTH": "조회 월을 선택하세요",
@@ -584,14 +533,12 @@
   "SALARY_HOURLY_MIN_190": "시급은 190위안 이상이어야 합니다",
   "SALARY_INPUT_WORK_HOURS": "근무 시간을 입력하세요",
   "SALARY_HOURLY_CALC_SUCCESS": "시급 계산이 완료되었습니다",
-
   "SALARY_SETTING_DESC": "기본 급여, 수당 및 공제 항목을 설정합니다",
   "PLEASE_SELECT": "선택하세요",
   "FULL_TIME": "정규직",
   "PART_TIME": "파트타임",
   "CONTRACT": "계약직",
   "HINT_AUTO_FILL": "직원을 선택하면 ID와 이름이 자동으로 입력됩니다",
-
   "SALARY_POSITION_ALLOWANCE_LABEL": "직책 수당",
   "HINT_POSITION_ALLOWANCE": "직책에 따라 고정 지급",
   "SALARY_MEAL_ALLOWANCE_LABEL": "식대",
@@ -604,12 +551,10 @@
   "HINT_PERFORMANCE_BONUS": "성과 평가에 따라 지급",
   "SALARY_OTHER_ALLOWANCES_LABEL": "기타 수당",
   "HINT_OTHER_ALLOWANCES": "기타 고정 수당",
-
   "SALARY_LEGAL_DEDUCTIONS_TITLE": "법정 공제 항목",
   "AUTO_CALCULATE": "✨ 자동 계산",
   "LEGAL_DEDUCTIONS_DESC": "기본 급여를 기준으로 법령에 따라 자동 계산됩니다",
   "AUTO": "자동",
-
   "SALARY_LABOR_INS_LABEL": "산재 보험료",
   "HINT_LABOR_INS": "본인 부담 20%",
   "SALARY_HEALTH_INS_LABEL": "건강 보험료",
@@ -620,7 +565,6 @@
   "HINT_PENSION_RATE": "0% ~ 6% 선택 가능",
   "SALARY_PENSION_SELF_LABEL": "연금 자기 부담 금액",
   "SALARY_TAX_LABEL": "소득세",
-
   "OTHER_DEDUCTIONS_TITLE": "⚠️ 기타 공제 항목",
   "SALARY_WELFARE_FEE_LABEL": "복지 기금",
   "HINT_WELFARE_FEE": "사내 복지위원회 기금",
@@ -630,7 +574,6 @@
   "HINT_GROUP_INSURANCE": "단체 보험 개인 부담분",
   "SALARY_OTHER_DEDUCTIONS_LABEL": "기타 공제",
   "HINT_OTHER_DEDUCTIONS": "기타 고정 공제 항목",
-
   "SALARY_PREVIEW_TITLE": "💡 급여 시뮬레이션 미리보기",
   "PREVIEW_BASE_SALARY": "기본 급여:",
   "PREVIEW_ALLOWANCES_TOTAL": "수당 합계:",
@@ -639,7 +582,6 @@
   "PREVIEW_LEGAL_DEDUCTIONS": "법정 공제:",
   "PREVIEW_OTHER_DEDUCTIONS": "기타 공제:",
   "PREVIEW_NET_SALARY": "예상 실수령액:",
-
   "BANK_INFO_TITLE": "🏦 은행 계좌 정보",
   "BANK_CODE_LABEL": "은행 코드",
   "SELECT_BANK": "-- 은행 선택 --",
@@ -650,13 +592,11 @@
   "HINT_PAYMENT_DAY": "매월 지급일 (1~31)",
   "NOTE_LABEL": "비고",
   "NOTE_PLACEHOLDER": "선택 입력 (특이 사항)",
-
   "MONTHLY_CALC_TITLE": "월급 계산",
   "MONTHLY_CALC_DESC": "초과 근무 수당, 수당 및 공제를 포함한 월급을 자동 계산합니다",
   "CALC_EMPLOYEE_LABEL": "직원",
   "CALC_YEAR_MONTH_LABEL": "대상 연월",
   "BTN_START_CALC": "🧮 계산 시작",
-
   "HOURLY_CALC_TITLE": "시급 계산",
   "HOURLY_CALC_DESC": "실제 근무 시간을 기준으로 시급제를 계산합니다",
   "HOURLY_EMPLOYEE_LABEL": "직원",
@@ -667,22 +607,16 @@
   "HINT_OVERTIME_HOURS": "평일 초과 근무 시간 (1.34배)",
   "HOURLY_CALC_MONTH_LABEL": "대상 연월",
   "BTN_START_HOURLY_CALC": "🧮 시급 계산 시작",
-
   "SALARY_LIST_TITLE": "급여 목록",
   "SALARY_LIST_DESC": "모든 직원의 급여 내역을 확인합니다",
   "FILTER_YEAR_MONTH_LABEL": "대상 연월",
   "BTN_LOAD_SALARY_LIST": "📋 급여 목록 불러오기",
-
   "SALARY_SELECT_QUERY_MONTH": "조회할 월을 선택하세요",
-
   "FOOTER_CREDITS": "0J 제작",
-
   "ADJUST_REASON_LABEL": "출퇴근 조정 사유",
   "ADJUST_REASON_PLACEHOLDER": "조정 사유를 입력해 주세요 (예: 체크인 누락, 시스템 오류 등)",
   "ADJUST_REASON_REQUIRED": "조정 사유를 입력해 주세요",
-
   "STATS_OVERTIME_HOURS": "초과 근무 시간",
-
   "TAB_WORKLOG": "업무 일지",
   "WORKLOG_TITLE": "업무 일지",
   "WORKLOG_DESCRIPTION": "일일 업무 내용과 근무 시간을 기록하고 상사의 승인을 받습니다",
@@ -728,7 +662,6 @@
   "STATUS_REJECTED": "거부됨",
   "DELETE_FAILED": "삭제에 실패했습니다",
   "LOAD_FAILED": "로드에 실패했습니다",
-
   "MY_BASIC_INFO_TITLE": "내 기본 정보",
   "MY_BASIC_INFO_DESC": "개인 기본 정보를 입력하거나 업데이트하세요",
   "ID_NUMBER_LABEL": "주민등록번호",
@@ -738,8 +671,55 @@
   "BTN_SAVE_BASIC_INFO": "기본 정보 저장",
   "SAVING": "저장 중...",
   "SAVE_SUCCESS": "저장되었습니다!",
-
   "STATS_WORK_HOURS": "출근 시간",
   "STATS_NORMAL_HOURS": "정상 출퇴근 기록 시간",
-  "SALARY_EARLY_LEAVE_DEDUCT": "조퇴 공제"
+  "SALARY_EARLY_LEAVE_DEDUCT": "조퇴 공제",
+  "_comment_leave_validation": "=== 휴가 검증 ===",
+  "LEAVE_END_AFTER_START": "❌ 종료 시간은 시작 시간보다 이후여야 합니다",
+  "LEAVE_MUST_INTEGER_HOURS": "❌ 휴가 시간은 정수여야 합니다 (현재 {hours}시간)\n시간을 조정하세요",
+  "LEAVE_NON_STANDARD_HOURS": " (비표준 근무 시간 포함)",
+  "LEAVE_HOURS_OK": "✅ 시간이 올바르게 계산되었습니다{info}, 신청 가능합니다",
+  "LEAVE_SUBMITTED": "휴가 신청이 제출되었습니다! 시간: {hours}",
+  "LEAVE_SELECT_TYPE": "휴가 유형을 선택하세요",
+  "LEAVE_SELECT_START": "시작 시간을 선택하세요",
+  "LEAVE_SELECT_END": "종료 시간을 선택하세요",
+  "LEAVE_START_WHOLE_HOUR": "시작 시간은 정각이어야 합니다 (예: 09:00, 10:00)",
+  "LEAVE_END_WHOLE_HOUR": "종료 시간은 정각이어야 합니다 (예: 09:00, 10:00)",
+  "LEAVE_REASON_MIN_2": "휴가 사유를 입력하세요 (최소 2자)",
+  "LEAVE_HOURS_GT_ZERO": "휴가 시간은 0보다 커야 합니다",
+  "LEAVE_HOURS_INTEGER": "휴가 시간은 정수여야 합니다. 현재 {hours}시간입니다",
+  "LEAVE_NOT_SET": "미설정",
+  "LEAVE_REASON_NONE": "없음",
+  "LEAVE_HOURS_UNKNOWN": "시간 불명",
+  "LEAVE_TIME_NOT_SET": "시간 미설정",
+  "LEAVE_REJECT_REASON_PROMPT": "거절 사유를 입력하세요:",
+  "LEAVE_REJECT_REASON_REQUIRED": "거절 사유를 입력하세요",
+  "LEAVE_REVIEW_FAILED": "검토 실패",
+  "LEAVE_BALANCE_EXCEEDED": "잔액 부족! {type} 잔액은 {available}시간이지만 {requested}시간을 신청했습니다",
+  "LEAVE_INSUFFICIENT_BALANCE_DAYS": "⚠️ 직원 잔액 부족 ({days}일 남음)",
+  "BTN_APPROVE": "승인",
+  "BTN_REJECT": "거절",
+  "_comment_overtime_stats": "=== 초과 근무 통계 ===",
+  "OVERTIME_MONTH_STATS": "{yearMonth} 초과 근무 통계",
+  "OVERTIME_APPROVED_HOURS_LABEL": "승인된 시간",
+  "OVERTIME_MAX_HOURS": "/ {max}시간",
+  "OVERTIME_EXCEEDED_LABEL": "초과 시간",
+  "OVERTIME_REMAINING_LABEL": "잔여 시간",
+  "OVERTIME_HOURS_UNIT": "시간",
+  "OVERTIME_EXCEEDED_WARNING": "⚠️ 월간 한도 초과, 초과분은 대체 휴가로 전환 필요",
+  "OVERTIME_COMPENSATORY_NEGATIVE": "대체 휴가 시간은 음수가 될 수 없습니다",
+  "OVERTIME_COMPENSATORY_EXCEED": "대체 휴가 시간은 {hours}시간을 초과할 수 없습니다",
+  "_comment_shift_settings": "=== 근무 유형 설정 ===",
+  "SHIFT_TAB_SETTINGS": "근무 유형 설정",
+  "SHIFT_MULTI_SELECT_HINT": "Ctrl/Cmd를 누른 채로 여러 항목 선택",
+  "SHIFT_TYPE_ADD_TITLE": "근무 유형 추가",
+  "SHIFT_TYPE_NAME_LABEL": "근무 유형 이름",
+  "SHIFT_TYPE_NAME_PLACEHOLDER": "예: 오전-A",
+  "SHIFT_TYPE_CATEGORY_LABEL": "카테고리",
+  "SHIFT_TYPE_ADD_BTN": "유형 추가",
+  "SHIFT_TYPE_MANAGE_TITLE": "근무 유형 관리",
+  "SHIFT_TYPE_MANAGE_DESC": "모든 근무 유형은 서버에 저장되며 변경사항이 즉시 적용됩니다.",
+  "SHIFT_TYPE_LOADING": "로딩 중...",
+  "SHIFT_TYPE_ALLDAY": "종일",
+  "SHIFT_TYPE_FALLBACK": "기본값"
 }

@@ -226,10 +226,10 @@ function updateWorkHoursPreview() {
     
     if (workHours <= 0) {
         hasError = true;
-        errorMsg = '❌ 結束時間必須晚於開始時間';
+        errorMsg = t('LEAVE_END_AFTER_START');
     } else if (!Number.isInteger(workHours)) {
         hasError = true;
-        errorMsg = `❌ 請假時數必須是整數小時（目前為 ${workHours} 小時）\n請調整時間使其為整數小時`;
+        errorMsg = t('LEAVE_MUST_INTEGER_HOURS', { hours: workHours });
     }
     
     // 顯示警告訊息
@@ -265,10 +265,10 @@ function updateWorkHoursPreview() {
             
             let timeInfo = '';
             if (startHour < 9 || endHour > 18) {
-                timeInfo = '（包含非標準工作時段）';
+                timeInfo = t('LEAVE_NON_STANDARD_HOURS');
             }
-            
-            warningEl.textContent = `✅ 時數計算正確${timeInfo}，可以提交申請`;
+
+            warningEl.textContent = t('LEAVE_HOURS_OK', { info: timeInfo });
         }
     }
 }
@@ -360,7 +360,7 @@ async function submitLeaveApplication() {
             
             if (workHours > availableHours) {
                 showNotification(
-                    `餘額不足！${t(leaveType)} 剩餘 ${availableHours} 小時，但您申請了 ${workHours} 小時`,
+                    t('LEAVE_BALANCE_EXCEEDED', { type: t(leaveType), available: availableHours, requested: workHours }),
                     'error'
                 );
                 return;
@@ -373,7 +373,7 @@ async function submitLeaveApplication() {
     const button = document.getElementById('submit-leave-btn');
     if (button) {
         button.disabled = true;
-        button.textContent = '處理中...';
+        button.textContent = t('LOADING');
     }
     
     try {
@@ -387,7 +387,7 @@ async function submitLeaveApplication() {
         console.log('📥 後端回應:', response);
         
         if (response.ok) {
-            showNotification(`請假申請已提交！時數：${workHours} 小時`, 'success');
+            showNotification(t('LEAVE_SUBMITTED', { hours: workHours }), 'success');
             
             // 清空表單
             document.getElementById('leave-type').value = '';
@@ -406,15 +406,15 @@ async function submitLeaveApplication() {
             
             console.log('✅ 資料更新完成');
         } else {
-            showNotification(response.msg || '提交失敗', 'error');
+            showNotification(response.msg || t('LEAVE_SUBMIT_FAILED'), 'error');
         }
     } catch (error) {
         console.error('❌ 提交請假申請失敗:', error);
-        showNotification('網路錯誤，請稍後再試', 'error');
+        showNotification(t('NETWORK_ERROR'), 'error');
     } finally {
         if (button) {
             button.disabled = false;
-            button.textContent = '提交請假申請';
+            button.textContent = t('BTN_SUBMIT_LEAVE');
         }
     }
 }
@@ -429,48 +429,48 @@ function validateLeaveForm() {
     const reason = document.getElementById('leave-reason').value;
     
     if (!leaveType) {
-        showNotification('請選擇假別', 'error');
+        showNotification(t('LEAVE_SELECT_TYPE'), 'error');
         return false;
     }
-    
+
     if (!startTime) {
-        showNotification('請選擇開始時間', 'error');
+        showNotification(t('LEAVE_SELECT_START'), 'error');
         return false;
     }
-    
+
     if (!endTime) {
-        showNotification('請選擇結束時間', 'error');
+        showNotification(t('LEAVE_SELECT_END'), 'error');
         return false;
     }
-    
+
     // 檢查是否為整點時間
     const start = new Date(startTime);
     const end = new Date(endTime);
-    
+
     if (start.getMinutes() !== 0 || start.getSeconds() !== 0) {
-        showNotification('開始時間必須是整點（例如：09:00, 10:00）', 'error');
+        showNotification(t('LEAVE_START_WHOLE_HOUR'), 'error');
         return false;
     }
-    
+
     if (end.getMinutes() !== 0 || end.getSeconds() !== 0) {
-        showNotification('結束時間必須是整點（例如：09:00, 10:00）', 'error');
+        showNotification(t('LEAVE_END_WHOLE_HOUR'), 'error');
         return false;
     }
-    
+
     if (!reason.trim() || reason.trim().length < 2) {
-        showNotification('請填寫請假原因（至少2個字）', 'error');
+        showNotification(t('LEAVE_REASON_MIN_2'), 'error');
         return false;
     }
-    
+
     const workHours = calculateWorkHours(startTime, endTime);
-    
+
     if (workHours <= 0) {
-        showNotification('請假時數必須大於 0', 'error');
+        showNotification(t('LEAVE_HOURS_GT_ZERO'), 'error');
         return false;
     }
-    
+
     if (!Number.isInteger(workHours)) {
-        showNotification(`請假時數必須是整數小時，目前為 ${workHours} 小時`, 'error');
+        showNotification(t('LEAVE_HOURS_INTEGER', { hours: workHours }), 'error');
         return false;
     }
     
@@ -608,7 +608,7 @@ async function loadLeaveRecords() {
  * 格式化日期時間顯示
  */
 function formatDateTime(isoString) {
-    if (!isoString) return '未設定';
+    if (!isoString) return t('LEAVE_NOT_SET');
     
     try {
         const date = new Date(isoString);
@@ -644,17 +644,19 @@ function renderLeaveRecords(records) {
         card.className = 'card p-4 hover:shadow-lg transition-shadow';
         
         let statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-        let statusText = '待審核';
-        
+        let statusText = t('LEAVE_STATUS_PENDING');
+
         if (record.status === 'APPROVED') {
             statusClass = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-            statusText = '已核准';
+            statusText = t('LEAVE_STATUS_APPROVED');
         } else if (record.status === 'REJECTED') {
             statusClass = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-            statusText = '已拒絕';
+            statusText = t('LEAVE_STATUS_REJECTED');
         }
-        
-        const workHoursDisplay = record.workHours ? `${record.workHours} 小時` : '0 小時';
+
+        const workHoursDisplay = record.workHours
+            ? t('OVERTIME_HOURS', { hours: record.workHours })
+            : t('OVERTIME_HOURS', { hours: 0 });
         const startTime = formatDateTime(record.startDateTime || record.startTime);
         const endTime = formatDateTime(record.endDateTime || record.endTime);
         
@@ -699,8 +701,8 @@ function renderLeaveRecords(records) {
                     <svg class="w-4 h-4 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                     </svg>
-                    <span>請假原因:</span>
-                    <span class="ml-1">${record.reason || '無'}</span>
+                    <span>${t('LEAVE_REASON_LABEL')}:</span>
+                    <span class="ml-1">${record.reason || t('LEAVE_REASON_NONE')}</span>
                 </div>
             </div>
         `;
@@ -761,13 +763,13 @@ function renderPendingLeaveRequests(requests) {
             ? `${formatDateTime(req.startDateTime)} ~ ${formatDateTime(req.endDateTime)}`
             : req.startDate && req.endDate
             ? `${req.startDate} ~ ${req.endDate}`
-            : '時間未設定';
-        
+            : t('LEAVE_TIME_NOT_SET');
+
         const durationDisplay = req.workHours
-            ? `${req.workHours} 小時`
+            ? t('OVERTIME_HOURS', { hours: req.workHours })
             : req.days
-            ? `${req.days} 天`
-            : '時數未知';
+            ? `${req.days} ${t('OVERTIME_HOURS_UNIT')}`
+            : t('LEAVE_HOURS_UNKNOWN');
         
         const balanceWarning = req.insufficientBalance 
             ? `<p class="text-xs text-red-600 dark:text-red-400 mt-2 font-semibold">
@@ -830,17 +832,17 @@ function renderPendingLeaveRequests(requests) {
 async function handleReviewLeave(button, action) {
     const rowNumber = button.dataset.row;
     
-    const comment = action === 'reject' 
-        ? prompt('請輸入拒絕原因：') 
+    const comment = action === 'reject'
+        ? prompt(t('LEAVE_REJECT_REASON_PROMPT'))
         : '';
-    
+
     if (action === 'reject' && !comment) {
-        showNotification('請輸入拒絕原因', 'warning');
+        showNotification(t('LEAVE_REJECT_REASON_REQUIRED'), 'warning');
         return;
     }
-    
+
     button.disabled = true;
-    button.textContent = '處理中...';
+    button.textContent = t('LOADING');
     
     try {
         const res = await callApifetch(
@@ -850,17 +852,17 @@ async function handleReviewLeave(button, action) {
         );
         
         if (res.ok) {
-            showNotification(action === 'approve' ? '已核准' : '已拒絕', 'success');
+            showNotification(action === 'approve' ? t('LEAVE_APPROVED') : t('LEAVE_REJECTED'), 'success');
             await new Promise(resolve => setTimeout(resolve, 500));
             loadPendingLeaveRequests();
         } else {
-            showNotification('審核失敗', 'error');
+            showNotification(t('LEAVE_REVIEW_FAILED'), 'error');
         }
     } catch (err) {
         console.error('審核請假失敗:', err);
-        showNotification('網路錯誤', 'error');
+        showNotification(t('NETWORK_ERROR'), 'error');
     } finally {
         button.disabled = false;
-        button.textContent = action === 'approve' ? '核准' : '拒絕';
+        button.textContent = action === 'approve' ? t('BTN_APPROVE') : t('BTN_REJECT');
     }
 }

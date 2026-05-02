@@ -58,7 +58,6 @@
   "FOOTER_SPONSOR": "Sponsori proyek ini",
   "FOOTER_OPEN_SOURCE": "Ini adalah proyek sumber terbuka, kontribusi dipersilakan.",
   "LOGIN_INFO": "Silakan klik masuk untuk melanjutkan.",
-  
   "_comment1": "＿＿＿＿＿Terjemahan Frontend JS＿＿＿＿",
   "LOADING": "⏳ Memproses...",
   "ADJUST_BUTTON_TEXT": "Absen Susulan",
@@ -85,7 +84,6 @@
   "ERROR_GEOLOCATION_TIMEOUT": "Permintaan lokasi habis waktu.",
   "ERROR_GEOLOCATION_UNKNOWN": "Terjadi kesalahan yang tidak diketahui.",
   "ERROR_BROWSER_NOT_SUPPORTED": "Browser Anda tidak mendukung geolokasi.",
-  
   "_comment2": "＿＿＿＿＿Terjemahan Backend＿＿＿＿",
   "FOOTER_NOTICE": "※ Status masuk disimpan di browser Anda selama satu hari. Masuk kembali jika Anda berganti perangkat atau menghapus data.",
   "ADJUST_PUNCH_TITLE": "Absen Susulan",
@@ -151,7 +149,6 @@
   "STATUS_REPAIR_REJECTED_IN": "Absen masuk susulan ditolak",
   "STATUS_REPAIR_REJECTED_OUT": "Absen keluar susulan ditolak",
   "REAPPLY": "Ajukan Ulang",
-
   "TAB_OVERTIME": "Lembur",
   "OVERTIME_APPLY_TITLE": "Ajukan Lembur",
   "OVERTIME_APPLY_DESCRIPTION": "Isi informasi berikut untuk mengajukan lembur",
@@ -185,7 +182,6 @@
   "ERROR_LOAD_OVERTIME": "Gagal memuat catatan lembur",
   "ERROR_SUBMIT_OVERTIME": "Gagal mengajukan permohonan lembur",
   "ERR_NO_PERMISSION": "Anda tidak memiliki izin untuk melakukan tindakan ini",
-
   "TAB_LEAVE": "Cuti",
   "LEAVE_BALANCE_TITLE": "Saldo Cuti",
   "LEAVE_BALANCE_DESCRIPTION": "Kuota cuti yang tersedia",
@@ -243,7 +239,6 @@
   "ERR_MISSING_REJECT_REASON": "Alasan penolakan diperlukan saat menolak cuti",
   "ENTER_REJECT_REASON": "Masukkan alasan penolakan:",
   "REVIEW_COMMENT_LABEL": "Komentar Tinjauan:",
-
   "EXPORT_ATTENDANCE_BTN": "Ekspor Laporan Kehadiran Bulan Ini",
   "EXPORT_LOADING": "Menyiapkan laporan...",
   "EXPORT_SUCCESS": "Laporan berhasil diekspor!",
@@ -253,7 +248,6 @@
   "ADMIN_EXPORT_DESCRIPTION": "Ekspor laporan kehadiran semua karyawan",
   "ADMIN_EXPORT_MONTH_LABEL": "Pilih Bulan",
   "ADMIN_EXPORT_ALL_BTN": "Ekspor Laporan Semua Karyawan",
-
   "TAB_SHIFT": "Shift",
   "SHIFT_TITLE": "Manajemen Shift",
   "SHIFT_DESCRIPTION": "Lihat dan kelola informasi shift karyawan",
@@ -270,7 +264,6 @@
   "EARLY_PUNCH_WARNING": "Perhatian: Shift Anda dimulai pada {startTime}, dan Anda masuk lebih dari 30 menit lebih awal.",
   "LATE_PUNCH_WARNING": "Perhatian: Shift Anda dimulai pada {startTime}, dan Anda terlambat lebih dari 30 menit.",
   "NO_SHIFT_TODAY": "Tidak ada catatan shift hari ini",
-
   "TAB_SALARY": "Gaji",
   "SALARY_CURRENT_TITLE": "Gaji Bulan Ini",
   "SALARY_NOT_CALCULATED": "Gaji bulan ini belum dihitung",
@@ -309,7 +302,6 @@
   "HOURS_THIS_MONTH": "Statistik Bulan Ini",
   "SALARY_REMINDER_TITLE": "Pengingat",
   "SALARY_REMINDER_TEXT": "Sistem gaji secara otomatis mengintegrasikan catatan absensi, lembur, dan cuti Anda untuk perhitungan. Pastikan absen tepat waktu untuk memastikan perhitungan gaji yang akurat.",
-
   "EXPORT_DATE": "Tanggal",
   "EXPORT_WEEKDAY": "Hari",
   "EXPORT_PUNCH_IN_TIME": "Waktu Absen Masuk",
@@ -323,7 +315,6 @@
   "EXPORT_STATISTICS": "Statistik",
   "EXPORT_TOTAL_DAYS": "Total {count} hari",
   "EXPORT_AVERAGE": "Rata-rata: {avg}",
-
   "WEEKDAY_SUNDAY": "Minggu",
   "WEEKDAY_MONDAY": "Senin",
   "WEEKDAY_TUESDAY": "Selasa",
@@ -331,7 +322,6 @@
   "WEEKDAY_THURSDAY": "Kamis",
   "WEEKDAY_FRIDAY": "Jumat",
   "WEEKDAY_SATURDAY": "Sabtu",
-
   "ANNOUNCEMENT_TITLE": "📢 Pengumuman Terbaru",
   "ANNOUNCEMENT_EMPTY": "Saat ini belum ada pengumuman",
   "BIOMETRIC_PUNCH_TITLE": "Absensi Cepat Biometrik",
@@ -343,7 +333,6 @@
   "BIOMETRIC_PUNCH_OUT_BTN": "Absen Keluar",
   "LINE_CHANNEL_TITLE": "Gabung ke Channel LINE Karyawan untuk Mendapatkan Pengumuman Terbaru!",
   "LINE_CHANNEL_ID": "@464mssoh",
-
   "MONTHLY_STATS_TITLE": "Statistik Kehadiran Bulanan",
   "STATS_TOTAL_HOURS": "Total Jam",
   "STATS_WORK_DAYS": "Hari Kerja",
@@ -352,20 +341,17 @@
   "UNIT_HOURS": "jam",
   "UNIT_DAYS": "hari",
   "UNIT_RECORDS": "catatan",
-  
   "DAILY_ATTENDANCE_TITLE": "Catatan Kehadiran",
   "PUNCH_RECORDS_TITLE": "Catatan Absen",
   "OVERTIME_PERIOD": "Periode Lembur",
   "TIME_LABEL": "Waktu",
   "REASON_LABEL": "Alasan",
   "SYSTEM_JUDGMENT": "Catatan Sistem",
-  
   "LEAVE_INFO_TITLE": "Informasi Cuti",
   "LEAVE_TYPE": "Jenis Cuti",
   "LEAVE_DAYS_COUNT": "Hari",
   "LEAVE_REASON_DISPLAY": "Alasan",
   "REVIEW_COMMENT": "Komentar Tinjauan",
-
   "ADMIN_ANNOUNCEMENT_MANAGEMENT": "📢 Manajemen Pengumuman",
   "ANNOUNCEMENT_TITLE_PLACEHOLDER": "Judul Pengumuman",
   "ANNOUNCEMENT_CONTENT_PLACEHOLDER": "Isi Pengumuman",
@@ -376,7 +362,6 @@
   "BTN_DELETE": "Hapus",
   "DELETE_ANNOUNCEMENT_CONFIRM": "Apakah Anda yakin ingin menghapus pengumuman ini?",
   "ANNOUNCEMENT_DELETED": "Pengumuman telah dihapus",
-
   "SEARCH_LOCATION_LABEL": "🔍 Cari Lokasi",
   "SEARCH_LOCATION_PLACEHOLDER": "Masukkan alamat atau nama lokasi...",
   "LOCATION_NAME_PLACEHOLDER": "contoh: Jakarta Barat",
@@ -384,7 +369,6 @@
   "LONGITUDE_LABEL": "Bujur",
   "PUNCH_RANGE_LABEL": "Jangkauan Absen",
   "PUNCH_RANGE_DESCRIPTION": "Geser slider untuk mengatur radius absen yang diizinkan (30-2000 meter).",
-  
   "ADMIN_PUNCH_ANALYSIS_TITLE": "Analisis Absen Karyawan",
   "ADMIN_PUNCH_ANALYSIS_DESC": "Lihat distribusi waktu absen dan statistik jam kerja bulanan karyawan",
   "SELECT_EMPLOYEE_LABEL": "Pilih Karyawan",
@@ -392,18 +376,15 @@
   "SELECT_MONTH_LABEL": "Pilih Bulan",
   "BTN_LOAD_ANALYSIS": "Muat Grafik Analisis",
   "BTN_EXPORT_PUNCH_REPORT": "Ekspor Laporan Absen",
-  
   "CHART_WORK_HOURS_TITLE": "Jam Kerja Harian",
   "CHART_PUNCH_TIME_TITLE": "Distribusi Waktu Absen",
   "ANALYSIS_LOADING": "Memuat data analisis...",
   "ANALYSIS_NO_DATA": "Tidak ada catatan absen untuk bulan ini",
-
   "MAKEUP_PUNCH_TITLE": "Absen Susulan: {date} ({type})",
   "SELECT_PUNCH_TIME": "Pilih Waktu {type}:",
   "BTN_CANCEL": "Batal",
   "BTN_SUBMIT_PUNCH_IN": "Kirim Absen Masuk Susulan",
   "BTN_SUBMIT_PUNCH_OUT": "Kirim Absen Keluar Susulan",
-
   "BTN_SUBMIT_OVERTIME": "Kirim Pengajuan Lembur",
   "BTN_SUBMIT_LEAVE": "Kirim Pengajuan Cuti",
   "ERROR_FETCH_RECORDS": "Gagal mengambil catatan",
@@ -412,54 +393,44 @@
   "CHECKING": "Memeriksa...",
   "NETWORK_ERROR": "Kesalahan jaringan",
   "ERR_AFTER_TODAY": "⚠️ Tidak dapat memilih tanggal setelah hari ini",
-
   "SHIFT_PAGE_TITLE": "Manajemen Shift - Sistem Absensi",
   "SHIFT_MANAGEMENT_TITLE": "Manajemen Shift",
   "BTN_BACK": "Kembali",
-  
   "SHIFT_TAB_VIEW": "Lihat Shift",
   "SHIFT_TAB_ADD": "Tambah Shift",
   "SHIFT_TAB_BATCH": "Unggah Massal",
   "SHIFT_TAB_STATS": "Statistik",
-  
   "SHIFT_FILTER_TITLE": "Kriteria Filter",
   "SHIFT_START_DATE": "Tanggal Mulai",
   "SHIFT_END_DATE": "Tanggal Selesai",
   "OPTION_ALL": "Semua",
-  
   "SHIFT_TYPE_MORNING": "Pagi",
   "SHIFT_TYPE_AFTERNOON": "Siang",
   "SHIFT_TYPE_NIGHT": "Malam",
   "SHIFT_TYPE_FULL": "Sehari Penuh",
   "SHIFT_TYPE_DAYOFF": "Libur",
   "SHIFT_TYPE_CUSTOM": "Kustom",
-  
   "BTN_APPLY_FILTER": "Terapkan Filter",
   "BTN_CLEAR_FILTER": "Hapus Filter",
   "BTN_EXPORT_SHIFTS": "Ekspor Jadwal Shift",
-  
   "SHIFT_ADD_TITLE": "Tambah Shift",
   "SHIFT_EMPLOYEE_LABEL": "Karyawan",
   "SHIFT_SELECT_EMPLOYEE": "Pilih Karyawan",
   "SHIFT_DATE_LABEL": "Tanggal",
   "SHIFT_SELECT_TYPE": "Pilih Jenis Shift",
-  
   "SHIFT_MORNING_DESC": "Pagi (08:00-16:00)",
   "SHIFT_AFTERNOON_DESC": "Siang (12:00-20:00)",
   "SHIFT_NIGHT_DESC": "Malam (16:00-24:00)",
   "SHIFT_FULL_DESC": "Sehari Penuh (09:00-18:00)",
   "SHIFT_DAYOFF_DESC": "Libur (Hari Istirahat)",
   "SHIFT_CUSTOM_DESC": "Waktu Kustom",
-  
   "SHIFT_START_TIME": "Waktu Mulai",
   "SHIFT_END_TIME": "Waktu Selesai",
   "SHIFT_SELECT_LOCATION": "Pilih Lokasi",
   "SHIFT_NOTE_LABEL": "Catatan",
   "SHIFT_NOTE_PLACEHOLDER": "Masukkan catatan...",
-  
   "BTN_ADD_SHIFT": "Tambah Shift",
   "BTN_RESET": "Reset",
-  
   "SHIFT_BATCH_TITLE": "Tambah Shift Massal",
   "SHIFT_BATCH_DESC": "Unggah file CSV atau Excel untuk menambahkan shift secara massal. Format: ID Karyawan, Nama, Tanggal, Jenis Shift, Waktu Mulai, Waktu Selesai, Lokasi, Catatan",
   "SHIFT_UPLOAD_DESC": "Tarik dan jatuhkan file di sini, atau klik untuk memilih",
@@ -467,21 +438,16 @@
   "SHIFT_PREVIEW_TITLE": "Pratinjau Data",
   "BTN_CONFIRM_UPLOAD": "Konfirmasi Unggah",
   "BTN_DOWNLOAD_TEMPLATE": "Unduh Template",
-  
   "SHIFT_STATS_LOADING": "Memuat data statistik...",
   "BTN_PREV_MONTH": "◀ Bulan Sebelumnya",
   "BTN_NEXT_MONTH": "Bulan Berikutnya ▶",
   "BTN_TODAY": "Hari Ini",
   "SHIFT_CALENDAR_LOADING": "Memuat kalender...",
-  
   "SHIFT_NO_DATA": "Tidak ada data shift",
   "SHIFT_LOAD_FAILED": "Gagal memuat",
   "SHIFT_LOAD_ERROR": "Gagal memuat",
-  
   "BTN_EDIT": "Edit",
-  
   "SHIFT_STATS_TOTAL": "Total Shift Bulanan",
-  
   "SHIFT_FILL_TIME": "Harap isi waktu mulai dan waktu selesai",
   "SHIFT_CONFIRM_CROSS_DAY": "Waktu selesai lebih awal dari waktu mulai, apakah ini shift lintas hari?",
   "SHIFT_ADD_SUCCESS": "Shift berhasil ditambahkan!",
@@ -491,50 +457,38 @@
   "SHIFT_DELETE_CONFIRM": "Apakah Anda yakin ingin menghapus shift ini?",
   "SHIFT_DELETE_SUCCESS": "Shift dihapus",
   "SHIFT_DELETE_FAILED": "Gagal menghapus",
-  
   "SHIFT_NO_EXPORT_DATA": "Tidak ada data untuk diekspor",
   "SHIFT_EXPORT_SUCCESS": "Berhasil mengekspor",
-  
   "SHIFT_BATCH_CSV_ONLY": "Hanya format CSV yang didukung saat ini",
   "SHIFT_BATCH_NO_DATA": "Tidak ada data valid di dalam file",
   "SHIFT_BATCH_UPLOAD_SUCCESS": "Unggah massal berhasil",
   "SHIFT_BATCH_UPLOAD_FAILED": "Unggah massal gagal",
   "SHIFT_BATCH_NETWORK_ERROR": "Unggah massal gagal: Kesalahan jaringan",
-  
   "SHIFT_DETAIL_TITLE": "Detail Shift",
   "SHIFT_NO_NOTE": "Tidak ada",
-  
   "SHIFT_DISTRIBUTION_TITLE": "Distribusi Shift Karyawan Bulanan",
   "SHIFT_TYPE_DISTRIBUTION_TITLE": "Distribusi Jenis Shift Bulanan",
   "SHIFT_SHIFTS_COUNT": "{count} shift",
-  
   "SHIFT_LOGIN_REQUIRED": "Silakan masuk terlebih dahulu",
   "SHIFT_NO_EMPLOYEE_DATA": "Tidak ada data karyawan",
   "SHIFT_LOAD_EMPLOYEES_FAILED": "Gagal memuat daftar karyawan",
   "SHIFT_LOAD_EMPLOYEES_ERROR": "Gagal memuat daftar karyawan",
-  
   "SHIFT_ADD_ERROR": "Gagal menambahkan shift",
-  
   "SHIFT_EDIT_TITLE": "Edit Shift",
   "BTN_UPDATE_SHIFT": "Perbarui Shift",
-  
   "SHIFT_BATCH_UPLOAD_ERROR": "Unggah massal gagal",
-
   "SALARY_PAGE_TITLE": "Sistem Manajemen Gaji - Manajer Kehadiran",
   "SALARY_SYSTEM_TITLE": "Sistem Manajemen Gaji",
   "SALARY_SYSTEM_DESC": "Solusi manajemen gaji lengkap termasuk tunjangan dan potongan",
-
   "SALARY_TAB_EMPLOYEE": "Gaji Karyawan",
   "SALARY_TAB_SETTING": "Pengaturan Gaji",
   "SALARY_TAB_MONTHLY": "Perhitungan Gaji Bulanan",
   "SALARY_TAB_HOURLY": "Perhitungan Upah Per Jam",
   "SALARY_TAB_LIST": "Daftar Gaji",
-
   "SALARY_QUERY_MONTH": "📅 Bulan Pencarian:",
   "BTN_QUERY": "🔍 Cari",
   "SALARY_MY_DETAIL": "Rincian Gaji Saya",
   "SALARY_NO_RECORD": "Belum ada data gaji",
-
   "SALARY_EARNINGS_TITLE": "Komponen Pendapatan",
   "SALARY_POSITION_ALLOWANCE": "Tunjangan Jabatan",
   "SALARY_MEAL_ALLOWANCE": "Tunjangan Makan",
@@ -542,14 +496,11 @@
   "SALARY_ATTENDANCE_BONUS": "Tunjangan Kehadiran",
   "SALARY_PERFORMANCE_BONUS": "Bonus Kinerja",
   "SALARY_RESTDAY_OT": "Upah Lembur Hari Libur",
-
   "SALARY_DEDUCTIONS_TITLE": "Komponen Potongan",
   "SALARY_OTHER_DEDUCT": "Potongan Lainnya",
-
   "SALARY_BANK_INFO_TITLE": "Informasi Rekening Bank",
   "SALARY_BANK_NAME_LABEL": "Bank:",
   "SALARY_ACCOUNT_LABEL": "Nomor Rekening:",
-
   "SALARY_SETTING_FORM_TITLE": "Pengaturan Gaji Karyawan (Lengkap)",
   "SALARY_BASIC_INFO": "Informasi Dasar",
   "SALARY_EMPLOYEE_LABEL": "Karyawan",
@@ -561,9 +512,7 @@
   "SALARY_TYPE_LABEL": "Jenis Gaji",
   "SALARY_BASE_LABEL": "Gaji Pokok",
   "SALARY_ALLOWANCE_TITLE": "💰 Tunjangan & Bantuan Tetap",
-
   "BTN_SAVE_SALARY_SETTING": "💾 Simpan Pengaturan Gaji",
-
   "SALARY_LOGIN_REQUIRED": "Silakan login terlebih dahulu",
   "SALARY_INIT_FAILED": "Inisialisasi gagal",
   "SALARY_SELECT_MONTH": "Silakan pilih bulan",
@@ -584,14 +533,12 @@
   "SALARY_HOURLY_MIN_190": "Upah per jam tidak boleh kurang dari 190 Yuan",
   "SALARY_INPUT_WORK_HOURS": "Masukkan jumlah jam kerja",
   "SALARY_HOURLY_CALC_SUCCESS": "Perhitungan upah per jam selesai",
-
   "SALARY_SETTING_DESC": "Atur gaji pokok, tunjangan, dan semua komponen potongan",
   "PLEASE_SELECT": "Silakan pilih",
   "FULL_TIME": "Karyawan Tetap",
   "PART_TIME": "Paruh Waktu",
   "CONTRACT": "Kontrak",
   "HINT_AUTO_FILL": "Setelah memilih karyawan, ID dan nama akan terisi otomatis",
-
   "SALARY_POSITION_ALLOWANCE_LABEL": "Tunjangan Jabatan",
   "HINT_POSITION_ALLOWANCE": "Diberikan tetap sesuai jabatan",
   "SALARY_MEAL_ALLOWANCE_LABEL": "Tunjangan Makan",
@@ -604,12 +551,10 @@
   "HINT_PERFORMANCE_BONUS": "Diberikan berdasarkan penilaian kinerja",
   "SALARY_OTHER_ALLOWANCES_LABEL": "Tunjangan Lainnya",
   "HINT_OTHER_ALLOWANCES": "Tunjangan tetap lainnya",
-
   "SALARY_LEGAL_DEDUCTIONS_TITLE": "Potongan Wajib",
   "AUTO_CALCULATE": "✨ Hitung Otomatis",
   "LEGAL_DEDUCTIONS_DESC": "Sistem akan menghitung otomatis sesuai peraturan ketenagakerjaan",
   "AUTO": "Otomatis",
-
   "SALARY_LABOR_INS_LABEL": "Asuransi Tenaga Kerja",
   "HINT_LABOR_INS": "Tanggungan karyawan 20%",
   "SALARY_HEALTH_INS_LABEL": "Asuransi Kesehatan",
@@ -620,7 +565,6 @@
   "HINT_PENSION_RATE": "Dapat dipilih dari 0% hingga 6%",
   "SALARY_PENSION_SELF_LABEL": "Iuran Pensiun Pribadi",
   "SALARY_TAX_LABEL": "Pajak Penghasilan",
-
   "OTHER_DEDUCTIONS_TITLE": "⚠️ Potongan Lainnya",
   "SALARY_WELFARE_FEE_LABEL": "Dana Kesejahteraan",
   "HINT_WELFARE_FEE": "Dana kesejahteraan karyawan",
@@ -630,7 +574,6 @@
   "HINT_GROUP_INSURANCE": "Bagian asuransi kelompok yang ditanggung karyawan",
   "SALARY_OTHER_DEDUCTIONS_LABEL": "Potongan Lainnya",
   "HINT_OTHER_DEDUCTIONS": "Potongan tetap lainnya",
-
   "SALARY_PREVIEW_TITLE": "💡 Pratinjau Perhitungan Gaji",
   "PREVIEW_BASE_SALARY": "Gaji Pokok:",
   "PREVIEW_ALLOWANCES_TOTAL": "Total Tunjangan:",
@@ -639,7 +582,6 @@
   "PREVIEW_LEGAL_DEDUCTIONS": "Potongan Wajib:",
   "PREVIEW_OTHER_DEDUCTIONS": "Potongan Lainnya:",
   "PREVIEW_NET_SALARY": "Perkiraan Gaji Bersih:",
-
   "BANK_INFO_TITLE": "🏦 Informasi Rekening Bank",
   "BANK_CODE_LABEL": "Kode Bank",
   "SELECT_BANK": "-- Pilih Bank --",
@@ -650,13 +592,11 @@
   "HINT_PAYMENT_DAY": "Tanggal pembayaran bulanan (1-31)",
   "NOTE_LABEL": "Catatan",
   "NOTE_PLACEHOLDER": "Opsional, untuk keterangan tambahan",
-
   "MONTHLY_CALC_TITLE": "Perhitungan Gaji Bulanan",
   "MONTHLY_CALC_DESC": "Menghitung gaji bulanan termasuk lembur, tunjangan, dan potongan",
   "CALC_EMPLOYEE_LABEL": "Karyawan",
   "CALC_YEAR_MONTH_LABEL": "Tahun & Bulan",
   "BTN_START_CALC": "🧮 Mulai Hitung",
-
   "HOURLY_CALC_TITLE": "Perhitungan Upah Per Jam",
   "HOURLY_CALC_DESC": "Menghitung upah berdasarkan jam kerja aktual",
   "HOURLY_EMPLOYEE_LABEL": "Karyawan",
@@ -667,22 +607,16 @@
   "HINT_OVERTIME_HOURS": "Jam lembur hari kerja (1,34x)",
   "HOURLY_CALC_MONTH_LABEL": "Tahun & Bulan",
   "BTN_START_HOURLY_CALC": "🧮 Mulai Hitung Upah",
-
   "SALARY_LIST_TITLE": "Daftar Gaji",
   "SALARY_LIST_DESC": "Menampilkan riwayat gaji seluruh karyawan",
   "FILTER_YEAR_MONTH_LABEL": "Tahun & Bulan",
   "BTN_LOAD_SALARY_LIST": "📋 Muat Daftar Gaji",
-
   "SALARY_SELECT_QUERY_MONTH": "Silakan pilih bulan pencarian",
-
   "FOOTER_CREDITS": "Dibuat oleh 0J",
-
   "ADJUST_REASON_LABEL": "Alasan Penyesuaian",
   "ADJUST_REASON_PLACEHOLDER": "Harap jelaskan alasan penyesuaian (misalnya: lupa absen, kesalahan sistem, dll.)",
   "ADJUST_REASON_REQUIRED": "Harap isi alasan penyesuaian",
-
   "STATS_OVERTIME_HOURS": "Jam Lembur",
-
   "TAB_WORKLOG": "Jurnal Kerja",
   "WORKLOG_TITLE": "Jurnal Kerja",
   "WORKLOG_DESCRIPTION": "Catat konten dan jam kerja harian, diajukan untuk ditinjau oleh supervisor",
@@ -728,7 +662,6 @@
   "STATUS_REJECTED": "Ditolak",
   "DELETE_FAILED": "Penghapusan gagal",
   "LOAD_FAILED": "Pemuatan gagal",
-  
   "MY_BASIC_INFO_TITLE": "Informasi Dasar Saya",
   "MY_BASIC_INFO_DESC": "Isi atau perbarui informasi dasar pribadi Anda",
   "ID_NUMBER_LABEL": "Nomor Identitas",
@@ -738,8 +671,55 @@
   "BTN_SAVE_BASIC_INFO": "Simpan Informasi Dasar",
   "SAVING": "Menyimpan...",
   "SAVE_SUCCESS": "Berhasil disimpan!",
-
   "STATS_WORK_HOURS": "Jam Kehadiran",
   "STATS_NORMAL_HOURS": "Jam Absen Normal",
-  "SALARY_EARLY_LEAVE_DEDUCT": "Potongan Pulang Cepat"
+  "SALARY_EARLY_LEAVE_DEDUCT": "Potongan Pulang Cepat",
+  "_comment_leave_validation": "=== Validasi Cuti ===",
+  "LEAVE_END_AFTER_START": "❌ Waktu selesai harus setelah waktu mulai",
+  "LEAVE_MUST_INTEGER_HOURS": "❌ Jam cuti harus bilangan bulat (saat ini {hours} jam)\nSilakan sesuaikan waktu",
+  "LEAVE_NON_STANDARD_HOURS": " (termasuk jam kerja non-standar)",
+  "LEAVE_HOURS_OK": "✅ Jam dihitung dengan benar{info}, dapat mengajukan",
+  "LEAVE_SUBMITTED": "Pengajuan cuti berhasil! Jam: {hours}",
+  "LEAVE_SELECT_TYPE": "Pilih jenis cuti",
+  "LEAVE_SELECT_START": "Pilih waktu mulai",
+  "LEAVE_SELECT_END": "Pilih waktu selesai",
+  "LEAVE_START_WHOLE_HOUR": "Waktu mulai harus tepat jam (mis. 09:00, 10:00)",
+  "LEAVE_END_WHOLE_HOUR": "Waktu selesai harus tepat jam (mis. 09:00, 10:00)",
+  "LEAVE_REASON_MIN_2": "Harap isi alasan cuti (minimal 2 karakter)",
+  "LEAVE_HOURS_GT_ZERO": "Jam cuti harus lebih dari 0",
+  "LEAVE_HOURS_INTEGER": "Jam cuti harus bilangan bulat, saat ini {hours} jam",
+  "LEAVE_NOT_SET": "Belum diatur",
+  "LEAVE_REASON_NONE": "Tidak ada",
+  "LEAVE_HOURS_UNKNOWN": "Jam tidak diketahui",
+  "LEAVE_TIME_NOT_SET": "Waktu belum diatur",
+  "LEAVE_REJECT_REASON_PROMPT": "Masukkan alasan penolakan:",
+  "LEAVE_REJECT_REASON_REQUIRED": "Harap masukkan alasan penolakan",
+  "LEAVE_REVIEW_FAILED": "Tinjauan gagal",
+  "LEAVE_BALANCE_EXCEEDED": "Saldo tidak cukup! {type} tersisa {available} jam, tetapi Anda mengajukan {requested} jam",
+  "LEAVE_INSUFFICIENT_BALANCE_DAYS": "⚠️ Saldo karyawan tidak cukup (tersisa {days} hari)",
+  "BTN_APPROVE": "Setujui",
+  "BTN_REJECT": "Tolak",
+  "_comment_overtime_stats": "=== Statistik Lembur ===",
+  "OVERTIME_MONTH_STATS": "Statistik Lembur {yearMonth}",
+  "OVERTIME_APPROVED_HOURS_LABEL": "Jam Disetujui",
+  "OVERTIME_MAX_HOURS": "/ {max} jam",
+  "OVERTIME_EXCEEDED_LABEL": "Kelebihan",
+  "OVERTIME_REMAINING_LABEL": "Sisa",
+  "OVERTIME_HOURS_UNIT": "jam",
+  "OVERTIME_EXCEEDED_WARNING": "⚠️ Batas bulanan terlampaui, kelebihan jam harus dikonversi ke cuti kompensasi",
+  "OVERTIME_COMPENSATORY_NEGATIVE": "Jam kompensasi tidak boleh negatif",
+  "OVERTIME_COMPENSATORY_EXCEED": "Jam kompensasi tidak boleh melebihi {hours} jam",
+  "_comment_shift_settings": "=== Pengaturan Shift ===",
+  "SHIFT_TAB_SETTINGS": "Pengaturan Shift",
+  "SHIFT_MULTI_SELECT_HINT": "Tahan Ctrl/Cmd untuk memilih beberapa",
+  "SHIFT_TYPE_ADD_TITLE": "Tambah Jenis Shift",
+  "SHIFT_TYPE_NAME_LABEL": "Nama Shift",
+  "SHIFT_TYPE_NAME_PLACEHOLDER": "mis. Pagi-A",
+  "SHIFT_TYPE_CATEGORY_LABEL": "Kategori",
+  "SHIFT_TYPE_ADD_BTN": "Tambah Shift",
+  "SHIFT_TYPE_MANAGE_TITLE": "Kelola Shift",
+  "SHIFT_TYPE_MANAGE_DESC": "Semua shift disimpan di server dan perubahan langsung berlaku.",
+  "SHIFT_TYPE_LOADING": "Memuat...",
+  "SHIFT_TYPE_ALLDAY": "Sepanjang hari",
+  "SHIFT_TYPE_FALLBACK": "Cadangan"
 }

@@ -77,38 +77,39 @@ async function loadEmployeeOvertimeRecords() {
  */
 function displayMonthlyOvertimeStats(approvedHours) {
     const now = new Date();
-    const monthName = `${now.getFullYear()}年${now.getMonth() + 1}月`;
-    
+    const yearMonth = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
+
     const remaining = Math.max(0, MAX_MONTHLY_OVERTIME - approvedHours);
     const exceeded = Math.max(0, approvedHours - MAX_MONTHLY_OVERTIME);
-    
+    const hoursUnit = t('OVERTIME_HOURS_UNIT');
+
     const statsHtml = `
         <div class="mb-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg">
             <h3 class="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-3">
-                ${monthName} 加班統計
+                ${t('OVERTIME_MONTH_STATS', { yearMonth })}
             </h3>
             <div class="grid grid-cols-2 gap-3">
                 <div class="text-center">
-                    <p class="text-xs text-gray-600 dark:text-gray-400">已核准時數</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">${t('OVERTIME_APPROVED_HOURS_LABEL')}</p>
                     <p class="text-2xl font-bold ${approvedHours > MAX_MONTHLY_OVERTIME ? 'text-red-600 dark:text-red-400' : 'text-indigo-600 dark:text-indigo-400'}">
                         ${approvedHours.toFixed(1)}
                     </p>
-                    <p class="text-xs text-gray-500">/ ${MAX_MONTHLY_OVERTIME} 小時</p>
+                    <p class="text-xs text-gray-500">${t('OVERTIME_MAX_HOURS', { max: MAX_MONTHLY_OVERTIME })}</p>
                 </div>
                 <div class="text-center">
                     <p class="text-xs text-gray-600 dark:text-gray-400">
-                        ${exceeded > 0 ? '超過時數' : '剩餘額度'}
+                        ${exceeded > 0 ? t('OVERTIME_EXCEEDED_LABEL') : t('OVERTIME_REMAINING_LABEL')}
                     </p>
                     <p class="text-2xl font-bold ${exceeded > 0 ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}">
                         ${exceeded > 0 ? exceeded.toFixed(1) : remaining.toFixed(1)}
                     </p>
-                    <p class="text-xs text-gray-500">小時</p>
+                    <p class="text-xs text-gray-500">${hoursUnit}</p>
                 </div>
             </div>
             ${exceeded > 0 ? `
                 <div class="mt-3 p-2 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 rounded text-center">
                     <p class="text-xs font-semibold text-orange-800 dark:text-orange-300">
-                        ⚠️ 已超過每月上限，超出部分需轉為補休
+                        ${t('OVERTIME_EXCEEDED_WARNING')}
                     </p>
                 </div>
             ` : ''}
@@ -464,12 +465,12 @@ function showCompensatoryHoursInput(currentHours, requestHours, exceededHours) {
         const compensatoryHours = parseFloat(document.getElementById('compensatory-hours').value) || 0;
         
         if (compensatoryHours < 0) {
-            showNotification('補休時數不可為負數', 'error');
+            showNotification(t('OVERTIME_COMPENSATORY_NEGATIVE'), 'error');
             return;
         }
-        
+
         if (compensatoryHours > exceededHours) {
-            showNotification(`補休時數不可超過 ${exceededHours.toFixed(1)} 小時`, 'error');
+            showNotification(t('OVERTIME_COMPENSATORY_EXCEED', { hours: exceededHours.toFixed(1) }), 'error');
             return;
         }
         
