@@ -11,28 +11,28 @@ const SHEET_OVERTIME = "加班申請";
 function initOvertimeSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_OVERTIME);
-  
+
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_OVERTIME);
     const headers = [
-      "申請ID", "員工ID", "員工姓名", "加班日期", 
+      "申請ID", "員工ID", "員工姓名", "加班日期",
       "開始時間", "結束時間", "加班時數", "申請原因",
       "申請時間", "審核狀態", "審核人ID", "審核人姓名",
-      "審核時間", "審核意見", "補休時數"
+      "審核時間", "審核意見", "補休時數", "補償方式"
     ];
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
     Logger.log("✅ 加班申請工作表已建立");
   }
-  
+
   return sheet;
 }
 
-function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, hours, reason, compensatoryHours) {
+function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, hours, reason, compensatoryHours, compensationType) {
   const employee = checkSession_(sessionToken);
   const user = employee.user;
   if (!user) return { ok: false, code: "ERR_SESSION_INVALID" };
-  
+
   const sheet = initOvertimeSheet();
   
   // ✅ 防重複提交
@@ -65,9 +65,10 @@ function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, h
   const endDateTime = new Date(`${overtimeDate}T${endTime}:00`);
   
   const compHours = parseFloat(compensatoryHours) || 0;
-  
-  Logger.log(`📝 提交加班: ${user.name}, 日期=${overtimeDate}, 時數=${hours}, 補休=${compHours}`);
-  
+  const compType = (compensationType === 'comp_time') ? 'comp_time' : 'money';
+
+  Logger.log(`📝 提交加班: ${user.name}, 日期=${overtimeDate}, 時數=${hours}, 補休=${compHours}, 補償方式=${compType}`);
+
   const row = [
     requestId,
     user.userId,
@@ -80,7 +81,8 @@ function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, h
     new Date(),
     "pending",
     "", "", "", "",
-    compHours
+    compHours,
+    compType
   ];
   
   sheet.appendRow(row);
@@ -108,21 +110,22 @@ function submitOvertimeRequest(sessionToken, overtimeDate, startTime, endTime, h
 }
 
 /**
- * Handler - 接收補休時數參數
+ * Handler - 接收補休時數與補償方式參數
  */
 function handleSubmitOvertime(params) {
-  const { token, overtimeDate, startTime, endTime, hours, reason, compensatoryHours } = params;
-  
-  Logger.log(`📥 收到加班申請: 日期=${overtimeDate}, 時數=${hours}, 補休=${compensatoryHours || 0}`);
-  
+  const { token, overtimeDate, startTime, endTime, hours, reason, compensatoryHours, compensationType } = params;
+
+  Logger.log(`📥 收到加班申請: 日期=${overtimeDate}, 時數=${hours}, 補休=${compensatoryHours || 0}, 補償方式=${compensationType || 'money'}`);
+
   return submitOvertimeRequest(
-    token, 
-    overtimeDate, 
-    startTime, 
-    endTime, 
-    parseFloat(hours), 
+    token,
+    overtimeDate,
+    startTime,
+    endTime,
+    parseFloat(hours),
     reason,
-    parseFloat(compensatoryHours) || 0
+    parseFloat(compensatoryHours) || 0,
+    compensationType || 'money'
   );
 }
 
@@ -162,7 +165,8 @@ function getEmployeeOvertimeRequests(sessionToken) {
       status: String(row[9]).trim().toLowerCase(),
       reviewerName: row[11] || "",
       reviewComment: row[13] || "",
-      compensatoryHours: parseFloat(row[14]) || 0
+      compensatoryHours: parseFloat(row[14]) || 0,
+      compensationType: String(row[15] || 'money').trim()
     };
   });
   
@@ -229,7 +233,8 @@ function getPendingOvertimeRequests(sessionToken) {
         hours: parseFloat(row[6]) || 0,
         reason: row[7],
         applyDate: formatDate(row[8]),
-        compensatoryHours: parseFloat(row[14]) || 0
+        compensatoryHours: parseFloat(row[14]) || 0,
+        compensationType: String(row[15] || 'money').trim()
       };
       
       requests.push(entry);
@@ -296,6 +301,21 @@ function reviewOvertimeRequest(sessionToken, rowNumber, action, comment) {
     }
     
     if (isApprove) {
+      // ⭐ 若有補休時數，自動新增到員工假期餘額
+      const compensatoryHours = parseFloat(record[14]) || 0;
+      if (compensatoryHours > 0) {
+        try {
+          const creditResult = addCompTimeOffBalance(employeeId, compensatoryHours);
+          if (creditResult.ok) {
+            Logger.log(`✅ 已新增 ${employeeName} 的補休時數: ${compensatoryHours} 小時（餘額: ${creditResult.newBalance} 小時）`);
+          } else {
+            Logger.log(`⚠️ 新增補休時數失敗: ${creditResult.msg}`);
+          }
+        } catch (creditErr) {
+          Logger.log(`⚠️ 新增補休時數時發生錯誤: ${creditErr.message}`);
+        }
+      }
+
       try {
         let yearMonth = '';
         if (overtimeDate instanceof Date) {
@@ -303,11 +323,11 @@ function reviewOvertimeRequest(sessionToken, rowNumber, action, comment) {
         } else if (typeof overtimeDate === 'string') {
           yearMonth = overtimeDate.substring(0, 7);
         }
-        
+
         Logger.log(`🔄 開始更新 ${employeeName} 的 ${yearMonth} 薪資...`);
-        
+
         const recalcResult = calculateMonthlySalary(employeeId, yearMonth);
-        
+
         if (recalcResult.success) {
           const saveResult = saveMonthlySalary(recalcResult.data);
           if (saveResult.success) {
@@ -318,7 +338,7 @@ function reviewOvertimeRequest(sessionToken, rowNumber, action, comment) {
         } else {
           Logger.log(`⚠️ 薪資計算失敗: ${recalcResult.message}`);
         }
-        
+
       } catch (error) {
         Logger.log(`⚠️ 自動更新薪資時發生錯誤: ${error.message}`);
       }
@@ -390,13 +410,25 @@ function upgradeOvertimeSheet() {
   
   sheet.getRange(1, 15).setValue("補休時數").setFontWeight("bold");
   sheet.setColumnWidth(15, 80);
-  
+
   const lastRow = sheet.getLastRow();
   if (lastRow > 1) {
     const defaultValues = Array(lastRow - 1).fill([0]);
     sheet.getRange(2, 15, lastRow - 1, 1).setValues(defaultValues);
   }
-  
+
+  // 升級 column 16：補償方式
+  const header16 = sheet.getLastColumn() >= 16 ? sheet.getRange(1, 16).getValue() : '';
+  if (header16 !== '補償方式') {
+    sheet.getRange(1, 16).setValue("補償方式").setFontWeight("bold");
+    sheet.setColumnWidth(16, 80);
+    if (lastRow > 1) {
+      const defaultCompType = Array(lastRow - 1).fill(['money']);
+      sheet.getRange(2, 16, lastRow - 1, 1).setValues(defaultCompType);
+    }
+    Logger.log(`✅ 已新增補償方式欄位`);
+  }
+
   Logger.log(`✅ 升級完成！已為 ${lastRow - 1} 筆記錄新增補休時數欄位`);
 }
 

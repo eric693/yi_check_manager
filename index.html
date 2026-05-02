@@ -689,8 +689,28 @@
                                           placeholder="請說明加班原因..."></textarea>
                             </div>
                             
+                            <!-- 補償方式 -->
+                            <div>
+                                <label data-i18n="OVERTIME_COMP_TYPE_LABEL"
+                                       class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    補償方式
+                                </label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label id="comp-type-money-label"
+                                           class="flex items-center p-3 border-2 rounded-lg cursor-pointer border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 transition-colors">
+                                        <input type="radio" name="overtime-comp-type" value="money" id="comp-type-money" checked class="mr-2 accent-indigo-600">
+                                        <span data-i18n="OVERTIME_COMP_TYPE_MONEY" class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">💰 薪資加給</span>
+                                    </label>
+                                    <label id="comp-type-comp-time-label"
+                                           class="flex items-center p-3 border-2 rounded-lg cursor-pointer border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 transition-colors">
+                                        <input type="radio" name="overtime-comp-type" value="comp_time" id="comp-type-comp-time" class="mr-2 accent-green-600">
+                                        <span data-i18n="OVERTIME_COMP_TYPE_COMP_TIME" class="text-sm font-semibold text-gray-700 dark:text-gray-300">🔄 換補休</span>
+                                    </label>
+                                </div>
+                            </div>
+
                             <!-- 提交按鈕 -->
-                            <button id="submit-overtime-btn" 
+                            <button id="submit-overtime-btn"
                                     data-i18n="BTN_SUBMIT_OVERTIME"
                                     class="w-full py-3 px-4 rounded-lg font-bold btn-primary">
                                 提交加班申請

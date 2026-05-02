@@ -825,6 +825,39 @@ function reviewLeaveRequest(sessionToken, rowNumber, reviewAction, comment) {
 }
 
 /**
+ * ✅ 新增加班補休時數到假期餘額（COMP_TIME_OFF）
+ */
+function addCompTimeOffBalance(userId, hours) {
+  try {
+    Logger.log(`📊 新增補休時數: 員工=${userId}, 時數=${hours}`);
+
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_LEAVE_BALANCE);
+    if (!sheet) return { ok: false, msg: '找不到假期餘額工作表' };
+
+    const values = sheet.getDataRange().getValues();
+    const COMP_TIME_COL = 17; // Q 欄（1-indexed）
+
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][0]).trim() === String(userId).trim()) {
+        const currentBalance = parseFloat(values[i][COMP_TIME_COL - 1]) || 0;
+        const newBalance = currentBalance + parseFloat(hours);
+        sheet.getRange(i + 1, COMP_TIME_COL).setValue(newBalance);
+        sheet.getRange(i + 1, 19).setValue(new Date()); // S 欄更新時間
+        Logger.log(`✅ 補休時數已新增: ${currentBalance} + ${hours} = ${newBalance} 小時`);
+        return { ok: true, newBalance: newBalance };
+      }
+    }
+
+    Logger.log(`⚠️ 找不到員工 ${userId} 的假期餘額記錄`);
+    return { ok: false, msg: `找不到員工 ${userId} 的假期餘額記錄` };
+
+  } catch (error) {
+    Logger.log(`❌ 新增補休時數失敗: ${error.message}`);
+    return { ok: false, msg: error.message };
+  }
+}
+
+/**
  * ✅ 扣除假期餘額
  */
 function deductLeaveBalance(userId, leaveType, hours) {
