@@ -25,6 +25,25 @@ const SYSTEM_CONFIG_DEFAULTS = {
   CANCEL_BONUS_SICK:    0,     // 病假取消全勤獎金（0=否）
   DEFAULT_PAYMENT_DAY:  5,     // 預設發薪日
   HOLIDAY_WORK_AS_NORMAL: 0,   // 國定假日上班不給加班費（1=是，視為平日）
+
+  // ===== 新增彈性薪資設定 =====
+
+  // 遲到扣薪管理
+  LATE_GRACE_MINUTES:        0,  // 遲到寬限時間（分鐘，0=無寬限）
+  LATE_DEDUCTION_ENABLED:    0,  // 遲到是否扣薪（0=否, 1=是）
+  CANCEL_BONUS_LATE:         0,  // 遲到取消全勤獎金（0=否, 1=是）
+  CANCEL_BONUS_LATE_TIMES:   1,  // 累計幾次遲到才取消全勤
+
+  // 津貼計算方式
+  MEAL_ALLOWANCE_PRORATED:      0,  // 伙食費按出勤天數比例（0=固定, 1=按天計算）
+  TRANSPORT_ALLOWANCE_PRORATED: 0,  // 交通補助按出勤天數比例（0=固定, 1=按天計算）
+
+  // 薪資取整方式
+  SALARY_ROUND_TYPE: 0,  // 0=四捨五入, 1=無條件捨去, 2=無條件進位
+  SALARY_ROUND_UNIT: 1,  // 取整單位：1=元, 10=十元, 100=百元
+
+  // 加班費時薪計算基準
+  OVERTIME_HOURLY_BASE: 0,  // 0=月薪/30/8(預設), 1=月薪/26/8(工作日), 2=月薪/174小時
 };
 
 const SYSTEM_CONFIG_LABELS = {
@@ -45,6 +64,16 @@ const SYSTEM_CONFIG_LABELS = {
   CANCEL_BONUS_SICK:    '病假取消全勤(1=是,0=否)',
   DEFAULT_PAYMENT_DAY:  '預設發薪日(每月幾號)',
   HOLIDAY_WORK_AS_NORMAL:'國定假日上班不給加班費(1=是,0=否)',
+  // 新增彈性設定
+  LATE_GRACE_MINUTES:        '遲到寬限時間(分鐘)',
+  LATE_DEDUCTION_ENABLED:    '遲到扣薪(1=是,0=否)',
+  CANCEL_BONUS_LATE:         '遲到取消全勤(1=是,0=否)',
+  CANCEL_BONUS_LATE_TIMES:   '遲到幾次取消全勤',
+  MEAL_ALLOWANCE_PRORATED:      '伙食費按出勤天數(1=是,0=否)',
+  TRANSPORT_ALLOWANCE_PRORATED: '交通補助按出勤天數(1=是,0=否)',
+  SALARY_ROUND_TYPE: '薪資取整方式(0=四捨五入,1=捨去,2=進位)',
+  SALARY_ROUND_UNIT: '薪資取整單位(1=元,10=十元,100=百元)',
+  OVERTIME_HOURLY_BASE: '加班費時薪基準(0=月薪/30/8,1=月薪/26/8,2=月薪/174)',
 };
 
 // Module-level cache for system config (avoids repeated Sheet reads per request)
@@ -119,6 +148,23 @@ function writeSystemConfig(updates) {
   });
   _sysConfigCache = null; // 清除快取，確保下次讀取為最新值
   Logger.log('✅ 系統設定已更新: ' + JSON.stringify(updates));
+}
+
+/**
+ * 依系統設定取整薪資金額
+ * @param {number} amount - 原始金額
+ * @param {Object} cfg - 系統設定物件（含 SALARY_ROUND_TYPE / SALARY_ROUND_UNIT）
+ * @returns {number}
+ */
+function salaryRound(amount, cfg) {
+  const type = parseInt(cfg && cfg.SALARY_ROUND_TYPE) || 0;
+  const unit = parseInt(cfg && cfg.SALARY_ROUND_UNIT) || 1;
+  const divided = amount / unit;
+  let result;
+  if (type === 1) result = Math.floor(divided) * unit;
+  else if (type === 2) result = Math.ceil(divided) * unit;
+  else result = Math.round(divided) * unit;
+  return result;
 }
 
 /**
@@ -1749,11 +1795,64 @@ function calculateHourlySalary(employeeId, yearMonth) {
       Logger.log(`✅ 無請假記錄`);
     }
 
-    // 9. 應發總額
+    // 遲到取消全勤（時薪員工）
+    const _sysC1Late = getSystemConfig();
+    const _cancelBonusLate1      = parseInt(_sysC1Late.CANCEL_BONUS_LATE)       || 0;
+    const _cancelBonusLateTimes1 = parseInt(_sysC1Late.CANCEL_BONUS_LATE_TIMES) || 1;
+    // 計算遲到次數（時薪員工）
+    let lateCount1 = 0;
+    let lateDeduction1 = 0;
+    const _lateEnabled1 = parseInt(_sysC1Late.LATE_DEDUCTION_ENABLED) || 0;
+    const _lateGrace1   = parseInt(_sysC1Late.LATE_GRACE_MINUTES)     || 0;
+    if (_lateEnabled1 || _cancelBonusLate1) {
+      attendanceRecords.forEach(record => {
+        try {
+          const shiftResult = getEmployeeShiftForDate(employeeId, record.date);
+          if (shiftResult && shiftResult.success && shiftResult.hasShift) {
+            const shift = shiftResult.data;
+            if (shift.startTime && record.punchIn) {
+              const [schedH, schedM] = shift.startTime.split(':').map(Number);
+              const [actualH, actualM] = record.punchIn.split(':').map(Number);
+              const schedTotal  = schedH * 60 + schedM;
+              const actualTotal = actualH * 60 + actualM;
+              if (actualTotal > schedTotal + _lateGrace1) {
+                lateCount1++;
+                if (_lateEnabled1) {
+                  const deduction = salaryRound(hourlyRate * ((actualTotal - schedTotal) / 60), _sysC1Late);
+                  lateDeduction1 += deduction;
+                }
+              }
+            }
+          }
+        } catch (e) {}
+      });
+      if (_cancelBonusLate1 && lateCount1 >= _cancelBonusLateTimes1) {
+        attendanceBonus = 0;
+        Logger.log(`⚠️ 遲到 ${lateCount1} 次，取消全勤獎金`);
+      }
+    }
+
+    // 津貼按出勤天數比例計算（時薪員工）
+    const _monthlyDays1         = parseFloat(_sysC1Late.MONTHLY_WORK_DAYS)          || 30;
+    const _mealProrated1        = parseInt(_sysC1Late.MEAL_ALLOWANCE_PRORATED)       || 0;
+    const _transportProrated1   = parseInt(_sysC1Late.TRANSPORT_ALLOWANCE_PRORATED)  || 0;
+    const actualWorkDays1       = attendanceRecords.length;
+    let finalMealAllowance1     = mealAllowance;
+    let finalTransportAllowance1 = transportAllowance;
+    if (_mealProrated1 && actualWorkDays1 > 0) {
+      finalMealAllowance1 = salaryRound(mealAllowance / _monthlyDays1 * actualWorkDays1, _sysC1Late);
+      Logger.log(`   伙食費按出勤: ${mealAllowance} × ${actualWorkDays1}/${_monthlyDays1} = $${finalMealAllowance1}`);
+    }
+    if (_transportProrated1 && actualWorkDays1 > 0) {
+      finalTransportAllowance1 = salaryRound(transportAllowance / _monthlyDays1 * actualWorkDays1, _sysC1Late);
+      Logger.log(`   交通補助按出勤: ${transportAllowance} × ${actualWorkDays1}/${_monthlyDays1} = $${finalTransportAllowance1}`);
+    }
+
+    // 9. 應發總額（使用調整後津貼）
     const grossSalary = basePay +
                        positionAllowance +
-                       mealAllowance +
-                       transportAllowance +
+                       finalMealAllowance1 +
+                       finalTransportAllowance1 +
                        attendanceBonus +
                        performanceBonus +
                        otherAllowances +
@@ -1762,8 +1861,8 @@ function calculateHourlySalary(employeeId, yearMonth) {
                        sundayOvertimePay +
                        holidayOvertimePay +
                        holidayWorkPay;
-    
-    Logger.log(`💵 應發總額: $${Math.round(grossSalary)}`);
+
+    Logger.log(`💵 應發總額: $${salaryRound(grossSalary, _sysC1Late)}`);
     
     // 10. 扣款項目（時薪若月薪未達基本工資，可能不需扣保險）
     let laborFee = 0;
@@ -1838,14 +1937,16 @@ function calculateHourlySalary(employeeId, yearMonth) {
     
     // 12. 扣款總額
     const totalDeductions = laborFee + healthFee + employmentFee + pensionSelf + incomeTax +
-                           leaveDeduction + earlyLeaveDeduction +
+                           leaveDeduction + earlyLeaveDeduction + lateDeduction1 +
                            welfareFee + dormitoryFee + groupInsurance + otherDeductions;
-    
+
     Logger.log(`💸 扣款總額: $${totalDeductions}`);
-    
-    // 13. 實發金額
+
+    // 13. 實發金額（依取整設定）
     const netSalary = grossSalary - totalDeductions;
-    
+    const _grossRounded1 = salaryRound(grossSalary, _sysC1Late);
+    const _netRounded1   = salaryRound(netSalary,   _sysC1Late);
+
     Logger.log('');
     Logger.log('═══════════════════════════════════════');
     Logger.log('📊 時薪薪資計算結果匯總:');
@@ -1862,17 +1963,18 @@ function calculateHourlySalary(employeeId, yearMonth) {
     Logger.log(`   - 國定假日加班費: $${holidayOvertimePay}`);
     if (leaveDeduction > 0) {
       Logger.log(`   請假扣款:`);
-      Logger.log(`   - 病假: ${sickLeaveHours} 小時，扣款 $${sickLeaveDeduction}`);  // ✅ 改用 sickLeaveHours
-      Logger.log(`   - 事假: ${personalLeaveHours} 小時，扣款 $${personalLeaveDeduction}`);  // ✅ 改用 personalLeaveHours
+      Logger.log(`   - 病假: ${sickLeaveHours} 小時，扣款 $${sickLeaveDeduction}`);
+      Logger.log(`   - 事假: ${personalLeaveHours} 小時，扣款 $${personalLeaveDeduction}`);
       Logger.log(`   - 合計: $${leaveDeduction}`);
     }
-    Logger.log(`   應發總額: $${Math.round(grossSalary)}`);
+    if (lateDeduction1 > 0) Logger.log(`   遲到扣款: $${lateDeduction1}`);
+    Logger.log(`   應發總額: $${_grossRounded1}`);
     Logger.log(`   扣款總額: $${totalDeductions}`);
-    Logger.log(`   實發金額: $${Math.round(netSalary)}`);
+    Logger.log(`   實發金額: $${_netRounded1}`);
     Logger.log('═══════════════════════════════════════');
     Logger.log('');
-    
-    // 14. 返回結果（加入請假相關欄位）
+
+    // 14. 返回結果
     const result = {
       employeeId: employeeId,
       employeeName: config['員工姓名'],
@@ -1880,10 +1982,10 @@ function calculateHourlySalary(employeeId, yearMonth) {
       salaryType: '時薪',
       hourlyRate: hourlyRate,
       totalWorkHours: parseFloat(totalWorkHours.toFixed(1)),
-      baseSalary: Math.round(basePay),
+      baseSalary: salaryRound(basePay, _sysC1Late),
       positionAllowance: positionAllowance,
-      mealAllowance: mealAllowance,
-      transportAllowance: transportAllowance,
+      mealAllowance: finalMealAllowance1,
+      transportAllowance: finalTransportAllowance1,
       attendanceBonus: attendanceBonus,
       performanceBonus: performanceBonus,
       otherAllowances: otherAllowances,
@@ -1905,18 +2007,21 @@ function calculateHourlySalary(employeeId, yearMonth) {
       personalLeaveHours: personalLeaveHours,
       personalLeaveDeduction: personalLeaveDeduction,
       earlyLeaveDeduction: earlyLeaveDeduction,
+      lateDeduction: lateDeduction1,
+      lateCount: lateCount1,
       welfareFee: welfareFee,
       dormitoryFee: dormitoryFee,
       groupInsurance: groupInsurance,
       otherDeductions: otherDeductions,
-      grossSalary: Math.round(grossSalary),
-      netSalary: Math.round(netSalary),
+      grossSalary: _grossRounded1,
+      netSalary: _netRounded1,
       bankCode: config['銀行代碼'] || "",
       bankAccount: config['銀行帳號'] || "",
       status: "已計算",
-      note: `工作${totalWorkHours.toFixed(1)}h，加班${totalOvertimeHours.toFixed(1)}h` + 
-        (sickLeaveHours > 0 ? `，病假${sickLeaveHours}h(半薪)` : '') +      // ⭐ 改為時數
-        (personalLeaveHours > 0 ? `，事假${personalLeaveHours}h` : '')      // ⭐ 改為時數
+      note: `工作${totalWorkHours.toFixed(1)}h，加班${totalOvertimeHours.toFixed(1)}h` +
+        (sickLeaveHours > 0 ? `，病假${sickLeaveHours}h(半薪)` : '') +
+        (personalLeaveHours > 0 ? `，事假${personalLeaveHours}h` : '') +
+        (lateDeduction1 > 0 ? `，遲到扣款$${lateDeduction1}` : '')
     };
     
     Logger.log('✅ 時薪計算完成');
@@ -2345,9 +2450,20 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
     const _monthlyDays = parseFloat(_sysCBase.MONTHLY_WORK_DAYS) || 30;
     const _dailyHoursBase = parseFloat(_sysCBase.DAILY_WORK_HOURS) || 8;
     const baseSalary = parseFloat(config['基本薪資']) || 0;
-    const hourlyRateExact = baseSalary / _monthlyDays / _dailyHoursBase; // 精確時薪，不先 round 避免累積誤差
 
-    Logger.log(`💵 基本薪資: ${baseSalary}, 月工作天數: ${_monthlyDays}, 每日工時: ${_dailyHoursBase}, 時薪: ${hourlyRateExact.toFixed(2)}`);
+    // 加班費時薪計算基準（OVERTIME_HOURLY_BASE）
+    const _otHourlyBase = parseInt(_sysCBase.OVERTIME_HOURLY_BASE) || 0;
+    let hourlyRateExact;
+    if (_otHourlyBase === 1) {
+      hourlyRateExact = baseSalary / 26 / _dailyHoursBase; // 月薪 / 26 工作日 / 每日工時
+    } else if (_otHourlyBase === 2) {
+      hourlyRateExact = baseSalary / 174; // 月薪 / 174 小時（勞基法公式）
+    } else {
+      hourlyRateExact = baseSalary / _monthlyDays / _dailyHoursBase; // 預設：月薪 / 30 / 8
+    }
+    const _otHourlyBaseNames = ['月薪/30/8', '月薪/26/8', '月薪/174'];
+
+    Logger.log(`💵 基本薪資: ${baseSalary}, 月工作天數: ${_monthlyDays}, 每日工時: ${_dailyHoursBase}, 時薪基準: ${_otHourlyBaseNames[_otHourlyBase] || '月薪/30/8'}, 時薪: ${hourlyRateExact.toFixed(2)}`);
     
     // 5. 固定津貼
     const positionAllowance = parseFloat(config['職務加給']) || 0;
@@ -2550,7 +2666,44 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
 
     Logger.log(`\n📋 早退扣款統計:`);
     Logger.log(`   合計扣款: $${earlyLeaveDeduction}`);
-    
+
+    // 6.6 ⭐ 遲到扣薪計算（月薪員工）
+    let lateDeduction = 0;
+    let lateCount = 0;
+    const _lateGrace   = parseInt(_sysCBase.LATE_GRACE_MINUTES)     || 0;
+    const _lateEnabled = parseInt(_sysCBase.LATE_DEDUCTION_ENABLED)  || 0;
+
+    Logger.log(`\n📋 遲到扣薪設定: 寬限 ${_lateGrace} 分鐘, 扣薪=${_lateEnabled}`);
+
+    if (_lateEnabled) {
+      attendanceRecords.forEach(record => {
+        try {
+          const shiftResult = getEmployeeShiftForDate(employeeId, record.date);
+          if (shiftResult && shiftResult.success && shiftResult.hasShift) {
+            const shift = shiftResult.data;
+            if (shift.startTime && record.punchIn) {
+              const [schedH, schedM] = shift.startTime.split(':').map(Number);
+              const [actualH, actualM] = record.punchIn.split(':').map(Number);
+              const schedTotal  = schedH * 60 + schedM;
+              const actualTotal = actualH * 60 + actualM;
+              if (actualTotal > schedTotal + _lateGrace) {
+                const lateMinutes = actualTotal - schedTotal;
+                lateCount++;
+                const deduction = salaryRound(hourlyRateExact * (lateMinutes / 60), _sysCBase);
+                lateDeduction += deduction;
+                Logger.log(`   ${record.date}: 遲到 ${lateMinutes} 分鐘 → 扣款 $${deduction}`);
+              }
+            }
+          }
+        } catch (e) {
+          Logger.log(`   ⚠️ ${record.date}: 遲到檢查失敗，跳過`);
+        }
+      });
+      Logger.log(`   遲到次數: ${lateCount}，遲到扣款合計: $${lateDeduction}`);
+    } else {
+      Logger.log(`   遲到扣薪未啟用，跳過`);
+    }
+
     // 7. 請假扣款
     let leaveDeduction = 0;
     let sickLeaveHours = 0;       
@@ -2611,6 +2764,29 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
       Logger.log(`✅ 無請假記錄`);
     }
 
+    // 遲到取消全勤獎金
+    const _cancelBonusLate2      = parseInt(_sysCBase.CANCEL_BONUS_LATE)       || 0;
+    const _cancelBonusLateTimes2 = parseInt(_sysCBase.CANCEL_BONUS_LATE_TIMES) || 1;
+    if (_cancelBonusLate2 && lateCount >= _cancelBonusLateTimes2) {
+      attendanceBonus = 0;
+      Logger.log(`⚠️ 遲到 ${lateCount} 次 >= ${_cancelBonusLateTimes2} 次，取消全勤獎金`);
+    }
+
+    // 津貼按出勤天數比例計算
+    const actualWorkDays2            = attendanceRecords.length;
+    const _mealProrated2             = parseInt(_sysCBase.MEAL_ALLOWANCE_PRORATED)      || 0;
+    const _transportProrated2        = parseInt(_sysCBase.TRANSPORT_ALLOWANCE_PRORATED) || 0;
+    let finalMealAllowance2      = mealAllowance;
+    let finalTransportAllowance2 = transportAllowance;
+    if (_mealProrated2 && actualWorkDays2 > 0) {
+      finalMealAllowance2 = salaryRound(mealAllowance / _monthlyDays * actualWorkDays2, _sysCBase);
+      Logger.log(`   伙食費按出勤: ${mealAllowance}/月 × ${actualWorkDays2}天/${_monthlyDays}天 = $${finalMealAllowance2}`);
+    }
+    if (_transportProrated2 && actualWorkDays2 > 0) {
+      finalTransportAllowance2 = salaryRound(transportAllowance / _monthlyDays * actualWorkDays2, _sysCBase);
+      Logger.log(`   交通補助按出勤: ${transportAllowance}/月 × ${actualWorkDays2}天/${_monthlyDays}天 = $${finalTransportAllowance2}`);
+    }
+
     // 8. ⭐⭐⭐ 法定扣款（直接使用設定表中的數值）
     const laborFee = parseFloat(config['勞保費']) || 0;
     const healthFee = parseFloat(config['健保費']) || 0;
@@ -2640,34 +2816,35 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
       if (otherDeductions > 0) Logger.log(`   - 其他扣款: $${otherDeductions}`);
     }
     
-    // 10. 應發總額
-    const grossSalary = baseSalary + 
-                       positionAllowance + 
-                       mealAllowance + 
-                       transportAllowance + 
-                       attendanceBonus + 
-                       performanceBonus + 
+    // 10. 應發總額（使用按出勤比例調整後的津貼）
+    const grossSalary = baseSalary +
+                       positionAllowance +
+                       finalMealAllowance2 +
+                       finalTransportAllowance2 +
+                       attendanceBonus +
+                       performanceBonus +
                        otherAllowances +
-                       weekdayOvertimePay + 
+                       weekdayOvertimePay +
                        restdayOvertimePay +
                        sundayOvertimePay +
                        holidayOvertimePay +
                        holidayWorkPay;
-    
+
     // 11. 扣款總額
-    const totalDeductions = laborFee + 
-                           healthFee + 
-                           employmentFee + 
-                           pensionSelf + 
+    const totalDeductions = laborFee +
+                           healthFee +
+                           employmentFee +
+                           pensionSelf +
                            incomeTax +
-                           leaveDeduction + 
+                           leaveDeduction +
                            earlyLeaveDeduction +
-                           welfareFee + 
-                           dormitoryFee + 
-                           groupInsurance + 
+                           lateDeduction +
+                           welfareFee +
+                           dormitoryFee +
+                           groupInsurance +
                            otherDeductions;
-    
-    // 12. 實發金額
+
+    // 12. 實發金額（依取整設定處理）
     const netSalary = grossSalary - totalDeductions;
     
     Logger.log('');
@@ -2683,12 +2860,15 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
     Logger.log(`   - 例假日加班費: $${sundayOvertimePay}`);
     Logger.log(`   - 國定假日加班費: $${holidayOvertimePay}`);
     Logger.log(`   - 國定假日出勤薪資: $${holidayWorkPay}`);
-    Logger.log(`   應發總額: $${Math.round(grossSalary)}`);
+    const _grossRounded = salaryRound(grossSalary, _sysCBase);
+    const _netRounded   = salaryRound(netSalary,   _sysCBase);
+
+    Logger.log(`   應發總額: $${_grossRounded}`);
     Logger.log(`   扣款總額: $${totalDeductions}`);
-    Logger.log(`   實發金額: $${Math.round(netSalary)}`);
+    Logger.log(`   實發金額: $${_netRounded}`);
     Logger.log('═══════════════════════════════════════');
     Logger.log('');
-    
+
     const result = {
       employeeId: employeeId,
       employeeName: config['員工姓名'],
@@ -2698,8 +2878,8 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
       totalWorkHours: 0,
       baseSalary: baseSalary,
       positionAllowance: positionAllowance,
-      mealAllowance: mealAllowance,
-      transportAllowance: transportAllowance,
+      mealAllowance: finalMealAllowance2,
+      transportAllowance: finalTransportAllowance2,
       attendanceBonus: attendanceBonus,
       performanceBonus: performanceBonus,
       otherAllowances: otherAllowances,
@@ -2709,32 +2889,35 @@ function calculateMonthlySalaryInternal(employeeId, yearMonth) {
       holidayOvertimePay: holidayOvertimePay,
       holidayWorkPay: holidayWorkPay,
       totalOvertimeHours: totalOvertimeHours,
-      laborFee: laborFee,              // ⭐ 使用設定表數值（可為 0）
-      healthFee: healthFee,            // ⭐ 使用設定表數值（可為 0）
-      employmentFee: employmentFee,    // ⭐ 使用設定表數值（可為 0）
-      pensionSelf: pensionSelf,        // ⭐ 使用設定表數值（可為 0）
+      laborFee: laborFee,
+      healthFee: healthFee,
+      employmentFee: employmentFee,
+      pensionSelf: pensionSelf,
       pensionSelfRate: pensionSelfRate,
-      incomeTax: incomeTax,            // ⭐ 使用設定表數值（可為 0）
-      leaveDeduction: Math.round(leaveDeduction),
+      incomeTax: incomeTax,
+      leaveDeduction: salaryRound(leaveDeduction, _sysCBase),
       sickLeaveHours: sickLeaveHours,
       sickLeaveDeduction: sickLeaveDeduction,
       personalLeaveHours: personalLeaveHours,
       personalLeaveDeduction: personalLeaveDeduction,
       earlyLeaveDeduction: earlyLeaveDeduction,
+      lateDeduction: lateDeduction,
+      lateCount: lateCount,
       welfareFee: welfareFee,
       dormitoryFee: dormitoryFee,
       groupInsurance: groupInsurance,
       otherDeductions: otherDeductions,
-      grossSalary: Math.round(grossSalary),
-      netSalary: Math.round(netSalary),
+      grossSalary: _grossRounded,
+      netSalary: _netRounded,
       bankCode: config['銀行代碼'] || "",
       bankAccount: config['銀行帳號'] || "",
       status: "已計算",
-      note: `本月加班${totalOvertimeHours.toFixed(1)}小時` + 
+      note: `本月加班${totalOvertimeHours.toFixed(1)}小時` +
         (holidayCompHours > 0 ? `，國定假日補休${holidayCompHours.toFixed(1)}h` : '') +
         (sickLeaveHours > 0 ? `，病假${sickLeaveHours}h(半薪)` : '') +
         (personalLeaveHours > 0 ? `，事假${personalLeaveHours}h` : '') +
-        (earlyLeaveDeduction > 0 ? `，早退扣款$${earlyLeaveDeduction}` : '')
+        (earlyLeaveDeduction > 0 ? `，早退扣款$${earlyLeaveDeduction}` : '') +
+        (lateDeduction > 0 ? `，遲到扣款$${lateDeduction}` : '')
     };
     
     Logger.log('✅ 月薪計算完成');

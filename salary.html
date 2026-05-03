@@ -1468,6 +1468,126 @@
 
                     <hr class="section-divider">
 
+                    <!-- 遲到管理設定 -->
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="LATE_MGMT_SECTION">遲到管理設定</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1rem;">
+                        <div>
+                            <label class="form-label" data-i18n="CFG_LATE_GRACE_LABEL">遲到寬限時間（分鐘）</label>
+                            <input type="number" id="cfg-LATE_GRACE_MINUTES" class="form-input" step="1" min="0" max="60">
+                            <small style="color:#64748b;" data-i18n="CFG_LATE_GRACE_HINT">打卡超過上班時間幾分鐘內不算遲到，預設 0（無寬限）</small>
+                        </div>
+                        <div>
+                            <label class="form-label" style="display:block;margin-bottom:0.75rem;" data-i18n="CFG_LATE_DEDUCT_LABEL">遲到扣薪與全勤設定</label>
+                            <label style="display:flex;align-items:center;gap:0.5rem;color:#cbd5e1;margin-bottom:0.5rem;cursor:pointer;">
+                                <input type="checkbox" id="cfg-LATE_DEDUCTION_ENABLED" style="width:16px;height:16px;accent-color:#f59e0b;">
+                                <span data-i18n="CFG_LATE_DEDUCTION_ENABLED">啟用遲到扣薪（依比例扣除遲到時數薪資）</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:0.5rem;color:#cbd5e1;cursor:pointer;">
+                                <input type="checkbox" id="cfg-CANCEL_BONUS_LATE" style="width:16px;height:16px;accent-color:#f59e0b;">
+                                <span data-i18n="CFG_CANCEL_BONUS_LATE">遲到取消全勤獎金</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1rem;">
+                        <div>
+                            <label class="form-label" data-i18n="CFG_LATE_TIMES_LABEL">遲到幾次取消全勤獎金</label>
+                            <input type="number" id="cfg-CANCEL_BONUS_LATE_TIMES" class="form-input" step="1" min="1" max="31">
+                            <small style="color:#64748b;" data-i18n="CFG_LATE_TIMES_HINT">達到此次數時取消全勤，需搭配上方「遲到取消全勤獎金」勾選</small>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:2rem;">
+                        <button onclick="saveSystemConfigSection('late')"
+                                style="padding:0.6rem 1.5rem;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.5);color:#fcd34d;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SAVE_LATE_RULE">
+                            儲存遲到設定
+                        </button>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- 津貼計算方式 -->
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="ALLOWANCE_CALC_SECTION">津貼計算方式</div>
+                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="ALLOWANCE_CALC_DESC">啟用後，津貼將依實際出勤天數按比例發放，而非固定金額。</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1rem;">
+                        <div>
+                            <label class="form-label" style="display:block;margin-bottom:0.75rem;" data-i18n="CFG_ALLOWANCE_PRORATED_LABEL">按出勤天數比例發放</label>
+                            <label style="display:flex;align-items:center;gap:0.5rem;color:#cbd5e1;margin-bottom:0.5rem;cursor:pointer;">
+                                <input type="checkbox" id="cfg-MEAL_ALLOWANCE_PRORATED" style="width:16px;height:16px;accent-color:#10b981;">
+                                <span data-i18n="CFG_MEAL_PRORATED">伙食費依出勤天數計算（設定值 ÷ 30 × 實際出勤天數）</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:0.5rem;color:#cbd5e1;cursor:pointer;">
+                                <input type="checkbox" id="cfg-TRANSPORT_ALLOWANCE_PRORATED" style="width:16px;height:16px;accent-color:#10b981;">
+                                <span data-i18n="CFG_TRANSPORT_PRORATED">交通補助依出勤天數計算（設定值 ÷ 30 × 實際出勤天數）</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:2rem;">
+                        <button onclick="saveSystemConfigSection('allowance')"
+                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SAVE_ALLOWANCE_RULE">
+                            儲存津貼設定
+                        </button>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- 薪資取整設定 -->
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="SALARY_ROUNDING_SECTION">薪資取整設定</div>
+                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="SALARY_ROUNDING_DESC">設定最終薪資金額的取整方式，影響應發總額與實發金額的尾數處理。</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1rem;">
+                        <div>
+                            <label class="form-label" data-i18n="CFG_ROUND_TYPE_LABEL">取整方式</label>
+                            <select id="cfg-SALARY_ROUND_TYPE" class="form-input">
+                                <option value="0" data-i18n="ROUND_TYPE_ROUND">四捨五入（預設）</option>
+                                <option value="1" data-i18n="ROUND_TYPE_FLOOR">無條件捨去</option>
+                                <option value="2" data-i18n="ROUND_TYPE_CEIL">無條件進位</option>
+                            </select>
+                            <small style="color:#64748b;" data-i18n="CFG_ROUND_TYPE_HINT">決定薪資計算後如何處理小數</small>
+                        </div>
+                        <div>
+                            <label class="form-label" data-i18n="CFG_ROUND_UNIT_LABEL">取整單位</label>
+                            <select id="cfg-SALARY_ROUND_UNIT" class="form-input">
+                                <option value="1" data-i18n="ROUND_UNIT_1">元（NT$1，預設）</option>
+                                <option value="10" data-i18n="ROUND_UNIT_10">十元（NT$10）</option>
+                                <option value="100" data-i18n="ROUND_UNIT_100">百元（NT$100）</option>
+                            </select>
+                            <small style="color:#64748b;" data-i18n="CFG_ROUND_UNIT_HINT">例如選「十元」，$32,456 → $32,460（四捨五入）</small>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:2rem;">
+                        <button onclick="saveSystemConfigSection('rounding')"
+                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SAVE_ROUNDING_RULE">
+                            儲存取整設定
+                        </button>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- 加班費時薪計算基準 -->
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="OT_HOURLY_BASE_SECTION">加班費時薪計算基準</div>
+                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="OT_HOURLY_BASE_DESC">月薪制員工加班費的時薪換算方式，影響加班費計算結果。</p>
+                    <div style="display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:1rem;">
+                        <div>
+                            <label class="form-label" data-i18n="CFG_OT_HOURLY_BASE_LABEL">時薪計算基準</label>
+                            <select id="cfg-OVERTIME_HOURLY_BASE" class="form-input">
+                                <option value="0" data-i18n="OT_BASE_30_8">月薪 ÷ 30 ÷ 每日工時（預設，勞基法常見）</option>
+                                <option value="1" data-i18n="OT_BASE_26_8">月薪 ÷ 26 ÷ 每日工時（以工作日計算）</option>
+                                <option value="2" data-i18n="OT_BASE_174">月薪 ÷ 174 小時（勞基法第 24 條公式）</option>
+                            </select>
+                            <small style="color:#64748b;" data-i18n="CFG_OT_HOURLY_BASE_HINT">例如月薪 $35,000：基準0 = $145.8/h，基準1 = $168.3/h，基準2 = $201.1/h</small>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:2rem;">
+                        <button onclick="saveSystemConfigSection('otbase')"
+                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SAVE_OT_BASE">
+                            儲存加班費基準
+                        </button>
+                    </div>
+
+                    <hr class="section-divider">
+
                     <!-- 國定假日管理 -->
                     <div class="section-label" style="margin:1rem 0;" data-i18n="HOLIDAY_MANAGE_SECTION">國定假日管理</div>
                     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">

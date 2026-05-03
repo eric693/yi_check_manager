@@ -2280,6 +2280,12 @@ const SYSTEM_CONFIG_FIELD_KEYS = [
   'DAILY_WORK_HOURS', 'MONTHLY_WORK_DAYS', 'DEFAULT_PAYMENT_DAY',
   'SICK_LEAVE_RATE', 'CANCEL_BONUS_PERSONAL', 'CANCEL_BONUS_SICK',
   'HOLIDAY_WORK_AS_NORMAL',
+  // 新增彈性設定
+  'LATE_GRACE_MINUTES', 'LATE_DEDUCTION_ENABLED',
+  'CANCEL_BONUS_LATE', 'CANCEL_BONUS_LATE_TIMES',
+  'MEAL_ALLOWANCE_PRORATED', 'TRANSPORT_ALLOWANCE_PRORATED',
+  'SALARY_ROUND_TYPE', 'SALARY_ROUND_UNIT',
+  'OVERTIME_HOURLY_BASE',
 ];
 
 /**
@@ -2299,12 +2305,15 @@ async function loadSystemConfig() {
     }
     _systemConfig = res.data || {};
 
-    // Fill numeric/text fields
+    // Fill numeric/text/select/checkbox fields
     SYSTEM_CONFIG_FIELD_KEYS.forEach(key => {
       const el = document.getElementById('cfg-' + key);
       if (!el) return;
       if (el.type === 'checkbox') {
         el.checked = parseInt(_systemConfig[key]) === 1;
+      } else if (el.tagName === 'SELECT') {
+        const val = _systemConfig[key] !== undefined ? String(_systemConfig[key]) : '';
+        el.value = val;
       } else {
         el.value = _systemConfig[key] !== undefined ? _systemConfig[key] : '';
       }
@@ -2358,9 +2367,13 @@ async function loadSystemConfig() {
  */
 async function saveSystemConfigSection(section) {
   const sectionKeys = {
-    overtime: ['OVERTIME_WEEKDAY_1','OVERTIME_WEEKDAY_2','OVERTIME_RESTDAY_1','OVERTIME_RESTDAY_2','OVERTIME_RESTDAY_3','OVERTIME_SUNDAY','OVERTIME_HOLIDAY'],
-    hours:    ['DAILY_WORK_HOURS','MONTHLY_WORK_DAYS','DEFAULT_PAYMENT_DAY','MAX_OT_WEEKDAY','MAX_OT_RESTDAY','MAX_OT_HOLIDAY'],
-    leave:    ['SICK_LEAVE_RATE','CANCEL_BONUS_PERSONAL','CANCEL_BONUS_SICK','HOLIDAY_WORK_AS_NORMAL'],
+    overtime:   ['OVERTIME_WEEKDAY_1','OVERTIME_WEEKDAY_2','OVERTIME_RESTDAY_1','OVERTIME_RESTDAY_2','OVERTIME_RESTDAY_3','OVERTIME_SUNDAY','OVERTIME_HOLIDAY'],
+    hours:      ['DAILY_WORK_HOURS','MONTHLY_WORK_DAYS','DEFAULT_PAYMENT_DAY','MAX_OT_WEEKDAY','MAX_OT_RESTDAY','MAX_OT_HOLIDAY'],
+    leave:      ['SICK_LEAVE_RATE','CANCEL_BONUS_PERSONAL','CANCEL_BONUS_SICK','HOLIDAY_WORK_AS_NORMAL'],
+    late:       ['LATE_GRACE_MINUTES','LATE_DEDUCTION_ENABLED','CANCEL_BONUS_LATE','CANCEL_BONUS_LATE_TIMES'],
+    allowance:  ['MEAL_ALLOWANCE_PRORATED','TRANSPORT_ALLOWANCE_PRORATED'],
+    rounding:   ['SALARY_ROUND_TYPE','SALARY_ROUND_UNIT'],
+    otbase:     ['OVERTIME_HOURLY_BASE'],
   };
 
   const keys = sectionKeys[section];
@@ -2372,6 +2385,8 @@ async function saveSystemConfigSection(section) {
     if (!el) return;
     if (el.type === 'checkbox') {
       updates[key] = el.checked ? 1 : 0;
+    } else if (el.tagName === 'SELECT') {
+      updates[key] = parseInt(el.value);
     } else {
       updates[key] = parseFloat(el.value) || el.value;
     }
