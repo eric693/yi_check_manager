@@ -392,36 +392,39 @@ function saveDailySalaryRecord(data) {
 function getEmployeeOvertimeForMonth(employeeId, yearMonth) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
+    // 加班申請 欄位: [0]申請ID [1]員工ID [2]員工姓名 [3]加班日期
+    //               [4]開始時間 [5]結束時間 [6]加班時數 [7]申請原因
+    //               [8]申請時間 [9]審核狀態
     const sheet = ss.getSheetByName('加班申請');
-    
+
     if (!sheet) return [];
-    
+
     const allData = sheet.getDataRange().getValues();
     const records = [];
-    
+
     for (let i = 1; i < allData.length; i++) {
       const row = allData[i];
-      const recordEmployeeId = row[0];
-      const overtimeDate = row[2];
-      
-      if (recordEmployeeId === employeeId && 
-          overtimeDate && 
-          overtimeDate.toString().startsWith(yearMonth)) {
-        records.push({
-          '員工ID': row[0],
-          '員工姓名': row[1],
-          '加班日期': row[2],
-          '開始時間': row[3],
-          '結束時間': row[4],
-          '加班時數': row[5],
-          '申請原因': row[6],
-          '狀態': row[7]
-        });
-      }
+      const recordEmployeeId = String(row[1] || '').trim();
+      const overtimeDate = row[3];
+
+      if (recordEmployeeId !== String(employeeId).trim()) continue;
+      if (!overtimeDate) continue;
+      if (!overtimeDate.toString().startsWith(yearMonth)) continue;
+
+      records.push({
+        '員工ID': row[1],
+        '員工姓名': row[2],
+        '加班日期': row[3],
+        '開始時間': row[4],
+        '結束時間': row[5],
+        '加班時數': row[6],
+        '申請原因': row[7],
+        '狀態': String(row[9] || '').trim() === 'approved' ? '已核准' : String(row[9] || '').trim()
+      });
     }
-    
+
     return records;
-    
+
   } catch (error) {
     Logger.log('❌ 取得加班記錄失敗: ' + error);
     return [];
@@ -434,36 +437,39 @@ function getEmployeeOvertimeForMonth(employeeId, yearMonth) {
 function getEmployeeLeaveForMonth(employeeId, yearMonth) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName('請假申請');
-    
+    // 請假紀錄 欄位: [0]申請時間 [1]員工ID [2]姓名 [3]部門 [4]假別
+    //               [5]開始時間 [6]結束時間 [7]工作時數 [8]天數
+    //               [9]原因 [10]狀態 [11]審核人 [12]審核時間 [13]審核意見
+    const sheet = ss.getSheetByName('請假紀錄');
+
     if (!sheet) return [];
-    
+
     const allData = sheet.getDataRange().getValues();
     const records = [];
-    
+
     for (let i = 1; i < allData.length; i++) {
       const row = allData[i];
-      const recordEmployeeId = row[0];
-      const startDate = row[3];
-      
-      if (recordEmployeeId === employeeId && 
-          startDate && 
-          startDate.toString().startsWith(yearMonth)) {
-        records.push({
-          '員工ID': row[0],
-          '員工姓名': row[1],
-          '假別': row[2],
-          '開始日期': row[3],
-          '結束日期': row[4],
-          '天數': row[5],
-          '原因': row[6],
-          '狀態': row[7]
-        });
-      }
+      const recordEmployeeId = String(row[1] || '').trim();
+      const startDate = row[5];
+
+      if (recordEmployeeId !== String(employeeId).trim()) continue;
+      if (!startDate) continue;
+      if (!startDate.toString().startsWith(yearMonth)) continue;
+
+      records.push({
+        '員工ID': row[1],
+        '員工姓名': row[2],
+        '假別': row[4],
+        '開始日期': row[5],
+        '結束日期': row[6],
+        '天數': row[8],
+        '原因': row[9],
+        '狀態': row[10]
+      });
     }
-    
+
     return records;
-    
+
   } catch (error) {
     Logger.log('❌ 取得請假記錄失敗: ' + error);
     return [];

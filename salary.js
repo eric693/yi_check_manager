@@ -407,9 +407,9 @@ async function loadWorkHoursCard(yearMonth, salaryData) {
     console.log('📊 載入工作時數卡片');
     
     // 從薪資資料中取得工時資訊
-    const totalWorkHours = parseFloat(salaryData['工作時數']) || 0;
-    const hourlyRate = parseFloat(salaryData['時薪']) || 0;
-    const baseSalary = parseFloat(salaryData['基本薪資']) || 0;
+    const totalWorkHours = parseFloat(salaryData.totalWorkHours || salaryData['工作時數']) || 0;
+    const hourlyRate = parseFloat(salaryData.hourlyRate || salaryData['時薪']) || 0;
+    const baseSalary = parseFloat(salaryData.baseSalary || salaryData['基本薪資']) || 0;
     const totalWorkHoursInt = Math.floor(totalWorkHours);
     console.log(`⏱️ 總工時: ${totalWorkHours}h, 時薪: $${hourlyRate}, 基本薪資: $${baseSalary}`);
     
@@ -717,7 +717,7 @@ const LEAVE_TYPE_LABELS = {
     SICK_LEAVE: '病假',
     PERSONAL_LEAVE: '事假',
     ANNUAL_LEAVE: '特休',
-    COMPENSATORY_LEAVE: '補休',
+    COMP_TIME_OFF: '補休',
     OFFICIAL_LEAVE: '公假',
     MATERNITY_LEAVE: '產假',
     PATERNITY_LEAVE: '陪產假',
@@ -1038,12 +1038,7 @@ async function handleSalaryConfigSubmit(e) {
     const paymentDay = safeGetValue('config-payment-day') || '5';
     const note = safeGetValue('config-note');
     
-    // 驗證
-    if (!employeeId || !employeeName || !baseSalary || parseFloat(baseSalary) <= 0) {
-        showNotification(t('SALARY_FILL_REQUIRED'), 'error');
-        return;
-    }
-    
+    // 驗證（薪資類型專屬檢查已在上方完成，此處僅檢查共用必填欄位）
     if (!employeeType || !salaryType) {
         showNotification(t('SALARY_SELECT_TYPE'), 'error');
         return;
@@ -1528,10 +1523,12 @@ async function saveSalaryRecord(data) {
             `&performanceBonus=${encodeURIComponent(data.performanceBonus || 0)}` +
             `&otherAllowances=${encodeURIComponent(data.otherAllowances || 0)}` +
             
-            // ⭐ 修正：加班費（三種）
+            // 加班費（五種）
             `&weekdayOvertimePay=${encodeURIComponent(data.weekdayOvertimePay || 0)}` +
             `&restdayOvertimePay=${encodeURIComponent(data.restdayOvertimePay || 0)}` +
+            `&sundayOvertimePay=${encodeURIComponent(data.sundayOvertimePay || 0)}` +
             `&holidayOvertimePay=${encodeURIComponent(data.holidayOvertimePay || 0)}` +
+            `&holidayWorkPay=${encodeURIComponent(data.holidayWorkPay || 0)}` +
             
             // 法定扣款
             `&laborFee=${encodeURIComponent(data.laborFee || 0)}` +
@@ -1543,6 +1540,7 @@ async function saveSalaryRecord(data) {
             
             // 其他扣款
             `&leaveDeduction=${encodeURIComponent(data.leaveDeduction || 0)}` +
+            `&earlyLeaveDeduction=${encodeURIComponent(data.earlyLeaveDeduction || 0)}` +
             `&welfareFee=${encodeURIComponent(data.welfareFee || 0)}` +
             `&dormitoryFee=${encodeURIComponent(data.dormitoryFee || 0)}` +
             `&groupInsurance=${encodeURIComponent(data.groupInsurance || 0)}` +

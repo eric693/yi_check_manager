@@ -117,6 +117,7 @@ function writeSystemConfig(updates) {
       sheet.getRange(nextRow, 1, 1, 4).setValues([[key, val, label, now]]);
     }
   });
+  _sysConfigCache = null; // 清除快取，確保下次讀取為最新值
   Logger.log('✅ 系統設定已更新: ' + JSON.stringify(updates));
 }
 
@@ -442,20 +443,6 @@ function getEmployeeSalarySheet() {
   
   return sheet;
 }
-
-function rebuildMonthlySalarySheet() {
-     // 刪除舊表（如果存在）
-     const ss = SpreadsheetApp.getActiveSpreadsheet();
-     const oldSheet = ss.getSheetByName('月薪資記錄');
-     if (oldSheet) {
-       ss.deleteSheet(oldSheet);
-     }
-     
-     // 建立新表
-     getMonthlySalarySheetEnhanced();
-     
-     Logger.log('✅ 月薪資記錄試算表已重建');
-   }
 
 /**
  * ✅ 取得或建立月薪資記錄試算表（完整版）
@@ -1133,8 +1120,10 @@ function saveMonthlySalaryAPI() {
       // 加班費
       weekdayOvertimePay: parseFloat(getParam('weekdayOvertimePay')) || 0,
       restdayOvertimePay: parseFloat(getParam('restdayOvertimePay')) || 0,
+      sundayOvertimePay: parseFloat(getParam('sundayOvertimePay')) || 0,
       holidayOvertimePay: parseFloat(getParam('holidayOvertimePay')) || 0,
-      
+      holidayWorkPay: parseFloat(getParam('holidayWorkPay')) || 0,
+
       // 法定扣款
       laborFee: parseFloat(getParam('laborFee')) || 0,
       healthFee: parseFloat(getParam('healthFee')) || 0,
@@ -1145,6 +1134,7 @@ function saveMonthlySalaryAPI() {
       
       // 其他扣款
       leaveDeduction: parseFloat(getParam('leaveDeduction')) || 0,
+      earlyLeaveDeduction: parseFloat(getParam('earlyLeaveDeduction')) || 0,
       welfareFee: parseFloat(getParam('welfareFee')) || 0,
       dormitoryFee: parseFloat(getParam('dormitoryFee')) || 0,
       groupInsurance: parseFloat(getParam('groupInsurance')) || 0,
@@ -1173,8 +1163,12 @@ function saveMonthlySalaryAPI() {
     
     // 呼叫原本的 saveMonthlySalary 函數
     const result = saveMonthlySalary(salaryData);
-    
+
     if (result.success) {
+      // 若薪資中含有預支扣款，標記為已扣除，避免下次批次計算重複扣帳
+      if (salaryData.otherDeductions > 0 && salaryData.employeeId) {
+        try { markAdvancesAsDeducted(salaryData.employeeId); } catch(e) {}
+      }
       return jsonResponse(true, { salaryId: result.salaryId }, result.message);
     } else {
       return jsonResponse(false, null, result.message);
@@ -1608,13 +1602,13 @@ function calculateHourlySalary(employeeId, yearMonth) {
           Logger.log(`   ✅ 正職員工國定假日補休 ${dailyHours}h，不計費`);
           return;
         } else {
-          // 兼職/約聘 → ×2
+          // 兼職/約聘 → 勞基法第39條：正常薪資(×1) + 加給(×1) = 共×2
           const normalPay = hourlyRate * dailyHours * 1.0;
-          const overtimePay = hourlyRate * dailyHours * 2.0;
+          const overtimePay = hourlyRate * dailyHours * 1.0;
           holidayWorkPay += normalPay;
           holidayOvertimePay += overtimePay;
           Logger.log(`   - 正常薪資: $${Math.round(normalPay)} (×1.0)`);
-          Logger.log(`   - 加班費: $${Math.round(overtimePay)} (×2.0)`);
+          Logger.log(`   - 加給: $${Math.round(overtimePay)} (×1.0，共×2)`);
           Logger.log(`   ✅ 兼職員工國定假日: $${Math.round(normalPay + overtimePay)}`);
         }
 
@@ -2104,9 +2098,9 @@ function getEmployeeMonthlyAttendanceInternal(employeeId, yearMonth) {
           
           if (diffMs > 0) {
             const totalHours = diffMs / (1000 * 60 * 60);
-            const lunchBreak = 1;
-            // workHours = Math.max(0, totalHours - lunchBreak);
-            workHours = Math.floor(Math.max(0, totalHours - lunchBreak));
+            // 僅超過6小時班次才扣除1小時午休
+            const lunchBreak = totalHours > 6 ? 1 : 0;
+            workHours = Math.max(0, totalHours - lunchBreak);
             Logger.log(`   ${date}: ${punchIn} ~ ${punchOut} = ${workHours.toFixed(2)}h (原始: ${totalHours.toFixed(2)}h)`);
           } else {
             Logger.log(`   ⚠️ ${date}: ${punchIn} ~ ${punchOut} 時間異常（下班早於上班）`);

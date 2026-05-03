@@ -6,7 +6,7 @@ const LINE_CHANNEL_SECRET = PropertiesService.getScriptProperties().getProperty(
 const LINE_REDIRECT_URL   = "https://eric693.github.io/yi_check_manager/";
 
 // ==================== Session 設定 ====================
-const SESSION_TTL_MS = 7000 * 60 * 60 * 24; // 1 天
+const SESSION_TTL_MS = 1 * 24 * 60 * 60 * 1000; // 1 天（86,400,000 ms）
 const TOKEN_LENGTH   = 36;
 
 // ==================== 工作表名稱 ====================
