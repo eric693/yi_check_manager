@@ -635,7 +635,7 @@
             <button class="tab-btn" onclick="showTab('monthly-calc')" data-role="admin" data-i18n="SALARY_TAB_MONTHLY" style="display: none;">月薪計算</button>
             <button class="tab-btn" onclick="showTab('hourly-calc')" data-role="admin" data-i18n="SALARY_TAB_HOURLY" style="display: none;">時薪計算</button>
             <button class="tab-btn" onclick="showTab('salary-list')" data-role="admin" data-i18n="SALARY_TAB_LIST">薪資列表</button>
-            <button class="tab-btn" onclick="showTab('system-config')" data-role="admin">⚙️ 系統設定</button>
+            <button class="tab-btn" onclick="showTab('system-config')" data-role="admin" data-i18n="SALARY_TAB_SYSTEM">系統設定</button>
         </div>
 
         <!-- Tab 1: 員工薪酬 -->
@@ -1330,8 +1330,8 @@
         <!-- Tab 6: 系統設定（管理員專用） -->
         <div id="system-config" class="tab-content">
             <div class="form-section">
-                <div class="feature-title">⚙️ 系統設定</div>
-                <p style="color:#94a3b8;margin-bottom:1.5rem;">調整薪資計算相關參數，設定後立即生效於後續薪資計算。</p>
+                <div class="feature-title" data-i18n="SALARY_TAB_SYSTEM">系統設定</div>
+                <p style="color:#94a3b8;margin-bottom:1.5rem;" data-i18n="SYSTEM_CONFIG_DESC">調整薪資計算相關參數，設定後立即生效於後續薪資計算。</p>
 
                 <div id="system-config-loading" style="text-align:center;color:#94a3b8;padding:2rem;">
                     載入中...
@@ -1339,136 +1339,139 @@
                 <div id="system-config-content" style="display:none;">
 
                     <!-- 加班費率 -->
-                    <div class="section-label" style="margin-bottom:1rem;">💰 加班費率設定</div>
+                    <div class="section-label" style="margin-bottom:1rem;" data-i18n="OVERTIME_RATE_SECTION">加班費率設定</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
                         <div>
-                            <label class="form-label">平日加班（前2小時）倍率</label>
+                            <label class="form-label" data-i18n="CFG_OT_WEEKDAY_1_LABEL">平日加班（前2小時）倍率</label>
                             <input type="number" id="cfg-OVERTIME_WEEKDAY_1" class="form-input" step="0.01" min="1">
-                            <small style="color:#64748b;">法定最低 1.34</small>
+                            <small style="color:#64748b;" data-i18n="CFG_OT_WEEKDAY_1_HINT">法定最低 1.34</small>
                         </div>
                         <div>
-                            <label class="form-label">平日加班（第3小時起）倍率</label>
+                            <label class="form-label" data-i18n="CFG_OT_WEEKDAY_2_LABEL">平日加班（第3小時起）倍率</label>
                             <input type="number" id="cfg-OVERTIME_WEEKDAY_2" class="form-input" step="0.01" min="1">
-                            <small style="color:#64748b;">法定最低 1.67</small>
+                            <small style="color:#64748b;" data-i18n="CFG_OT_WEEKDAY_2_HINT">法定最低 1.67</small>
                         </div>
                         <div>
-                            <label class="form-label">休息日（前2小時）倍率</label>
+                            <label class="form-label" data-i18n="CFG_OT_RESTDAY_1_LABEL">休息日（前2小時）倍率</label>
                             <input type="number" id="cfg-OVERTIME_RESTDAY_1" class="form-input" step="0.01" min="1">
-                            <small style="color:#64748b;">法定最低 1.34</small>
+                            <small style="color:#64748b;" data-i18n="CFG_OT_WEEKDAY_1_HINT">法定最低 1.34</small>
                         </div>
                         <div>
-                            <label class="form-label">休息日（第3~8小時）倍率</label>
+                            <label class="form-label" data-i18n="CFG_OT_RESTDAY_2_LABEL">休息日（第3~8小時）倍率</label>
                             <input type="number" id="cfg-OVERTIME_RESTDAY_2" class="form-input" step="0.01" min="1">
-                            <small style="color:#64748b;">法定最低 1.67</small>
+                            <small style="color:#64748b;" data-i18n="CFG_OT_WEEKDAY_2_HINT">法定最低 1.67</small>
                         </div>
                         <div>
-                            <label class="form-label">休息日（第9小時起）倍率</label>
+                            <label class="form-label" data-i18n="CFG_OT_RESTDAY_3_LABEL">休息日（第9小時起）倍率</label>
                             <input type="number" id="cfg-OVERTIME_RESTDAY_3" class="form-input" step="0.01" min="1">
-                            <small style="color:#64748b;">法定最低 2.67</small>
+                            <small style="color:#64748b;" data-i18n="CFG_OT_RESTDAY_3_HINT">法定最低 2.67</small>
                         </div>
                         <div>
-                            <label class="form-label">例假日（週日）加班倍率</label>
+                            <label class="form-label" data-i18n="CFG_OT_SUNDAY_LABEL">例假日（週日）加班倍率</label>
                             <input type="number" id="cfg-OVERTIME_SUNDAY" class="form-input" step="0.01" min="1">
-                            <small style="color:#64748b;">法定最低 2.0</small>
+                            <small style="color:#64748b;" data-i18n="CFG_OT_SUNDAY_HINT">法定最低 2.0</small>
                         </div>
                         <div>
-                            <label class="form-label">國定假日加班倍率</label>
+                            <label class="form-label" data-i18n="CFG_OT_HOLIDAY_LABEL">國定假日加班倍率</label>
                             <input type="number" id="cfg-OVERTIME_HOLIDAY" class="form-input" step="0.01" min="1">
-                            <small style="color:#64748b;">法定最低 2.0</small>
+                            <small style="color:#64748b;" data-i18n="CFG_OT_SUNDAY_HINT">法定最低 2.0</small>
                         </div>
                     </div>
                     <div style="margin-bottom:2rem;">
                         <button onclick="saveSystemConfigSection('overtime')"
-                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;">
-                            💾 儲存加班費率
+                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SAVE_OVERTIME_RATE">
+                            儲存加班費率
                         </button>
                     </div>
 
                     <hr class="section-divider">
 
                     <!-- 工時標準 -->
-                    <div class="section-label" style="margin:1rem 0;">🕐 工時與基準設定</div>
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="WORK_HOURS_SECTION">工時與基準設定</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
                         <div>
-                            <label class="form-label">每日標準工時（小時）</label>
+                            <label class="form-label" data-i18n="CFG_DAILY_HOURS_LABEL">每日標準工時（小時）</label>
                             <input type="number" id="cfg-DAILY_WORK_HOURS" class="form-input" step="0.5" min="1" max="12">
-                            <small style="color:#64748b;">預設 8 小時</small>
+                            <small style="color:#64748b;" data-i18n="CFG_DAILY_HOURS_HINT">預設 8 小時</small>
                         </div>
                         <div>
-                            <label class="form-label">月薪計算基準天數</label>
+                            <label class="form-label" data-i18n="CFG_MONTHLY_DAYS_LABEL">月薪計算基準天數</label>
                             <input type="number" id="cfg-MONTHLY_WORK_DAYS" class="form-input" step="1" min="20" max="31">
-                            <small style="color:#64748b;">預設 30 天</small>
+                            <small style="color:#64748b;" data-i18n="CFG_MONTHLY_DAYS_HINT">預設 30 天</small>
                         </div>
                         <div>
-                            <label class="form-label">預設發薪日（每月幾號）</label>
+                            <label class="form-label" data-i18n="CFG_PAYMENT_DAY_LABEL">預設發薪日（每月幾號）</label>
                             <input type="number" id="cfg-DEFAULT_PAYMENT_DAY" class="form-input" step="1" min="1" max="28">
-                            <small style="color:#64748b;">預設 5 號</small>
+                            <small style="color:#64748b;" data-i18n="CFG_PAYMENT_DAY_HINT">預設 5 號</small>
                         </div>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
                         <div>
-                            <label class="form-label">平日最多加班時數（小時）</label>
+                            <label class="form-label" data-i18n="CFG_MAX_OT_WEEKDAY_LABEL">平日最多加班時數（小時）</label>
                             <input type="number" id="cfg-MAX_OT_WEEKDAY" class="form-input" step="1" min="1" max="8">
-                            <small style="color:#64748b;">法定上限 4h</small>
+                            <small style="color:#64748b;" data-i18n="CFG_MAX_OT_WEEKDAY_HINT">法定上限 4h</small>
                         </div>
                         <div>
-                            <label class="form-label">休息日最多加班時數（小時）</label>
+                            <label class="form-label" data-i18n="CFG_MAX_OT_RESTDAY_LABEL">休息日最多加班時數（小時）</label>
                             <input type="number" id="cfg-MAX_OT_RESTDAY" class="form-input" step="1" min="1" max="16">
-                            <small style="color:#64748b;">法定上限 12h</small>
+                            <small style="color:#64748b;" data-i18n="CFG_MAX_OT_RESTDAY_HINT">法定上限 12h</small>
                         </div>
                         <div>
-                            <label class="form-label">國定假日最多加班時數（小時）</label>
+                            <label class="form-label" data-i18n="CFG_MAX_OT_HOLIDAY_LABEL">國定假日最多加班時數（小時）</label>
                             <input type="number" id="cfg-MAX_OT_HOLIDAY" class="form-input" step="1" min="1" max="12">
-                            <small style="color:#64748b;">法定上限 8h</small>
+                            <small style="color:#64748b;" data-i18n="CFG_MAX_OT_HOLIDAY_HINT">法定上限 8h</small>
                         </div>
                     </div>
                     <div style="margin-bottom:2rem;">
                         <button onclick="saveSystemConfigSection('hours')"
-                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;">
-                            💾 儲存工時設定
+                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SAVE_WORK_HOURS">
+                            儲存工時設定
                         </button>
                     </div>
 
                     <hr class="section-divider">
 
                     <!-- 請假扣薪規則 -->
-                    <div class="section-label" style="margin:1rem 0;">📋 請假扣薪規則</div>
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="LEAVE_DEDUCT_SECTION">請假扣薪規則</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1rem;">
                         <div>
-                            <label class="form-label">病假扣薪率（0~1）</label>
+                            <label class="form-label" data-i18n="CFG_SICK_LEAVE_RATE_LABEL">病假扣薪率（0~1）</label>
                             <input type="number" id="cfg-SICK_LEAVE_RATE" class="form-input" step="0.05" min="0" max="1">
-                            <small style="color:#64748b;">0 = 不扣薪，0.5 = 半薪，1 = 全薪（法定 0.5）</small>
+                            <small style="color:#64748b;" data-i18n="CFG_SICK_LEAVE_RATE_HINT">0 = 不扣薪，0.5 = 半薪，1 = 全薪（法定 0.5）</small>
                         </div>
                         <div>
-                            <label class="form-label" style="display:block;margin-bottom:0.75rem;">取消全勤獎金條件</label>
+                            <label class="form-label" style="display:block;margin-bottom:0.75rem;" data-i18n="CFG_CANCEL_BONUS_LABEL">取消全勤獎金條件</label>
                             <label style="display:flex;align-items:center;gap:0.5rem;color:#cbd5e1;margin-bottom:0.5rem;cursor:pointer;">
                                 <input type="checkbox" id="cfg-CANCEL_BONUS_PERSONAL" style="width:16px;height:16px;accent-color:#10b981;">
-                                事假取消全勤獎金（法定規定）
+                                <span data-i18n="CFG_CANCEL_BONUS_PERSONAL">事假取消全勤獎金（法定規定）</span>
                             </label>
                             <label style="display:flex;align-items:center;gap:0.5rem;color:#cbd5e1;cursor:pointer;">
                                 <input type="checkbox" id="cfg-CANCEL_BONUS_SICK" style="width:16px;height:16px;accent-color:#10b981;">
-                                病假取消全勤獎金（勞基法不強制，公司可自訂）
+                                <span data-i18n="CFG_CANCEL_BONUS_SICK">病假取消全勤獎金（勞基法不強制，公司可自訂）</span>
                             </label>
                             <label style="display:flex;align-items:center;gap:0.5rem;color:#fbbf24;margin-top:0.75rem;cursor:pointer;">
                                 <input type="checkbox" id="cfg-HOLIDAY_WORK_AS_NORMAL" style="width:16px;height:16px;accent-color:#f59e0b;">
-                                國定假日上班不給加班費（視為一般平日出勤）
+                                <span data-i18n="CFG_HOLIDAY_WORK_NORMAL">國定假日上班不給加班費（視為一般平日出勤）</span>
                             </label>
-                            <small style="color:#64748b;margin-top:0.25rem;display:block;">勾選後，員工在國定假日出勤只計正常薪資，不另給加班倍率。</small>
+                            <small style="color:#64748b;margin-top:0.25rem;display:block;" data-i18n="CFG_HOLIDAY_WORK_NORMAL_DESC">勾選後，員工在國定假日出勤只計正常薪資，不另給加班倍率。</small>
                         </div>
                     </div>
                     <div style="margin-bottom:2rem;">
                         <button onclick="saveSystemConfigSection('leave')"
-                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;">
-                            💾 儲存請假規則
+                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SAVE_LEAVE_RULE">
+                            儲存請假規則
                         </button>
                     </div>
 
                     <hr class="section-divider">
 
                     <!-- 國定假日管理 -->
-                    <div class="section-label" style="margin:1rem 0;">📅 國定假日管理</div>
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="HOLIDAY_MANAGE_SECTION">國定假日管理</div>
                     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
-                        <label class="form-label" style="margin:0;">管理年份：</label>
+                        <label class="form-label" style="margin:0;" data-i18n="HOLIDAY_YEAR_LABEL">管理年份：</label>
                         <select id="holiday-year-select" onchange="loadHolidayList()" class="form-input" style="width:120px;">
                         </select>
                     </div>
@@ -1478,14 +1481,16 @@
                     </div>
                     <div style="display:flex;gap:0.75rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
                         <input type="date" id="holiday-add-date" class="form-input" style="width:180px;">
-                        <input type="text" id="holiday-add-label" class="form-input" placeholder="假日名稱（選填）" style="width:200px;">
+                        <input type="text" id="holiday-add-label" class="form-input" data-i18n="HOLIDAY_NAME_PLACEHOLDER" placeholder="假日名稱（選填）" style="width:200px;">
                         <button onclick="addHolidayToList()"
-                                style="padding:0.6rem 1.2rem;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);color:#93c5fd;border-radius:8px;cursor:pointer;font-weight:600;">
+                                style="padding:0.6rem 1.2rem;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);color:#93c5fd;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_ADD_HOLIDAY">
                             + 新增假日
                         </button>
                         <button onclick="saveHolidayList()"
-                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;">
-                            💾 儲存假日清單
+                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SAVE_HOLIDAY_LIST">
+                            儲存假日清單
                         </button>
                     </div>
                     <div id="holiday-save-status" style="color:#10b981;font-size:0.875rem;min-height:1.25rem;"></div>
@@ -1493,13 +1498,14 @@
                     <hr class="section-divider">
 
                     <!-- 批次計算薪資 -->
-                    <div class="section-label" style="margin:1rem 0;">📊 批次計算薪資</div>
-                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;">一次計算所有員工指定月份的薪資，自動儲存結果並扣除待扣預支。</p>
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="BATCH_CALC_SECTION">批次計算薪資</div>
+                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="BATCH_CALC_DESC">一次計算所有員工指定月份的薪資，自動儲存結果並扣除待扣預支。</p>
                     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
                         <input type="month" id="batch-calc-month" class="form-input" style="width:160px;">
                         <button onclick="batchCalculateSalary()"
-                                style="padding:0.6rem 1.5rem;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.5);color:#c4b5fd;border-radius:8px;cursor:pointer;font-weight:600;">
-                            ⚡ 一鍵計算所有員工薪資
+                                style="padding:0.6rem 1.5rem;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.5);color:#c4b5fd;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_BATCH_CALC_SALARY">
+                            一鍵計算所有員工薪資
                         </button>
                     </div>
                     <div id="batch-calc-result" style="font-size:0.875rem;min-height:1.5rem;"></div>
@@ -1507,9 +1513,9 @@
                         <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
                             <thead>
                                 <tr style="color:#94a3b8;border-bottom:1px solid rgba(255,255,255,0.1);">
-                                    <th style="text-align:left;padding:0.4rem 0.5rem;">員工</th>
-                                    <th style="text-align:right;padding:0.4rem 0.5rem;">實發</th>
-                                    <th style="text-align:center;padding:0.4rem 0.5rem;">狀態</th>
+                                    <th style="text-align:left;padding:0.4rem 0.5rem;" data-i18n="SALARY_EMPLOYEE_LABEL">員工</th>
+                                    <th style="text-align:right;padding:0.4rem 0.5rem;" data-i18n="COL_NET_SALARY">實發</th>
+                                    <th style="text-align:center;padding:0.4rem 0.5rem;" data-i18n="STATUS">狀態</th>
                                 </tr>
                             </thead>
                             <tbody id="batch-calc-tbody"></tbody>
@@ -1519,44 +1525,45 @@
                     <hr class="section-divider">
 
                     <!-- 薪資預支管理 -->
-                    <div class="section-label" style="margin:1rem 0;">💳 薪資預支管理</div>
-                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;">新增員工薪資預支，下次計算薪資時自動從「其他扣款」扣除。</p>
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="SALARY_ADVANCE_SECTION">薪資預支管理</div>
+                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="SALARY_ADVANCE_DESC">新增員工薪資預支，下次計算薪資時自動從「其他扣款」扣除。</p>
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.75rem;align-items:end;margin-bottom:1rem;">
                         <div>
-                            <label class="form-label">員工</label>
+                            <label class="form-label" data-i18n="SALARY_EMPLOYEE_LABEL">員工</label>
                             <select id="advance-employee-id" class="form-input">
                                 <option value="">— 選擇員工 —</option>
                             </select>
                         </div>
                         <div>
-                            <label class="form-label">預支金額 (NT$)</label>
-                            <input type="number" id="advance-amount" class="form-input" min="1" placeholder="例：5000">
+                            <label class="form-label" data-i18n="ADVANCE_AMOUNT_LABEL">預支金額 (NT$)</label>
+                            <input type="number" id="advance-amount" class="form-input" min="1" data-i18n="ADVANCE_AMOUNT_PLACEHOLDER" placeholder="例：5000">
                         </div>
                         <div>
-                            <label class="form-label">預支日期</label>
+                            <label class="form-label" data-i18n="ADVANCE_DATE_LABEL">預支日期</label>
                             <input type="date" id="advance-date" class="form-input">
                         </div>
                         <div>
                             <button onclick="recordSalaryAdvance()"
-                                    style="padding:0.6rem 1.2rem;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.5);color:#fcd34d;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap;">
+                                    style="padding:0.6rem 1.2rem;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.5);color:#fcd34d;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap;"
+                                    data-i18n="BTN_ADD_ADVANCE">
                                 + 新增預支
                             </button>
                         </div>
                     </div>
                     <div>
-                        <label class="form-label">備註（選填）</label>
-                        <input type="text" id="advance-note" class="form-input" placeholder="例：急用、生活費...">
+                        <label class="form-label" data-i18n="ADVANCE_NOTE_LABEL">備註（選填）</label>
+                        <input type="text" id="advance-note" class="form-input" data-i18n="ADVANCE_NOTE_PLACEHOLDER" placeholder="例：急用、生活費...">
                     </div>
                     <div id="advance-msg" style="color:#10b981;font-size:0.875rem;min-height:1.25rem;margin:0.5rem 0;"></div>
 
                     <!-- 預支記錄列表 -->
                     <div style="margin-top:1rem;">
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-                            <span style="color:#cbd5e1;font-size:0.875rem;">預支記錄</span>
-                            <button onclick="loadSalaryAdvances()" style="font-size:0.75rem;background:none;border:1px solid rgba(255,255,255,0.1);color:#94a3b8;border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;">重新整理</button>
+                            <span style="color:#cbd5e1;font-size:0.875rem;" data-i18n="ADVANCE_RECORDS_LABEL">預支記錄</span>
+                            <button onclick="loadSalaryAdvances()" style="font-size:0.75rem;background:none;border:1px solid rgba(255,255,255,0.1);color:#94a3b8;border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;" data-i18n="BTN_REFRESH">重新整理</button>
                         </div>
                         <div id="advance-list" style="font-size:0.8rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.75rem;min-height:60px;">
-                            <span style="color:#64748b;">載入中...</span>
+                            <span style="color:#64748b;" data-i18n="SHIFT_LOADING">載入中...</span>
                         </div>
                     </div>
 
