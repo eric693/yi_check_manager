@@ -636,6 +636,8 @@
             <button class="tab-btn" onclick="showTab('hourly-calc')" data-role="admin" data-i18n="SALARY_TAB_HOURLY" style="display: none;">時薪計算</button>
             <button class="tab-btn" onclick="showTab('salary-list')" data-role="admin" data-i18n="SALARY_TAB_LIST">薪資列表</button>
             <button class="tab-btn" onclick="showTab('system-config')" data-role="admin" data-i18n="SALARY_TAB_SYSTEM">系統設定</button>
+            <button class="tab-btn" onclick="showTab('store-mgmt')" data-role="admin" data-i18n="SALARY_TAB_STORE">門市管理</button>
+            <button class="tab-btn" onclick="showTab('kpi-mgmt')" data-role="admin" data-i18n="SALARY_TAB_KPI">績效KPI</button>
         </div>
 
         <!-- Tab 1: 員工薪酬 -->
@@ -1726,6 +1728,146 @@
             </div>
         </div>
 
+        <!-- Tab 7: 門市管理（管理員專用） -->
+        <div id="store-mgmt" class="tab-content">
+            <div class="feature-box">
+                <div class="feature-title" data-i18n="STORE_MGMT_TITLE">門市管理</div>
+
+                <!-- 跨門市儀表板 -->
+                <div class="section-label" style="margin:1rem 0;" data-i18n="STORE_DASHBOARD_SECTION">跨門市儀表板</div>
+                <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="STORE_DASHBOARD_DESC">選擇月份後查看各門市的員工人數、薪資成本、加班時數與出勤天數比較。</p>
+                <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+                    <input type="month" id="store-dashboard-month" class="form-input" style="max-width:180px;">
+                    <button onclick="loadStoreDashboard()" style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;padding:0.5rem 1rem;border-radius:8px;font-size:0.875rem;cursor:pointer;" data-i18n="BTN_LOAD_DASHBOARD">查看儀表板</button>
+                </div>
+                <div id="store-dashboard-result" style="margin-top:0.5rem;"></div>
+
+                <div style="margin:1.5rem 0;border-top:1px solid rgba(255,255,255,0.08);"></div>
+
+                <!-- 門市清單 + 新增 -->
+                <div class="section-label" style="margin:1rem 0;" data-i18n="STORE_LIST_SECTION">門市清單</div>
+                <div style="display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1rem;">
+                    <div>
+                        <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="STORE_NAME_LABEL">門市名稱</label>
+                        <input type="text" id="new-store-name" class="form-input" style="max-width:180px;" data-i18n-placeholder="STORE_NAME_PLACEHOLDER" placeholder="例：台北旗艦店">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="STORE_ADDRESS_LABEL">地址（選填）</label>
+                        <input type="text" id="new-store-address" class="form-input" style="max-width:200px;" placeholder="">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="STORE_PHONE_LABEL">電話（選填）</label>
+                        <input type="text" id="new-store-phone" class="form-input" style="max-width:140px;" placeholder="">
+                    </div>
+                    <button onclick="createStore()" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#6ee7b7;padding:0.5rem 1rem;border-radius:8px;font-size:0.875rem;cursor:pointer;" data-i18n="BTN_CREATE_STORE">+ 新增門市</button>
+                </div>
+                <div id="store-msg" style="color:#10b981;font-size:0.875rem;min-height:1.25rem;margin-bottom:0.5rem;"></div>
+                <div id="store-list-container" style="min-height:60px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.75rem;">
+                    <div style="color:#64748b;font-size:0.875rem;" data-i18n="STORE_LIST_EMPTY">尚無門市資料，請先新增。</div>
+                </div>
+
+                <div style="margin:1.5rem 0;border-top:1px solid rgba(255,255,255,0.08);"></div>
+
+                <!-- 員工指派門市 -->
+                <div class="section-label" style="margin:1rem 0;" data-i18n="STORE_ASSIGN_SECTION">員工門市指派</div>
+                <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="STORE_ASSIGN_DESC">為員工指定所屬門市，儀表板即可按門市統計薪資成本。</p>
+                <div style="display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;">
+                    <div>
+                        <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="STORE_ASSIGN_EMP">選擇員工</label>
+                        <select id="store-assign-emp" class="form-input" style="max-width:200px;">
+                            <option value="" data-i18n="PLACEHOLDER_SELECT_EMP">請選擇員工</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="STORE_ASSIGN_TARGET">指派門市</label>
+                        <select id="store-assign-target" class="form-input" style="max-width:200px;">
+                            <option value="" data-i18n="PLACEHOLDER_SELECT_STORE">請選擇門市</option>
+                        </select>
+                    </div>
+                    <button onclick="assignEmployeeStore()" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4);color:#93c5fd;padding:0.5rem 1rem;border-radius:8px;font-size:0.875rem;cursor:pointer;" data-i18n="BTN_ASSIGN_STORE">確認指派</button>
+                </div>
+                <div id="store-assign-msg" style="color:#10b981;font-size:0.875rem;min-height:1.25rem;margin-top:0.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- Tab 8: 績效KPI管理（管理員專用） -->
+        <div id="kpi-mgmt" class="tab-content">
+            <div class="feature-box">
+                <div class="feature-title" data-i18n="KPI_MGMT_TITLE">績效KPI管理</div>
+
+                <!-- KPI 月份與員工選擇 -->
+                <div class="section-label" style="margin:1rem 0;" data-i18n="KPI_SETUP_SECTION">KPI 設定</div>
+                <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="KPI_SETUP_DESC">為員工設定 KPI 目標與實際達成值，系統自動計算達成率與獎金金額。支援業績目標、出勤率、客訴次數三種類型。</p>
+                <div style="display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1rem;">
+                    <div>
+                        <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="KPI_MONTH_LABEL">月份</label>
+                        <input type="month" id="kpi-month" class="form-input" style="max-width:180px;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="KPI_EMP_LABEL">員工</label>
+                        <select id="kpi-emp-select" class="form-input" style="max-width:200px;" onchange="loadKpiList()">
+                            <option value="" data-i18n="PLACEHOLDER_SELECT_EMP">請選擇員工</option>
+                        </select>
+                    </div>
+                    <button onclick="loadKpiList()" style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;padding:0.5rem 1rem;border-radius:8px;font-size:0.875rem;cursor:pointer;" data-i18n="BTN_LOAD_KPI">載入KPI</button>
+                </div>
+
+                <!-- 新增KPI條目 -->
+                <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:1rem;margin-bottom:1rem;">
+                    <div style="font-size:0.875rem;font-weight:600;color:#cbd5e1;margin-bottom:0.75rem;" data-i18n="KPI_ADD_ITEM">新增KPI條目</div>
+                    <div style="display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;">
+                        <div>
+                            <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="KPI_TYPE_LABEL">KPI類型</label>
+                            <select id="kpi-type-select" class="form-input" style="max-width:180px;">
+                                <option value="sales_target" data-i18n="KPI_TYPE_SALES">業績目標</option>
+                                <option value="attendance_rate" data-i18n="KPI_TYPE_ATTENDANCE">出勤率(%)</option>
+                                <option value="complaint_count" data-i18n="KPI_TYPE_COMPLAINT">客訴次數</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="KPI_TARGET_LABEL">目標值</label>
+                            <input type="number" id="kpi-target" class="form-input" style="max-width:120px;" placeholder="0" min="0">
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="KPI_ACTUAL_LABEL">實際值</label>
+                            <input type="number" id="kpi-actual" class="form-input" style="max-width:120px;" placeholder="0" min="0">
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="KPI_BONUS_CAP_LABEL">獎金上限(NT$)</label>
+                            <input type="number" id="kpi-bonus-cap" class="form-input" style="max-width:140px;" placeholder="3000" min="0">
+                        </div>
+                        <button onclick="saveKpiItem()" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#6ee7b7;padding:0.5rem 1rem;border-radius:8px;font-size:0.875rem;cursor:pointer;" data-i18n="BTN_SAVE_KPI">儲存KPI</button>
+                    </div>
+                </div>
+
+                <!-- 自動計算出勤率 -->
+                <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+                    <div>
+                        <label style="display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:4px;" data-i18n="KPI_ATTEND_CAP_LABEL">出勤率獎金上限(NT$)</label>
+                        <input type="number" id="kpi-attend-cap" class="form-input" style="max-width:160px;" placeholder="1000" value="1000" min="0">
+                    </div>
+                    <button onclick="autoCalcAttendanceKpi()" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#fcd34d;padding:0.5rem 1rem;border-radius:8px;font-size:0.875rem;cursor:pointer;" data-i18n="BTN_AUTO_CALC_ATTEND">自動計算所有員工出勤率KPI</button>
+                </div>
+                <div id="kpi-msg" style="color:#10b981;font-size:0.875rem;min-height:1.25rem;margin-bottom:0.75rem;"></div>
+
+                <!-- KPI列表 -->
+                <div id="kpi-list-container" style="min-height:80px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.75rem;margin-bottom:1.5rem;">
+                    <div style="color:#64748b;font-size:0.875rem;" data-i18n="KPI_LIST_EMPTY">請選擇員工與月份後載入KPI。</div>
+                </div>
+
+                <div style="margin:1.5rem 0;border-top:1px solid rgba(255,255,255,0.08);"></div>
+
+                <!-- KPI 總覽 -->
+                <div class="section-label" style="margin:1rem 0;" data-i18n="KPI_SUMMARY_SECTION">當月KPI獎金總覽</div>
+                <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="KPI_SUMMARY_DESC">顯示所有員工本月 KPI 總獎金，可作為業績獎金填入依據。</p>
+                <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+                    <input type="month" id="kpi-summary-month" class="form-input" style="max-width:180px;">
+                    <button onclick="loadKpiSummary()" style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;padding:0.5rem 1rem;border-radius:8px;font-size:0.875rem;cursor:pointer;" data-i18n="BTN_LOAD_KPI_SUMMARY">載入總覽</button>
+                </div>
+                <div id="kpi-summary-container" style="min-height:80px;"></div>
+            </div>
+        </div>
+
         <style>
         .export-toolbar {
             display: flex;
@@ -1974,6 +2116,12 @@
             // Lazy-load system config when the tab is first opened
             if (tabId === 'system-config' && typeof loadSystemConfig === 'function') {
                 loadSystemConfig();
+            }
+            if (tabId === 'store-mgmt' && typeof initStoreMgmt === 'function') {
+                initStoreMgmt();
+            }
+            if (tabId === 'kpi-mgmt' && typeof initKpiMgmt === 'function') {
+                initKpiMgmt();
             }
         }
         

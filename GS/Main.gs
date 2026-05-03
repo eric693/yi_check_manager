@@ -374,6 +374,32 @@ function doGet(e) {
       case "setupDailyNotificationTrigger":
         return respond1(setupDailyNotificationTrigger());
 
+      // ==================== 多門市管理 ====================
+      case "getStoreList":
+        return respond1(handleGetStoreList(e.parameter));
+      case "createStore":
+        return respond1(handleCreateStore(e.parameter));
+      case "updateStore":
+        return respond1(handleUpdateStore(e.parameter));
+      case "assignEmployeeStore":
+        return respond1(handleAssignEmployeeStore(e.parameter));
+      case "getStoreDashboard":
+        return respond1(handleGetStoreDashboard(e.parameter));
+      case "getStoreEmployees":
+        return respond1(handleGetStoreEmployees(e.parameter));
+
+      // ==================== 績效KPI管理 ====================
+      case "getKpiList":
+        return respond1(handleGetKpiList(e.parameter));
+      case "saveKpi":
+        return respond1(handleSaveKpi(e.parameter));
+      case "deleteKpi":
+        return respond1(handleDeleteKpi(e.parameter));
+      case "autoCalcAttendanceKpi":
+        return respond1(handleAutoCalcAttendanceKpi(e.parameter));
+      case "getKpiSummary":
+        return respond1(handleGetKpiSummary(e.parameter));
+
       // ==================== 預設：返回 HTML 頁面 ====================
       default:
         return HtmlService.createHtmlOutputFromFile('index')

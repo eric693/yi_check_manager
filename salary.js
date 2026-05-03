@@ -2760,8 +2760,304 @@ async function setupDailyNotificationTrigger() {
 (function initSalaryPageDefaults() {
   const now = new Date();
   const ym  = now.toISOString().slice(0, 7);
-  ['compliance-month', 'payslip-notify-month'].forEach(id => {
+  ['compliance-month', 'payslip-notify-month',
+   'store-dashboard-month', 'kpi-month', 'kpi-summary-month'].forEach(id => {
     const el = document.getElementById(id);
     if (el && !el.value) el.value = ym;
   });
 })()
+
+// ==================== 門市管理 ====================
+
+let _storeList = [];
+
+async function initStoreMgmt() {
+  const now = new Date();
+  const ym  = now.toISOString().slice(0, 7);
+  const monthEl = document.getElementById('store-dashboard-month');
+  if (monthEl && !monthEl.value) monthEl.value = ym;
+  await _refreshStoreList();
+  await _populateStoreAssignDropdowns();
+}
+
+async function _refreshStoreList() {
+  try {
+    const res = await callApifetch('getStoreList');
+    if (!res.ok) return;
+    _storeList = res.stores || [];
+    renderStoreList(_storeList);
+  } catch (e) { console.error('getStoreList error:', e); }
+}
+
+function renderStoreList(stores) {
+  const container = document.getElementById('store-list-container');
+  if (!container) return;
+  if (!stores.length) {
+    container.innerHTML = '<div style="color:#64748b;font-size:0.875rem;">尚無門市資料，請先新增。</div>';
+    return;
+  }
+  const rows = stores.map(s => `
+    <div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <span style="flex:1;font-weight:600;color:#e2e8f0;">${escHtml(s.name)}</span>
+      <span style="color:#94a3b8;font-size:0.8rem;flex:1;">${escHtml(s.address || '—')}</span>
+      <span style="color:#94a3b8;font-size:0.8rem;width:110px;">${escHtml(s.phone || '—')}</span>
+      <span style="font-size:0.75rem;padding:2px 8px;border-radius:12px;background:${s.status==='啟用'?'rgba(16,185,129,0.15)':'rgba(239,68,68,0.15)'};color:${s.status==='啟用'?'#6ee7b7':'#f87171'};">${escHtml(s.status)}</span>
+      <button onclick="toggleStoreStatus('${escHtml(s.storeId)}','${s.status==='啟用'?'停用':'啟用'}')" style="font-size:0.75rem;padding:2px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#94a3b8;cursor:pointer;">${s.status==='啟用'?'停用':'啟用'}</button>
+    </div>`).join('');
+  container.innerHTML = rows;
+}
+
+async function createStore() {
+  const name    = (document.getElementById('new-store-name')?.value || '').trim();
+  const address = (document.getElementById('new-store-address')?.value || '').trim();
+  const phone   = (document.getElementById('new-store-phone')?.value || '').trim();
+  const msg     = document.getElementById('store-msg');
+  if (!name) { if (msg) msg.textContent = '請填寫門市名稱'; return; }
+  try {
+    const res = await callApifetch(`createStore&name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}`);
+    if (msg) msg.textContent = res.ok ? res.message : (res.error || '新增失敗');
+    if (res.ok) {
+      document.getElementById('new-store-name').value    = '';
+      document.getElementById('new-store-address').value = '';
+      document.getElementById('new-store-phone').value   = '';
+      await _refreshStoreList();
+      await _populateStoreAssignDropdowns();
+    }
+  } catch(e) { if(msg) msg.textContent='新增失敗'; }
+}
+
+async function toggleStoreStatus(storeId, newStatus) {
+  try {
+    await callApifetch(`updateStore&storeId=${encodeURIComponent(storeId)}&status=${encodeURIComponent(newStatus)}`);
+    await _refreshStoreList();
+  } catch(e) {}
+}
+
+async function _populateStoreAssignDropdowns() {
+  // 員工下拉
+  const empSel = document.getElementById('store-assign-emp');
+  const storeSel = document.getElementById('store-assign-target');
+  if (!empSel || !storeSel) return;
+
+  // Populate stores
+  storeSel.innerHTML = '<option value="">請選擇門市</option>' +
+    _storeList.filter(s => s.status==='啟用').map(s =>
+      `<option value="${escHtml(s.storeId)}">${escHtml(s.name)}</option>`).join('');
+
+  // Populate employees from existing global list if available
+  try {
+    const res = await callApifetch('getAllUsers');
+    if (res.ok) {
+      empSel.innerHTML = '<option value="">請選擇員工</option>' +
+        (res.users || []).map(u =>
+          `<option value="${escHtml(u.userId)}">${escHtml(u.name)} (${escHtml(u.dept||'')})</option>`
+        ).join('');
+    }
+  } catch(e) {}
+}
+
+async function assignEmployeeStore() {
+  const empId   = document.getElementById('store-assign-emp')?.value;
+  const storeId = document.getElementById('store-assign-target')?.value;
+  const msg     = document.getElementById('store-assign-msg');
+  if (!empId) { if(msg) msg.textContent='請選擇員工'; return; }
+  try {
+    const res = await callApifetch(`assignEmployeeStore&employeeId=${encodeURIComponent(empId)}&storeId=${encodeURIComponent(storeId||'')}`);
+    if (msg) msg.textContent = res.ok ? res.message : (res.error || '指派失敗');
+  } catch(e) { if(msg) msg.textContent='指派失敗'; }
+}
+
+async function loadStoreDashboard() {
+  const month   = document.getElementById('store-dashboard-month')?.value || new Date().toISOString().slice(0,7);
+  const result  = document.getElementById('store-dashboard-result');
+  if (!result) return;
+  result.innerHTML = '<div style="color:#94a3b8;font-size:0.875rem;">載入中...</div>';
+  try {
+    const res = await callApifetch(`getStoreDashboard&yearMonth=${encodeURIComponent(month)}`);
+    if (!res.ok) { result.innerHTML = `<div style="color:#f87171;">${escHtml(res.error||'載入失敗')}</div>`; return; }
+    const stores = res.stores || [];
+    if (!stores.length) { result.innerHTML = '<div style="color:#64748b;">此月份無資料</div>'; return; }
+
+    const cards = stores.map(s => `
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:1rem;min-width:200px;flex:1;">
+        <div style="font-weight:700;color:#e2e8f0;margin-bottom:0.5rem;">${escHtml(s.name)}</div>
+        <div style="font-size:0.8rem;color:#94a3b8;display:flex;flex-direction:column;gap:4px;">
+          <span>👥 員工人數：<strong style="color:#a5b4fc;">${s.employeeCount}</strong></span>
+          <span>💰 薪資成本：<strong style="color:#6ee7b7;">NT$ ${s.totalSalaryCost.toLocaleString()}</strong></span>
+          <span>⏱ 加班時數：<strong style="color:#fcd34d;">${s.totalOvertimeHours.toFixed(1)} h</strong></span>
+          <span>📅 出勤天數：<strong style="color:#93c5fd;">${s.totalAttendanceDays} 天</strong></span>
+        </div>
+      </div>`).join('');
+    result.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:0.5rem;">${cards}</div>`;
+  } catch(e) { result.innerHTML='<div style="color:#f87171;">載入失敗</div>'; }
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ==================== 績效KPI管理 ====================
+
+let _kpiEmpList = [];
+
+async function initKpiMgmt() {
+  const now = new Date();
+  const ym  = now.toISOString().slice(0, 7);
+  ['kpi-month','kpi-summary-month'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value) el.value = ym;
+  });
+  await _populateKpiEmpDropdown();
+}
+
+async function _populateKpiEmpDropdown() {
+  const sel = document.getElementById('kpi-emp-select');
+  if (!sel) return;
+  try {
+    const res = await callApifetch('getAllUsers');
+    if (res.ok) {
+      _kpiEmpList = res.users || [];
+      sel.innerHTML = '<option value="">請選擇員工</option>' +
+        _kpiEmpList.map(u =>
+          `<option value="${escHtml(u.userId)}" data-name="${escHtml(u.name)}">${escHtml(u.name)} (${escHtml(u.dept||'')})</option>`
+        ).join('');
+    }
+  } catch(e) {}
+}
+
+async function loadKpiList() {
+  const month = document.getElementById('kpi-month')?.value || new Date().toISOString().slice(0,7);
+  const empId = document.getElementById('kpi-emp-select')?.value;
+  const container = document.getElementById('kpi-list-container');
+  const msg       = document.getElementById('kpi-msg');
+  if (!container) return;
+  if (!empId) { container.innerHTML='<div style="color:#64748b;font-size:0.875rem;">請先選擇員工。</div>'; return; }
+
+  container.innerHTML = '<div style="color:#94a3b8;font-size:0.875rem;">載入中...</div>';
+  try {
+    const res = await callApifetch(`getKpiList&yearMonth=${encodeURIComponent(month)}&employeeId=${encodeURIComponent(empId)}`);
+    if (!res.ok) { container.innerHTML=`<div style="color:#f87171;">${escHtml(res.error||'載入失敗')}</div>`; return; }
+
+    const list = res.list || [];
+    if (!list.length) {
+      container.innerHTML = '<div style="color:#64748b;font-size:0.875rem;">此員工本月尚無KPI設定。</div>';
+      return;
+    }
+
+    const kpiLabels = { sales_target:'業績目標', attendance_rate:'出勤率(%)', complaint_count:'客訴次數' };
+    const rows = list.map(k => {
+      const rateColor = k.achievementRate >= 100 ? '#6ee7b7' : k.achievementRate >= 70 ? '#fcd34d' : '#f87171';
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+        <td style="padding:0.5rem 0.4rem;color:#cbd5e1;">${escHtml(kpiLabels[k.kpiType]||k.kpiType)}</td>
+        <td style="padding:0.5rem 0.4rem;color:#94a3b8;text-align:right;">${k.target}</td>
+        <td style="padding:0.5rem 0.4rem;color:#e2e8f0;text-align:right;">${k.actual}</td>
+        <td style="padding:0.5rem 0.4rem;text-align:right;font-weight:700;color:${rateColor};">${k.achievementRate}%</td>
+        <td style="padding:0.5rem 0.4rem;color:#94a3b8;text-align:right;">NT$ ${k.bonusCap.toLocaleString()}</td>
+        <td style="padding:0.5rem 0.4rem;color:#6ee7b7;font-weight:700;text-align:right;">NT$ ${k.calcBonus.toLocaleString()}</td>
+        <td style="padding:0.5rem 0.4rem;text-align:center;">
+          <button onclick="deleteKpiItem('${escHtml(k.kpiId)}')" style="font-size:0.7rem;padding:2px 8px;border-radius:5px;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.1);color:#f87171;cursor:pointer;">刪除</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    const total = list.reduce((s, k) => s + k.calcBonus, 0);
+    container.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+        <thead><tr style="color:#64748b;border-bottom:1px solid rgba(255,255,255,0.1);">
+          <th style="padding:0.4rem;text-align:left;">KPI項目</th>
+          <th style="padding:0.4rem;text-align:right;">目標值</th>
+          <th style="padding:0.4rem;text-align:right;">實際值</th>
+          <th style="padding:0.4rem;text-align:right;">達成率</th>
+          <th style="padding:0.4rem;text-align:right;">獎金上限</th>
+          <th style="padding:0.4rem;text-align:right;">計算獎金</th>
+          <th style="padding:0.4rem;"></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr>
+          <td colspan="5" style="padding:0.5rem 0.4rem;color:#94a3b8;font-size:0.8rem;text-align:right;font-weight:600;">本月KPI獎金合計：</td>
+          <td style="padding:0.5rem 0.4rem;color:#6ee7b7;font-weight:700;text-align:right;">NT$ ${total.toLocaleString()}</td>
+          <td></td>
+        </tr></tfoot>
+      </table>`;
+  } catch(e) { container.innerHTML='<div style="color:#f87171;">載入失敗</div>'; }
+}
+
+async function saveKpiItem() {
+  const month   = document.getElementById('kpi-month')?.value || new Date().toISOString().slice(0,7);
+  const empSel  = document.getElementById('kpi-emp-select');
+  const empId   = empSel?.value;
+  const empName = empSel?.options[empSel.selectedIndex]?.dataset?.name || '';
+  const kpiType = document.getElementById('kpi-type-select')?.value;
+  const target  = document.getElementById('kpi-target')?.value;
+  const actual  = document.getElementById('kpi-actual')?.value;
+  const bonusCap = document.getElementById('kpi-bonus-cap')?.value;
+  const msg     = document.getElementById('kpi-msg');
+
+  if (!empId)   { if(msg) msg.textContent='請選擇員工'; return; }
+  if (!bonusCap){ if(msg) msg.textContent='請填寫獎金上限'; return; }
+
+  try {
+    const params = `saveKpi&employeeId=${encodeURIComponent(empId)}&employeeName=${encodeURIComponent(empName)}&yearMonth=${encodeURIComponent(month)}&kpiType=${encodeURIComponent(kpiType)}&target=${encodeURIComponent(target||0)}&actual=${encodeURIComponent(actual||0)}&bonusCap=${encodeURIComponent(bonusCap)}`;
+    const res = await callApifetch(params);
+    if (msg) msg.textContent = res.ok ? `${res.message}（計算獎金 NT$ ${(res.calcBonus||0).toLocaleString()}，達成率 ${res.achievementRate}%）` : (res.error||'儲存失敗');
+    if (res.ok) loadKpiList();
+  } catch(e) { if(msg) msg.textContent='儲存失敗'; }
+}
+
+async function deleteKpiItem(kpiId) {
+  if (!confirm('確定刪除此KPI條目？')) return;
+  try {
+    const res = await callApifetch(`deleteKpi&kpiId=${encodeURIComponent(kpiId)}`);
+    if (res.ok) loadKpiList();
+    else showNotification(res.error || '刪除失敗', 'error');
+  } catch(e) {}
+}
+
+async function autoCalcAttendanceKpi() {
+  const month    = document.getElementById('kpi-month')?.value || new Date().toISOString().slice(0,7);
+  const bonusCap = document.getElementById('kpi-attend-cap')?.value || 1000;
+  const msg      = document.getElementById('kpi-msg');
+  if (!confirm(`確定自動計算 ${month} 所有員工出勤率 KPI 嗎？（出勤率獎金上限：NT$ ${bonusCap}）`)) return;
+  if(msg) msg.textContent = '計算中...';
+  try {
+    const res = await callApifetch(`autoCalcAttendanceKpi&yearMonth=${encodeURIComponent(month)}&attendanceBonusCap=${encodeURIComponent(bonusCap)}`);
+    if(msg) msg.textContent = res.ok ? res.message : (res.error||'計算失敗');
+  } catch(e) { if(msg) msg.textContent='計算失敗'; }
+}
+
+async function loadKpiSummary() {
+  const month     = document.getElementById('kpi-summary-month')?.value || new Date().toISOString().slice(0,7);
+  const container = document.getElementById('kpi-summary-container');
+  if (!container) return;
+  container.innerHTML = '<div style="color:#94a3b8;font-size:0.875rem;">載入中...</div>';
+  try {
+    const res = await callApifetch(`getKpiSummary&yearMonth=${encodeURIComponent(month)}`);
+    if (!res.ok) { container.innerHTML=`<div style="color:#f87171;">${escHtml(res.error||'載入失敗')}</div>`; return; }
+    const summary = res.summary || [];
+    if (!summary.length) { container.innerHTML='<div style="color:#64748b;">本月尚無KPI資料。</div>'; return; }
+
+    const kpiLabels = { sales_target:'業績目標', attendance_rate:'出勤率', complaint_count:'客訴次數' };
+    const rows = summary.map(emp => {
+      const itemHtml = emp.items.map(it => {
+        const rateColor = it.achievementRate >= 100 ? '#6ee7b7' : it.achievementRate >= 70 ? '#fcd34d' : '#f87171';
+        return `<span style="font-size:0.75rem;color:#94a3b8;margin-right:0.75rem;">${kpiLabels[it.kpiType]||it.kpiType}: <span style="color:${rateColor}">${it.achievementRate}%</span> → <span style="color:#6ee7b7;">+${it.calcBonus.toLocaleString()}</span></span>`;
+      }).join('');
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+        <td style="padding:0.6rem 0.4rem;color:#e2e8f0;font-weight:600;">${escHtml(emp.employeeName)}</td>
+        <td style="padding:0.6rem 0.4rem;color:#94a3b8;font-size:0.8rem;">${itemHtml}</td>
+        <td style="padding:0.6rem 0.4rem;color:#6ee7b7;font-weight:700;text-align:right;white-space:nowrap;">NT$ ${emp.totalBonus.toLocaleString()}</td>
+      </tr>`;
+    }).join('');
+
+    container.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+        <thead><tr style="color:#64748b;border-bottom:1px solid rgba(255,255,255,0.1);">
+          <th style="padding:0.4rem;text-align:left;">員工</th>
+          <th style="padding:0.4rem;text-align:left;">KPI明細</th>
+          <th style="padding:0.4rem;text-align:right;">KPI獎金合計</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  } catch(e) { container.innerHTML='<div style="color:#f87171;">載入失敗</div>'; }
+}

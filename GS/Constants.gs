@@ -29,6 +29,12 @@ const SHEET_SHIFT_TYPES = '班別設定';
 // 費用申報系統
 const SHEET_EXPENSE_CLAIMS = '費用申報';
 
+// 多門市管理
+const SHEET_STORES = '門市設定';
+
+// 績效KPI
+const SHEET_KPI = 'KPI設定';
+
 // ==================== 工作表名稱（新增）====================
 // const SHEET_WORKLOG = '工作日誌';
 
@@ -47,7 +53,8 @@ const EMPLOYEE_COL = {
   CREATED: 4,      // E 欄：建立時間
   DEPT: 5,         // F 欄：部門
   HIRE_DATE: 6,    // G 欄：到職日期
-  STATUS: 7        // H 欄：狀態
+  STATUS: 7,       // H 欄：狀態
+  STORE: 8         // I 欄：門市ID
 };
 
 // ==================== 假期類型定義（完整版）====================
