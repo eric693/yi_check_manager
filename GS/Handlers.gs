@@ -510,34 +510,6 @@ function handleRejectReview(params) {
   return updateReviewStatus(recordId, "x", "拒絕");
 }
 
-// ==================== 加班功能相關 ====================
-
-function handleGetEmployeeOvertime(params) {
-  Logger.log(`查詢員工加班記錄`);
-  return getEmployeeOvertimeRequests(params.token);
-}
-
-function handleGetPendingOvertime(params) {
-  Logger.log(`查詢待審核加班申請`);
-  return getPendingOvertimeRequests(params.token);
-}
-
-function handleReviewOvertime(params) {
-  const { token, rowNumber, reviewAction, comment } = params;
-  
-  Logger.log(`handleReviewOvertime 收到參數:`);
-  Logger.log(`   - rowNumber: ${rowNumber}`);
-  Logger.log(`   - reviewAction: "${reviewAction}"`);
-  Logger.log(`   - comment: "${comment}"`);
-  
-  return reviewOvertimeRequest(
-    token, 
-    parseInt(rowNumber), 
-    reviewAction,
-    comment || ""
-  );
-}
-
 // ==================== 請假功能相關 ====================
 
 function handleGetLeaveBalance(params) {

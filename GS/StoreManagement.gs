@@ -157,17 +157,18 @@ function handleGetStoreDashboard(params) {
     attByEmp[uid].add(dayStr);
   }
 
-  // 加班時數
-  const otSh   = ss.getSheetByName(SHEET_OVERTIME_RECORDS);
+  // 加班時數 — 欄位: [0]=申請ID [1]=員工ID [2]=姓名 [3]=日期 [6]=時數 [9]=狀態
+  const otSh   = ss.getSheetByName(SHEET_OVERTIME);
   const otData = otSh ? otSh.getDataRange().getValues() : [];
   const otByEmp = {};
   for (let i = 1; i < otData.length; i++) {
-    const dateStr = otData[i][1]
-      ? Utilities.formatDate(new Date(otData[i][1]), 'Asia/Taipei', 'yyyy-MM') : '';
+    if (String(otData[i][9] || '').toLowerCase() !== 'approved') continue;
+    const dateStr = otData[i][3]
+      ? Utilities.formatDate(new Date(otData[i][3]), 'Asia/Taipei', 'yyyy-MM') : '';
     if (dateStr !== yearMonth) continue;
-    const uid = String(otData[i][0] || '').trim();
+    const uid = String(otData[i][1] || '').trim();
     if (!otByEmp[uid]) otByEmp[uid] = 0;
-    otByEmp[uid] += parseFloat(otData[i][3]) || 0;
+    otByEmp[uid] += parseFloat(otData[i][6]) || 0;
   }
 
   // 彙整門市
