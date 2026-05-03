@@ -98,6 +98,18 @@ function renderTranslations(container = document) {
             }
         });
     });
+
+    // 處理 optgroup label 的翻譯
+    const optgroups = container.querySelectorAll('optgroup[data-i18n-label]');
+    optgroups.forEach(optgroup => {
+        const key = optgroup.getAttribute('data-i18n-label');
+        if (key) {
+            const translatedText = t(key);
+            if (translatedText !== key) {
+                optgroup.label = translatedText;
+            }
+        }
+    });
 }
 /**
  * 透過 fetch API 呼叫後端 API。

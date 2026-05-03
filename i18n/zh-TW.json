@@ -862,5 +862,24 @@
   "ADVANCE_NOTE_PLACEHOLDER": "例：急用、生活費...",
   "ADVANCE_RECORDS_LABEL": "預支記錄",
   "BTN_REFRESH": "重新整理",
-  "COL_NET_SALARY": "實發"
+  "COL_NET_SALARY": "實發",
+
+  "_comment_admin_user": "=== 管理員用戶管理 ===",
+  "ADMIN_USER_MGMT_TITLE": "用戶管理",
+  "ADMIN_TOTAL_USERS": "總用戶數",
+  "ADMIN_STAT_ADMIN": "管理員",
+  "ADMIN_STAT_EMPLOYEE": "一般員工",
+  "ADMIN_SEARCH_USERS_PLACEHOLDER": "搜尋用戶名稱或部門...",
+  "ADMIN_NO_USERS_FOUND": "沒有找到用戶",
+
+  "_comment_salary_misc": "=== 薪資雜項 ===",
+  "NO_SALARY_RECORD": "尚無薪資記錄",
+  "LOAD_FAILED": "載入失敗",
+  "UNKNOWN_BANK": "未知銀行",
+
+  "_comment_shift_optgroup": "=== 排班班別分組 ===",
+  "OPTGROUP_KITCHEN": "廚房班別",
+  "OPTGROUP_FLOOR": "外場班別",
+  "OPTGROUP_LEAVE": "假別",
+  "SHIFT_TYPE_PUBLIC_HOLIDAY": "國定假日"
 }

@@ -862,5 +862,20 @@
   "ADVANCE_NOTE_PLACEHOLDER": "e.g.: Emergency, living expenses...",
   "ADVANCE_RECORDS_LABEL": "Advance Records",
   "BTN_REFRESH": "Refresh",
-  "COL_NET_SALARY": "Net Pay"
+  "COL_NET_SALARY": "Net Pay",
+  "_comment_admin_user": "=== Admin User Management ===",
+  "ADMIN_USER_MGMT_TITLE": "User Management",
+  "ADMIN_TOTAL_USERS": "Total Users",
+  "ADMIN_STAT_ADMIN": "Admins",
+  "ADMIN_STAT_EMPLOYEE": "Employees",
+  "ADMIN_SEARCH_USERS_PLACEHOLDER": "Search by name or department...",
+  "ADMIN_NO_USERS_FOUND": "No users found",
+  "_comment_salary_misc": "=== Salary Misc ===",
+  "NO_SALARY_RECORD": "No salary records",
+  "UNKNOWN_BANK": "Unknown bank",
+  "_comment_shift_optgroup": "=== Shift Type Groups ===",
+  "OPTGROUP_KITCHEN": "Kitchen Shifts",
+  "OPTGROUP_FLOOR": "Floor Shifts",
+  "OPTGROUP_LEAVE": "Leave Types",
+  "SHIFT_TYPE_PUBLIC_HOLIDAY": "Public Holiday"
 }

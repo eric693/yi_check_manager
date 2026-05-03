@@ -859,5 +859,20 @@
   "ADVANCE_NOTE_PLACEHOLDER": "vd：Khẩn cấp, chi phí sinh hoạt...",
   "ADVANCE_RECORDS_LABEL": "Lịch Sử Ứng Lương",
   "BTN_REFRESH": "Làm Mới",
-  "COL_NET_SALARY": "Lương Thực Nhận"
+  "COL_NET_SALARY": "Lương Thực Nhận",
+  "_comment_admin_user": "=== Quản lý người dùng Admin ===",
+  "ADMIN_USER_MGMT_TITLE": "Quản Lý Người Dùng",
+  "ADMIN_TOTAL_USERS": "Tổng Người Dùng",
+  "ADMIN_STAT_ADMIN": "Quản Trị Viên",
+  "ADMIN_STAT_EMPLOYEE": "Nhân Viên",
+  "ADMIN_SEARCH_USERS_PLACEHOLDER": "Tìm theo tên hoặc phòng ban...",
+  "ADMIN_NO_USERS_FOUND": "Không tìm thấy người dùng",
+  "_comment_salary_misc": "=== Lương Khác ===",
+  "NO_SALARY_RECORD": "Chưa có hồ sơ lương",
+  "UNKNOWN_BANK": "Ngân hàng không xác định",
+  "_comment_shift_optgroup": "=== Nhóm Loại Ca ===",
+  "OPTGROUP_KITCHEN": "Ca Bếp",
+  "OPTGROUP_FLOOR": "Ca Phục Vụ",
+  "OPTGROUP_LEAVE": "Loại Nghỉ",
+  "SHIFT_TYPE_PUBLIC_HOLIDAY": "Ngày Lễ Quốc Gia"
 }

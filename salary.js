@@ -923,7 +923,7 @@ function showNoSalaryMessage(month) {
     if (emptyEl) {
         emptyEl.innerHTML = `
             <div class="empty-state-icon">📄</div>
-            <div class="empty-state-title">尚無薪資記錄</div>
+            <div class="empty-state-title">${t('NO_SALARY_RECORD')}</div>
             <div class="empty-state-text">
                 <p>${month} 還沒有薪資資料</p>
                 <p style="margin-top: 0.5rem; font-size: 0.875rem;">
@@ -1611,13 +1611,13 @@ async function loadAllEmployeeSalaryFromList() {
                 listEl.appendChild(item);
             });
         } else {
-            listEl.innerHTML = '<p class="text-center text-gray-400 py-8">尚無薪資記錄</p>';
+            listEl.innerHTML = `<p class="text-center text-gray-400 py-8">${t('NO_SALARY_RECORD')}</p>`;
         }
-        
+
     } catch (error) {
         console.error('❌ 載入薪資列表失敗:', error);
         loadingEl.style.display = 'none';
-        listEl.innerHTML = '<p class="text-center text-red-400 py-8">載入失敗</p>';
+        listEl.innerHTML = `<p class="text-center text-red-400 py-8">${t('LOAD_FAILED')}</p>`;
     }
 }
 
@@ -1781,7 +1781,7 @@ function getBankName(code) {
         "700": "中華郵政"
     };
     
-    return banks[code] || "未知銀行";
+    return banks[code] || t('UNKNOWN_BANK');
 }
 
 // ✅ 新方法：直接用 calculateMonthlySalary（跟時薪計算一樣）
