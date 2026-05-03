@@ -167,11 +167,14 @@
                     <button id="tab-leave-btn" data-i18n="TAB_LEAVE" class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200 dark:text-gray-300 dark:bg-gray-700">請假</button>
                     <button id="tab-admin-btn" data-i18n="TAB_ADMIN" class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200 dark:text-gray-300 dark:bg-gray-700" style="display: none;">管理員</button>
                 
-                    <button id="tab-worklog-btn" data-i18n="TAB_WORKLOG" 
+                    <button id="tab-worklog-btn" data-i18n="TAB_WORKLOG"
                             class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200 dark:text-gray-300 dark:bg-gray-700">
                         工作日誌
                     </button>
-
+                    <button id="tab-expense-btn" data-i18n="TAB_EXPENSE"
+                            class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200 dark:text-gray-300 dark:bg-gray-700">
+                        費用申報
+                    </button>
                 </div>
                 
                 <!-- Dashboard View -->
@@ -1096,6 +1099,83 @@
                     </div>
                     
                 </section>
+
+                <!-- 費用申報 View -->
+                <section id="expense-view" class="space-y-6" style="display: none;">
+                    <!-- 員工：送出費用申報 -->
+                    <div class="card p-6">
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4" data-i18n="EXPENSE_SUBMIT_TITLE">送出費用申報</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="EXPENSE_CATEGORY_LABEL">費用類別</label>
+                                <select id="expense-category" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                                    <option value="餐費" data-i18n="EXPENSE_CAT_MEAL">餐費</option>
+                                    <option value="交通費" data-i18n="EXPENSE_CAT_TRANSPORT">交通費</option>
+                                    <option value="耗材採購" data-i18n="EXPENSE_CAT_SUPPLIES">耗材採購</option>
+                                    <option value="住宿費" data-i18n="EXPENSE_CAT_LODGING">住宿費</option>
+                                    <option value="娛樂費" data-i18n="EXPENSE_CAT_ENTERTAINMENT">娛樂費</option>
+                                    <option value="其他" data-i18n="EXPENSE_CAT_OTHER">其他</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="EXPENSE_AMOUNT_LABEL">金額（NT$）</label>
+                                <input type="number" id="expense-amount" min="1" step="1" placeholder="例：350"
+                                       class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="EXPENSE_DATE_LABEL">費用日期</label>
+                                <input type="date" id="expense-date"
+                                       class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="EXPENSE_DESC_LABEL">說明（選填）</label>
+                                <input type="text" id="expense-description" placeholder="例：客戶午餐"
+                                       class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                            </div>
+                        </div>
+                        <button onclick="submitExpense()"
+                                class="mt-4 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition"
+                                data-i18n="BTN_SUBMIT_EXPENSE">
+                            送出申報
+                        </button>
+                        <p id="expense-submit-msg" class="mt-2 text-sm min-h-[1.25rem]"></p>
+                    </div>
+
+                    <!-- 員工：我的申報記錄 -->
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold text-gray-800 dark:text-white" data-i18n="EXPENSE_MY_RECORDS_TITLE">我的申報記錄</h2>
+                            <button onclick="loadMyExpenses()"
+                                    class="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
+                                    data-i18n="BTN_REFRESH">重新整理</button>
+                        </div>
+                        <div id="my-expense-list" class="space-y-3">
+                            <p class="text-gray-400 text-sm text-center py-4" data-i18n="LOADING">載入中...</p>
+                        </div>
+                    </div>
+
+                    <!-- 管理員：待審核費用 -->
+                    <div class="card p-6" id="expense-admin-section" style="display:none;">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold text-gray-800 dark:text-white" data-i18n="EXPENSE_PENDING_TITLE">待審核費用申報</h2>
+                            <div class="flex gap-2">
+                                <select id="expense-filter-status" onchange="loadPendingExpenses()"
+                                        class="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                                    <option value="待審核" data-i18n="EXPENSE_STATUS_PENDING">待審核</option>
+                                    <option value="核准" data-i18n="EXPENSE_STATUS_APPROVED">已核准</option>
+                                    <option value="拒絕" data-i18n="EXPENSE_STATUS_REJECTED">已拒絕</option>
+                                </select>
+                                <button onclick="loadPendingExpenses()"
+                                        class="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
+                                        data-i18n="BTN_REFRESH">重新整理</button>
+                            </div>
+                        </div>
+                        <div id="pending-expense-list" class="space-y-3">
+                            <p class="text-gray-400 text-sm text-center py-4" data-i18n="LOADING">載入中...</p>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Admin View -->
                 <section id="admin-view" class="space-y-6" style="display: none;">
                     <!-- 📢 公告管理 -->

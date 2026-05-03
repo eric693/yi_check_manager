@@ -26,6 +26,9 @@ const SHEET_LEAVE_BALANCE = '員工假期額度';
 // 班別設定
 const SHEET_SHIFT_TYPES = '班別設定';
 
+// 費用申報系統
+const SHEET_EXPENSE_CLAIMS = '費用申報';
+
 // ==================== 工作表名稱（新增）====================
 // const SHEET_WORKLOG = '工作日誌';
 

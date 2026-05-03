@@ -1775,3 +1775,332 @@ function notifyAdminsNewOvertimeRequest(employeeName, overtimeDate, startTime, e
   );
   notifyAllAdmins_(message);
 }
+
+// ==================== 費用申報通知 ====================
+
+/**
+ * 通知管理員有新費用申報
+ */
+function notifyAdminsNewExpense(employeeName, category, amount, expenseDate, description) {
+  const message = {
+    type: "flex",
+    altText: `💰 ${employeeName} 送出費用申報 $${amount}`,
+    contents: {
+      type: "bubble",
+      header: {
+        type: "box", layout: "vertical",
+        backgroundColor: "#10b981",
+        paddingAll: "16px",
+        contents: [{
+          type: "text", text: "💰 費用申報通知", weight: "bold",
+          size: "lg", color: "#ffffff", align: "center"
+        }]
+      },
+      body: {
+        type: "box", layout: "vertical", spacing: "md",
+        paddingAll: "16px",
+        contents: [
+          { type: "text", text: `申請人：${employeeName}`, size: "md", color: "#1e293b" },
+          { type: "text", text: `類別：${category}`, size: "md", color: "#475569" },
+          { type: "text", text: `金額：NT$ ${Number(amount).toLocaleString()}`, size: "xl", weight: "bold", color: "#10b981" },
+          { type: "text", text: `日期：${expenseDate}`, size: "sm", color: "#64748b" },
+          description ? { type: "text", text: `說明：${description}`, size: "sm", color: "#64748b", wrap: true } : null
+        ].filter(Boolean)
+      },
+      footer: {
+        type: "box", layout: "vertical", paddingAll: "12px",
+        contents: [{
+          type: "button", style: "primary", height: "sm",
+          action: { type: "uri", label: "前往審核", uri: "https://eric693.github.io/yi_check_manager/" },
+          color: "#10b981"
+        }]
+      }
+    }
+  };
+  notifyAllAdmins_(message);
+}
+
+/**
+ * 通知員工費用申報結果
+ */
+function notifyExpenseResult(userId, employeeName, category, amount, isApproved, comment) {
+  const color  = isApproved ? "#10b981" : "#ef4444";
+  const icon   = isApproved ? "✅" : "❌";
+  const status = isApproved ? "核准" : "拒絕";
+
+  const message = {
+    type: "flex",
+    altText: `${icon} 您的費用申報已${status}`,
+    contents: {
+      type: "bubble",
+      header: {
+        type: "box", layout: "vertical",
+        backgroundColor: color,
+        paddingAll: "16px",
+        contents: [{
+          type: "text", text: `${icon} 費用申報${status}`,
+          weight: "bold", size: "lg", color: "#ffffff", align: "center"
+        }]
+      },
+      body: {
+        type: "box", layout: "vertical", spacing: "sm", paddingAll: "16px",
+        contents: [
+          { type: "text", text: `類別：${category}`, size: "md", color: "#1e293b" },
+          { type: "text", text: `金額：NT$ ${Number(amount).toLocaleString()}`, size: "xl", weight: "bold", color: color },
+          comment ? { type: "text", text: `審核意見：${comment}`, size: "sm", color: "#64748b", wrap: true } : null
+        ].filter(Boolean)
+      }
+    }
+  };
+  sendLineNotification_(userId, message);
+}
+
+// ==================== 薪資單通知 ====================
+
+/**
+ * 發送薪資單通知給員工
+ */
+function sendPayslipNotification(userId, name, yearMonth, grossSalary, netSalary, bankAccount) {
+  const message = {
+    type: "flex",
+    altText: `💵 ${yearMonth} 薪資單已發布`,
+    contents: {
+      type: "bubble",
+      header: {
+        type: "box", layout: "vertical",
+        backgroundColor: "#6366f1",
+        paddingAll: "16px",
+        contents: [{
+          type: "text", text: "💵 薪資單通知", weight: "bold",
+          size: "lg", color: "#ffffff", align: "center"
+        }]
+      },
+      body: {
+        type: "box", layout: "vertical", spacing: "md", paddingAll: "16px",
+        contents: [
+          { type: "text", text: `${name} 您好！`, size: "md", weight: "bold", color: "#1e293b" },
+          { type: "text", text: `${yearMonth} 薪資單已核算完成`, size: "sm", color: "#475569" },
+          {
+            type: "separator", margin: "md"
+          },
+          {
+            type: "box", layout: "horizontal", margin: "md",
+            contents: [
+              { type: "text", text: "應發總額", size: "sm", color: "#64748b", flex: 1 },
+              { type: "text", text: `NT$ ${Number(grossSalary).toLocaleString()}`, size: "sm", align: "end", color: "#1e293b", flex: 1 }
+            ]
+          },
+          {
+            type: "box", layout: "horizontal",
+            contents: [
+              { type: "text", text: "實發金額", size: "lg", weight: "bold", color: "#6366f1", flex: 1 },
+              { type: "text", text: `NT$ ${Number(netSalary).toLocaleString()}`, size: "lg", weight: "bold", align: "end", color: "#6366f1", flex: 1 }
+            ]
+          }
+        ]
+      },
+      footer: {
+        type: "box", layout: "vertical", paddingAll: "12px",
+        contents: [{
+          type: "button", style: "primary", height: "sm",
+          action: { type: "uri", label: "查看薪資明細", uri: "https://eric693.github.io/yi_check_manager/" },
+          color: "#6366f1"
+        }]
+      }
+    }
+  };
+  return sendLineNotification_(userId, message);
+}
+
+// ==================== 生日 / 到職週年通知 ====================
+
+/**
+ * 員工生日祝福
+ */
+function sendBirthdayNotification(userId, name) {
+  const message = {
+    type: "flex",
+    altText: `🎂 生日快樂，${name}！`,
+    contents: {
+      type: "bubble",
+      header: {
+        type: "box", layout: "vertical",
+        backgroundColor: "#f59e0b",
+        paddingAll: "20px",
+        contents: [
+          { type: "text", text: "🎂", size: "3xl", align: "center" },
+          { type: "text", text: "生日快樂！", weight: "bold", size: "xl", color: "#ffffff", align: "center" }
+        ]
+      },
+      body: {
+        type: "box", layout: "vertical", spacing: "md", paddingAll: "20px",
+        contents: [
+          { type: "text", text: `親愛的 ${name}，`, size: "md", color: "#1e293b" },
+          { type: "text", text: "今天是您的生日，公司全體同仁祝您生日快樂、健康平安！", size: "sm", color: "#475569", wrap: true }
+        ]
+      }
+    }
+  };
+  return sendLineNotification_(userId, message);
+}
+
+/**
+ * 到職週年通知
+ */
+function sendWorkAnniversaryNotification(userId, name, years) {
+  const message = {
+    type: "flex",
+    altText: `🎉 恭喜 ${name} 到職 ${years} 週年！`,
+    contents: {
+      type: "bubble",
+      header: {
+        type: "box", layout: "vertical",
+        backgroundColor: "#8b5cf6",
+        paddingAll: "20px",
+        contents: [
+          { type: "text", text: "🎉", size: "3xl", align: "center" },
+          { type: "text", text: `到職 ${years} 週年`, weight: "bold", size: "xl", color: "#ffffff", align: "center" }
+        ]
+      },
+      body: {
+        type: "box", layout: "vertical", spacing: "md", paddingAll: "20px",
+        contents: [
+          { type: "text", text: `親愛的 ${name}，`, size: "md", color: "#1e293b" },
+          { type: "text", text: `感謝您這 ${years} 年來對公司的貢獻與付出！感謝有您同行！`, size: "sm", color: "#475569", wrap: true }
+        ]
+      }
+    }
+  };
+  return sendLineNotification_(userId, message);
+}
+
+// ==================== 每日排程通知（由 GAS Trigger 呼叫）====================
+
+/**
+ * 每日檢查生日/到職週年，並發送通知
+ * 在 GAS 設定「每日觸發器」呼叫此函數
+ */
+function runDailyNotifications() {
+  try {
+    const today = Utilities.formatDate(new Date(), 'Asia/Taipei', 'MM-dd');
+    const ss    = SpreadsheetApp.getActiveSpreadsheet();
+    const empSheet = ss.getSheetByName(SHEET_EMPLOYEES);
+    if (!empSheet) return;
+
+    const data = empSheet.getDataRange().getValues();
+
+    for (let i = 1; i < data.length; i++) {
+      const row    = data[i];
+      const userId = String(row[EMPLOYEE_COL.USER_ID]);
+      const name   = String(row[EMPLOYEE_COL.NAME]);
+      const status = String(row[EMPLOYEE_COL.STATUS] || '');
+      if (status === '停用') continue;
+
+      // 生日（需要 basicInfo 裡有出生日期）
+      try {
+        const basicInfoSheet = ss.getSheetByName('員工基本資料');
+        if (basicInfoSheet) {
+          const biData = basicInfoSheet.getDataRange().getValues();
+          for (let j = 1; j < biData.length; j++) {
+            if (String(biData[j][0]) !== userId) continue;
+            const birthday = biData[j][3]; // 假設第4欄是出生年月日
+            if (birthday) {
+              const bdStr = Utilities.formatDate(new Date(birthday), 'Asia/Taipei', 'MM-dd');
+              if (bdStr === today) {
+                sendBirthdayNotification(userId, name);
+                Logger.log(`🎂 生日通知已發送: ${name}`);
+              }
+            }
+          }
+        }
+      } catch(e) {}
+
+      // 到職週年
+      const hireDate = row[EMPLOYEE_COL.HIRE_DATE];
+      if (hireDate) {
+        try {
+          const hd = new Date(hireDate);
+          const hireMMDD = Utilities.formatDate(hd, 'Asia/Taipei', 'MM-dd');
+          if (hireMMDD === today) {
+            const thisYear  = new Date().getFullYear();
+            const hireYear  = hd.getFullYear();
+            const years     = thisYear - hireYear;
+            if (years > 0) {
+              sendWorkAnniversaryNotification(userId, name, years);
+              Logger.log(`🎉 到職週年通知已發送: ${name} (${years}年)`);
+            }
+          }
+        } catch(e) {}
+      }
+    }
+
+    Logger.log('✅ 每日通知排程執行完成');
+  } catch (e) {
+    Logger.log('❌ runDailyNotifications: ' + e);
+  }
+}
+
+/**
+ * 批次發送薪資單通知（薪資計算完成後由管理員觸發）
+ */
+function sendBatchPayslipNotifications(params) {
+  try {
+    const session = handleCheckSession(params.token);
+    if (!session.ok) return { ok: false, msg: 'SESSION_INVALID' };
+    if (session.user.dept !== '管理員') return { ok: false, msg: '僅限管理員' };
+
+    const yearMonth = params.yearMonth;
+    if (!yearMonth) return { ok: false, msg: '請指定月份' };
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('月薪資記錄');
+    if (!sheet) return { ok: false, msg: '找不到月薪資記錄' };
+
+    const data = sheet.getDataRange().getValues();
+    let sent = 0, failed = 0;
+
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      if (String(row[3]) !== yearMonth) continue;
+      const userId      = String(row[1]);
+      const name        = String(row[2]);
+      const grossSalary = parseFloat(row[40]) || parseFloat(row[8]) || 0; // 應發 or 基本
+      const netSalary   = parseFloat(row[41]) || 0;
+
+      try {
+        const result = sendPayslipNotification(userId, name, yearMonth, grossSalary, netSalary);
+        if (result && result.ok) sent++;
+        else failed++;
+      } catch(e) {
+        failed++;
+      }
+      Utilities.sleep(200); // 避免 rate limit
+    }
+
+    return { ok: true, msg: `薪資單通知已發送：成功 ${sent} 筆，失敗 ${failed} 筆`, sent, failed };
+  } catch (e) {
+    Logger.log('❌ sendBatchPayslipNotifications: ' + e);
+    return { ok: false, msg: e.toString() };
+  }
+}
+
+/**
+ * 設定每日通知觸發器（管理員執行一次即可）
+ */
+function setupDailyNotificationTrigger() {
+  // 刪除舊的同名觸發器
+  ScriptApp.getProjectTriggers().forEach(t => {
+    if (t.getHandlerFunction() === 'runDailyNotifications') {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+  // 建立每天早上 9 點觸發
+  ScriptApp.newTrigger('runDailyNotifications')
+    .timeBased()
+    .atHour(9)
+    .everyDays(1)
+    .inTimezone('Asia/Taipei')
+    .create();
+  Logger.log('✅ 每日通知觸發器已設定（每天 09:00）');
+  return { ok: true, msg: '每日通知觸發器已設定（每天 09:00 台北時間）' };
+}

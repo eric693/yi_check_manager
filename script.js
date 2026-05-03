@@ -2180,10 +2180,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // UI切換邏輯
     const switchTab = (tabId) => {
         // 修改這一行，加入 'shift-view'
-        const tabs = ['dashboard-view', 'monthly-view', 'location-view', 'shift-view', 'admin-view', 'overtime-view', 'leave-view', 'salary-view', 'worklog-view'];
-        
-        // 修改這一行，加入 'tab-shift-btn'
-        const btns = ['tab-dashboard-btn', 'tab-monthly-btn', 'tab-location-btn', 'tab-shift-btn', 'tab-admin-btn', 'tab-overtime-btn', 'tab-leave-btn', 'tab-salary-btn', 'tab-worklog-btn'];
+        const tabs = ['dashboard-view', 'monthly-view', 'location-view', 'shift-view', 'admin-view', 'overtime-view', 'leave-view', 'salary-view', 'worklog-view', 'expense-view'];
+
+        const btns = ['tab-dashboard-btn', 'tab-monthly-btn', 'tab-location-btn', 'tab-shift-btn', 'tab-admin-btn', 'tab-overtime-btn', 'tab-leave-btn', 'tab-salary-btn', 'tab-worklog-btn', 'tab-expense-btn'];
     
         // 1. 移除舊的 active 類別和 CSS 屬性
         tabs.forEach(id => {
@@ -2238,10 +2237,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             initLeaveTab();
         } else if (tabId === 'salary-view') { // 👈 新增
             initSalaryTab();
-        } else if (tabId === 'worklog-view') { // 👈 新增
+        } else if (tabId === 'worklog-view') {
             initWorklogTab();
+        } else if (tabId === 'expense-view') {
+            initExpenseTab();
         }
-        
+
     };
     
     // 初始化拉桿
@@ -5260,4 +5261,141 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const saveBtn = document.getElementById('edit-shift-type-save-btn');
     if (saveBtn) saveBtn.addEventListener('click', adminSaveShiftType);
+
+    // 費用申報 tab 按鈕
+    const expenseBtn = document.getElementById('tab-expense-btn');
+    if (expenseBtn) expenseBtn.addEventListener('click', () => { switchTab('expense-view'); });
 });
+
+// ==================== 費用申報模組 ====================
+
+function initExpenseTab() {
+    // 設定今天日期
+    const dateEl = document.getElementById('expense-date');
+    if (dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
+
+    // 管理員才顯示審核區
+    const user = JSON.parse(localStorage.getItem('cachedUser') || '{}');
+    const adminSection = document.getElementById('expense-admin-section');
+    if (adminSection) adminSection.style.display = (user.dept === '管理員') ? 'block' : 'none';
+
+    loadMyExpenses();
+    if (user.dept === '管理員') loadPendingExpenses();
+}
+
+async function submitExpense() {
+    const category    = document.getElementById('expense-category').value;
+    const amount      = document.getElementById('expense-amount').value;
+    const expenseDate = document.getElementById('expense-date').value;
+    const description = document.getElementById('expense-description').value;
+    const msgEl       = document.getElementById('expense-submit-msg');
+
+    if (!amount || !expenseDate) {
+        if (msgEl) { msgEl.textContent = '請填寫金額與費用日期'; msgEl.className = 'mt-2 text-sm text-red-500'; }
+        return;
+    }
+
+    try {
+        const res = await callApifetch(`submitExpense&category=${encodeURIComponent(category)}&amount=${amount}&expenseDate=${expenseDate}&description=${encodeURIComponent(description)}`);
+        if (res.ok) {
+            if (msgEl) { msgEl.textContent = res.msg || '申報已送出'; msgEl.className = 'mt-2 text-sm text-emerald-600'; }
+            document.getElementById('expense-amount').value = '';
+            document.getElementById('expense-description').value = '';
+            await loadMyExpenses();
+        } else {
+            if (msgEl) { msgEl.textContent = res.msg || '送出失敗'; msgEl.className = 'mt-2 text-sm text-red-500'; }
+        }
+    } catch (e) {
+        if (msgEl) { msgEl.textContent = '網路錯誤'; msgEl.className = 'mt-2 text-sm text-red-500'; }
+    }
+}
+
+async function loadMyExpenses() {
+    const container = document.getElementById('my-expense-list');
+    if (!container) return;
+    container.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">載入中...</p>';
+
+    try {
+        const res = await callApifetch('getMyExpenses');
+        if (!res.ok || !res.records || !res.records.length) {
+            container.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">尚無費用申報記錄</p>';
+            return;
+        }
+
+        container.innerHTML = res.records.map(r => {
+            const statusColor = { '待審核': 'yellow', '核准': 'green', '拒絕': 'red' }[r.status] || 'gray';
+            const statusBg    = { '待審核': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
+                                   '核准':   'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+                                   '拒絕':   'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300' }[r.status] || 'bg-gray-100';
+            return `
+            <div class="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="font-semibold text-gray-800 dark:text-white">${r.category}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full font-medium ${statusBg}">${r.status}</span>
+                    </div>
+                    <p class="text-emerald-600 dark:text-emerald-400 font-bold text-lg">NT$ ${Number(r.amount).toLocaleString()}</p>
+                    <p class="text-xs text-gray-500">${r.expenseDate}${r.description ? ' ｜ ' + r.description : ''}</p>
+                    ${r.reviewComment ? `<p class="text-xs text-gray-400 mt-1">審核意見：${r.reviewComment}</p>` : ''}
+                </div>
+                <p class="text-xs text-gray-400 ml-3 whitespace-nowrap">${String(r.appliedAt).slice(0, 10)}</p>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        container.innerHTML = '<p class="text-red-400 text-sm text-center py-4">載入失敗</p>';
+    }
+}
+
+async function loadPendingExpenses() {
+    const container = document.getElementById('pending-expense-list');
+    if (!container) return;
+    const statusFilter = document.getElementById('expense-filter-status')?.value || '待審核';
+    container.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">載入中...</p>';
+
+    try {
+        const res = await callApifetch(`getPendingExpenses&status=${encodeURIComponent(statusFilter)}`);
+        if (!res.ok || !res.records || !res.records.length) {
+            container.innerHTML = `<p class="text-gray-400 text-sm text-center py-4">目前沒有「${statusFilter}」的費用申報</p>`;
+            return;
+        }
+
+        container.innerHTML = res.records.map(r => `
+            <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div class="flex items-start justify-between mb-2">
+                    <div>
+                        <span class="font-semibold text-gray-800 dark:text-white">${r.employeeName}</span>
+                        <span class="ml-2 text-xs text-gray-500">${r.category}</span>
+                    </div>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold text-lg">NT$ ${Number(r.amount).toLocaleString()}</span>
+                </div>
+                <p class="text-xs text-gray-500 mb-1">${r.expenseDate}${r.description ? ' ｜ ' + r.description : ''}</p>
+                ${r.status === '待審核' ? `
+                <div class="flex items-center gap-2 mt-3">
+                    <input type="text" id="expense-comment-${r.expenseId}" placeholder="審核意見（選填）"
+                           class="flex-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                    <button onclick="reviewExpense('${r.expenseId}','approve')"
+                            class="px-3 py-1 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium">核准</button>
+                    <button onclick="reviewExpense('${r.expenseId}','reject')"
+                            class="px-3 py-1 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium">拒絕</button>
+                </div>` : `<p class="text-xs text-gray-400">審核人：${r.reviewerName || '-'} ｜ ${r.reviewedAt || ''}</p>`}
+            </div>`
+        ).join('');
+    } catch (e) {
+        container.innerHTML = '<p class="text-red-400 text-sm text-center py-4">載入失敗</p>';
+    }
+}
+
+async function reviewExpense(expenseId, action) {
+    const comment = document.getElementById(`expense-comment-${expenseId}`)?.value || '';
+    try {
+        const res = await callApifetch(`reviewExpense&expenseId=${expenseId}&action=${action}&comment=${encodeURIComponent(comment)}`);
+        if (res.ok) {
+            showNotification(res.msg || '審核完成', 'success');
+            loadPendingExpenses();
+        } else {
+            showNotification(res.msg || '審核失敗', 'error');
+        }
+    } catch (e) {
+        showNotification('網路錯誤', 'error');
+    }
+}

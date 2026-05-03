@@ -351,7 +351,29 @@ function doGet(e) {
         return respond1(handleInitApp(e.parameter));
       case "testEndpoint":
         return respond1({ ok: true, msg: "CORS 測試成功!" });
-      
+
+      // ==================== 費用申報系統 ====================
+      case "submitExpense":
+        return respond1(handleSubmitExpense(e.parameter));
+      case "getMyExpenses":
+        return respond1(handleGetMyExpenses(e.parameter));
+      case "getPendingExpenses":
+        return respond1(handleGetPendingExpenses(e.parameter));
+      case "reviewExpense":
+        return respond1(handleReviewExpense(e.parameter));
+      case "getAllExpenses":
+        return respond1(handleGetAllExpenses(e.parameter));
+
+      // ==================== 勞基法合規警示 ====================
+      case "runComplianceCheck":
+        return respond1(runComplianceCheck(e.parameter));
+
+      // ==================== LINE 推播通知 ====================
+      case "sendBatchPayslipNotifications":
+        return respond1(sendBatchPayslipNotifications(e.parameter));
+      case "setupDailyNotificationTrigger":
+        return respond1(setupDailyNotificationTrigger());
+
       // ==================== 預設：返回 HTML 頁面 ====================
       default:
         return HtmlService.createHtmlOutputFromFile('index')

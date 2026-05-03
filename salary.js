@@ -2644,3 +2644,124 @@ async function loadSalaryAdvances() {
     listEl.innerHTML = '<span style="color:#f87171;">載入失敗</span>';
   }
 }
+
+// ==================== 勞基法合規自動警示 ====================
+
+async function runComplianceCheck() {
+  const monthEl  = document.getElementById('compliance-month');
+  const resultEl = document.getElementById('compliance-result');
+  if (!monthEl || !resultEl) return;
+
+  const yearMonth = monthEl.value || new Date().toISOString().slice(0, 7);
+  if (!yearMonth) { showNotification('請選擇月份', 'warning'); return; }
+
+  resultEl.innerHTML = '<span style="color:#94a3b8;">掃描中，請稍候...</span>';
+
+  try {
+    const res = await callApifetch('runComplianceCheck&yearMonth=' + yearMonth);
+    if (!res.ok) { resultEl.innerHTML = `<span style="color:#f87171;">掃描失敗：${res.msg}</span>`; return; }
+
+    const { violations, warnings, summary } = res;
+    const totalIssues = violations.length + warnings.length;
+
+    let html = `
+      <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div style="padding:0.75rem 1.25rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;">
+          <div style="font-size:0.75rem;color:#94a3b8;">掃描員工數</div>
+          <div style="font-size:1.5rem;font-weight:700;color:#10b981;">${summary.totalEmployees}</div>
+        </div>
+        <div style="padding:0.75rem 1.25rem;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;">
+          <div style="font-size:0.75rem;color:#94a3b8;">違規項目（紅燈）</div>
+          <div style="font-size:1.5rem;font-weight:700;color:#ef4444;">${summary.redCount}</div>
+        </div>
+        <div style="padding:0.75rem 1.25rem;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;">
+          <div style="font-size:0.75rem;color:#94a3b8;">警告項目（黃燈）</div>
+          <div style="font-size:1.5rem;font-weight:700;color:#f59e0b;">${summary.yellowCount}</div>
+        </div>
+      </div>`;
+
+    if (totalIssues === 0) {
+      html += '<div style="padding:1rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;color:#10b981;font-weight:600;">✅ 本月無合規問題，一切正常！</div>';
+    } else {
+      const renderItems = (items, level) => items.map(v => `
+        <div style="padding:0.75rem 1rem;border-radius:8px;margin-bottom:0.5rem;
+                    background:${level==='red'?'rgba(239,68,68,0.1)':'rgba(245,158,11,0.1)'};
+                    border-left:3px solid ${level==='red'?'#ef4444':'#f59e0b'};">
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
+            <span style="font-size:1rem;">${level==='red'?'🔴':'🟡'}</span>
+            <span style="font-weight:600;color:${level==='red'?'#fca5a5':'#fcd34d'}">${v.employeeName || ''}</span>
+            <span style="font-size:0.8rem;color:#94a3b8;">${v.message}</span>
+          </div>
+          <p style="font-size:0.75rem;color:#64748b;margin-left:1.5rem;">${v.detail}</p>
+        </div>`).join('');
+
+      if (violations.length) html += `<div style="margin-bottom:1rem;"><div style="font-size:0.8rem;font-weight:600;color:#fca5a5;margin-bottom:0.5rem;">🔴 違規項目（須立即處理）</div>${renderItems(violations, 'red')}</div>`;
+      if (warnings.length)   html += `<div><div style="font-size:0.8rem;font-weight:600;color:#fcd34d;margin-bottom:0.5rem;">🟡 警告項目（建議關注）</div>${renderItems(warnings, 'yellow')}</div>`;
+    }
+
+    resultEl.innerHTML = html;
+  } catch (err) {
+    console.error('runComplianceCheck error:', err);
+    resultEl.innerHTML = '<span style="color:#f87171;">掃描失敗，請稍後再試</span>';
+  }
+}
+
+// ==================== LINE 推播通知 ====================
+
+async function sendBatchPayslipNotifications() {
+  const monthEl  = document.getElementById('payslip-notify-month');
+  const resultEl = document.getElementById('notify-result');
+  if (!monthEl) return;
+
+  const yearMonth = monthEl.value || new Date().toISOString().slice(0, 7);
+  if (!yearMonth) { showNotification('請選擇月份', 'warning'); return; }
+
+  if (!confirm(`確定要發送 ${yearMonth} 的薪資單通知給所有員工嗎？`)) return;
+
+  if (resultEl) resultEl.textContent = '發送中...';
+
+  try {
+    const res = await callApifetch('sendBatchPayslipNotifications&yearMonth=' + yearMonth);
+    if (res.ok) {
+      showNotification(res.msg || '發送完成', 'success');
+      if (resultEl) resultEl.textContent = res.msg || '發送完成';
+    } else {
+      showNotification(res.msg || '發送失敗', 'error');
+      if (resultEl) resultEl.textContent = '發送失敗：' + (res.msg || '');
+    }
+  } catch (err) {
+    console.error('sendBatchPayslipNotifications error:', err);
+    if (resultEl) resultEl.textContent = '發送失敗';
+  }
+}
+
+async function setupDailyNotificationTrigger() {
+  if (!confirm('確定要啟用每日生日 / 到職週年通知嗎？（將在 GAS 設定每天 09:00 自動觸發）')) return;
+
+  const resultEl = document.getElementById('notify-result');
+  if (resultEl) resultEl.textContent = '設定中...';
+
+  try {
+    const res = await callApifetch('setupDailyNotificationTrigger');
+    if (res.ok) {
+      showNotification(res.msg || '每日通知觸發器已啟用', 'success');
+      if (resultEl) resultEl.textContent = res.msg || '已啟用';
+    } else {
+      showNotification(res.msg || '設定失敗', 'error');
+    }
+  } catch (err) {
+    console.error('setupDailyNotificationTrigger error:', err);
+    if (resultEl) resultEl.textContent = '設定失敗';
+  }
+}
+
+// ==================== salary.html 初始化時設定預設月份 ====================
+
+(function initSalaryPageDefaults() {
+  const now = new Date();
+  const ym  = now.toISOString().slice(0, 7);
+  ['compliance-month', 'payslip-notify-month'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value) el.value = ym;
+  });
+})()

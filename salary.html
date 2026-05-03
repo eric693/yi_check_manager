@@ -1687,6 +1687,41 @@
                         </div>
                     </div>
 
+                    <hr class="section-divider">
+
+                    <!-- 勞基法合規警示 -->
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="COMPLIANCE_CHECK_SECTION">勞基法合規自動警示</div>
+                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="COMPLIANCE_CHECK_DESC">自動掃描指定月份的出勤、加班與薪資資料，標出潛在違反勞基法的情況，以紅燈（違規）/ 黃燈（警告）提示。</p>
+                    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
+                        <input type="month" id="compliance-month" class="form-input" style="width:160px;">
+                        <button onclick="runComplianceCheck()"
+                                style="padding:0.6rem 1.5rem;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.5);color:#fca5a5;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_RUN_COMPLIANCE">
+                            執行合規掃描
+                        </button>
+                    </div>
+                    <div id="compliance-result" style="margin-top:0.5rem;"></div>
+
+                    <hr class="section-divider">
+
+                    <!-- LINE 推播通知 -->
+                    <div class="section-label" style="margin:1rem 0;" data-i18n="LINE_NOTIFY_SECTION">LINE 推播通知</div>
+                    <p style="color:#94a3b8;font-size:0.875rem;margin-bottom:1rem;" data-i18n="LINE_NOTIFY_DESC">批次發送薪資單通知給所有員工，或設定每日自動發送生日 / 到職週年提醒。</p>
+                    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
+                        <input type="month" id="payslip-notify-month" class="form-input" style="width:160px;">
+                        <button onclick="sendBatchPayslipNotifications()"
+                                style="padding:0.6rem 1.5rem;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.5);color:#a5b4fc;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SEND_PAYSLIP_NOTIFY">
+                            發送薪資單通知
+                        </button>
+                        <button onclick="setupDailyNotificationTrigger()"
+                                style="padding:0.6rem 1.5rem;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#6ee7b7;border-radius:8px;cursor:pointer;font-weight:600;"
+                                data-i18n="BTN_SETUP_DAILY_TRIGGER">
+                            啟用每日生日/週年通知
+                        </button>
+                    </div>
+                    <div id="notify-result" style="font-size:0.875rem;min-height:1.5rem;color:#10b981;"></div>
+
                 </div><!-- end system-config-content -->
             </div>
         </div>
