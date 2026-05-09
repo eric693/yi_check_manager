@@ -400,6 +400,16 @@ function doGet(e) {
       case "getKpiSummary":
         return respond1(handleGetKpiSummary(e.parameter));
 
+      // ==================== PDF 薪資單 ====================
+      case "generatePayslipPdf":
+        return respond1(handleGeneratePayslipPdf(e.parameter));
+      case "batchGeneratePayslipPdf":
+        return respond1(handleBatchGeneratePayslipPdf(e.parameter));
+
+      // ==================== 考勤報表 Excel 匯出 ====================
+      case "exportAttendanceExcel":
+        return respond1(handleExportAttendanceExcel(e.parameter));
+
       // ==================== 預設：返回 HTML 頁面 ====================
       default:
         return HtmlService.createHtmlOutputFromFile('index')
